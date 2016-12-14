@@ -1,5 +1,5 @@
-# JSPM Project Template 
-This repo contains the basic framework for a project that contains jspm, D3 and bootstrap css.
+# Interim Email 
+Prototype of interim data insights email
 
 ## Install
 First, run
