@@ -14,6 +14,10 @@ System.config({
   },
 
   map: {
+    // internal project scripts
+    "data": "scripts/data.js",
+    "startup": "scripts/startup.js",
+    // files in jspm_modules
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
