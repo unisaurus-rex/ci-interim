@@ -17,6 +17,7 @@ System.config({
     // internal project scripts
     "data": "scripts/data.js",
     "startup": "scripts/startup.js",
+    "model": "scripts/model/model.js",
     // files in jspm_modules
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
