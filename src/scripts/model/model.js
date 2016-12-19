@@ -4,7 +4,8 @@ import {dataJSON} from 'data';
 /***** model *****/
 var insightsData = JSON.parse(dataJSON, typeConverter);
 
-// revier callback from json.parse
+/***** Handle Insights Data *****/
+// reviver callback for json.parse
 // callback should return a value
 function typeConverter(key, value) {
   // reviver passes key as string
