@@ -4,6 +4,8 @@ import bootstrap from 'bootstrap-sass';
 
 /***** local packages *****/
 import {getInsightsData} from 'model';
+import Checkboxes from 'checkboxes';
 
-console.log(getInsightsData("sig_credit"));
-console.log(getInsightsData("sig_debit", "All Issuers"));
+ console.log(getInsightsData("sig_credit"));
+ console.log(getInsightsData("sig_debit", "All Issuers"));
+

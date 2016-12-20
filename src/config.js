@@ -15,6 +15,7 @@ System.config({
 
   map: {
     // internal project scripts
+    "checkboxes": "scripts/utils/checkboxes.js",
     "data": "scripts/data.js",
     "startup": "scripts/startup.js",
     "model": "scripts/model/model.js",

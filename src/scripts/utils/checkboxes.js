@@ -7,11 +7,13 @@ export default class Checkboxes {
     if(arguments.length == 1) {
       this.checkboxes = namesArr.reduce( (result, val) => {
         result[val] = false;
-      }, {}):
+        return result;
+      }, {});
     } else if (arguments.length == 2) {
       // use valuesArr to set starting value of each checkbox
       this.checkboxes = namesArr.reduce( (result, val, idx) => {
         result[val] = valuesArr[idx];
+        return result;
       }, {});
     } else {
       this.checkboxes = {};
