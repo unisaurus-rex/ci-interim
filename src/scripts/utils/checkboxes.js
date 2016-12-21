@@ -1,32 +1,45 @@
+/**
+ * @module checkboxes
+ */
+
+/** Track a group of checkboxes and their state (checked or unchecked) */
 export default class Checkboxes {
-  // namesArr: array of strings
-  // [Optional]  valuesArr: array of bools corresponding to each value in namesArr
+  /**
+   * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
+   * @param {string[]} namesArr - the name of each checkbox you want to track
+   * @param {bool[]} [valuesArr] - the starting value of each checkbox in nameArr, true means the checkbox is checked
+   */
   constructor(namesArr, valuesArr){
-    // only namesArr passed as argument
-    // initialize checkbox properties to false by default
+    // Case 1: only namesArr passed as argument, initialize checkbox properties to false by default
     if(arguments.length == 1) {
       this.checkboxes = namesArr.reduce( (result, val) => {
         result[val] = false;
         return result;
       }, {});
     } else if (arguments.length == 2) {
+      // case 2: namesArr and valuesArr provided
       // use valuesArr to set starting value of each checkbox
       this.checkboxes = namesArr.reduce( (result, val, idx) => {
         result[val] = valuesArr[idx];
         return result;
       }, {});
     } else {
-      this.checkboxes = {};
+      // case 3: throw an error 
+      throw new Error('Attempted to instantiate Checkboxes class with no parameters');
     }
 
   }
 
-  // return all checkbox names and values as an object
+  /**
+   * Return an object containing all checkbox names and values
+   */
   getAll() {
     return this.checkboxes;
   }
 
-  // return an array of all properties whose value is true
+  /**
+   * return an array of all properties whose value is true
+   */ 
   getAllChecked() {
     // get array of checkbox names
     let keys = Object.keys(this.checkboxes);
@@ -38,10 +51,18 @@ export default class Checkboxes {
     });
   }
 
+  /**
+   * Return the value belonging to the checkbox associated with name
+   * @param {string} name - name of the checkbox
+   */
   getValue(name) {
     return this.checkboxes[name];
   }
 
+  /**
+   * Flip the value of the checkbox associated with name
+   * @param {string} name - name of the checkbox
+   */
   toggle(name) {
     this.checkboxes[name] = !this.checkboxes[name];
   }

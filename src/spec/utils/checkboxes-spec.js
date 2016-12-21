@@ -24,11 +24,24 @@ describe("Checkboxes: ", function() {
   });
 
   describe("initialized with no parameters", function() {
-    var cbox = new Checkboxes();
-
-    it("creates an empty object", function() {
-      expect(cbox.getAll() ).toEqual({});
+    var err;
+    
+    beforeAll(function() {
+      try {
+        var c = new Checkboxes();
+      }
+      catch(e) {
+        err = e;
+      }
     });
     
+    it("throws an error", function() {
+      expect(err).toBeDefined();
+    });
+
+    it("the error message is not empty ", function() {
+      expect(err.message.length).toBeGreaterThan(0);
+    });
+       
   });
 });

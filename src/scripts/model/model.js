@@ -1,12 +1,42 @@
+/**
+ *@module model
+ *@description model depends on a json file of insights data existing
+ * the model presumes that the data is formatted as specified in
+ * the csv-parser project (https://github.com/unisaurus-rex/csv-parser) 
+ */
+
 /***** local packages *****/
 import {dataJSON} from 'data';
 
 /***** model *****/
 var insightsData = JSON.parse(dataJSON, typeConverter);
 
-/***** Handle Insights Data *****/
-// reviver callback for json.parse
-// callback should return a value
+/**
+ * public interface for retrieving data
+ * @function getInsightsData
+ * @param {string} txn_type - transaction type you want to retrieve data for
+ * @param {string} [fi] - financial instituation you want to retrieve data for  
+ * @returns {Obj}
+ * @description retrieve data for a specific transaction type, or optionally, a fi of a transaction type
+ */
+export function getInsightsData(txn_type, fi) {
+  var o = insightsData[txn_type];
+
+  if(fi){
+    return o[fi];
+  }
+
+  return o;
+}
+
+/**
+ * reviver callback passed as second argument to JSON.parse
+ * @function typeConverter
+ * @param {string} key - key from a json string
+ * @param {string} value - value belonging to key in json string
+ * @returns {float | int}
+ * @description convert a data value from a json string to the appropriate type
+ */
 function typeConverter(key, value) {
   // reviver passes key as string
   switch (key) {
@@ -44,12 +74,4 @@ function typeConverter(key, value) {
 
 }
 
-export function getInsightsData(txn_type, fi) {
-  var o = insightsData[txn_type];
 
-  if(fi){
-    return o[fi];
-  }
-
-  return o;
-}
