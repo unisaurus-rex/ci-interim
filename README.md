@@ -87,3 +87,9 @@ When you try to run your new spec, you may encounter errors loading files import
 1) The Karma server serves all files from /base/<your path starts here>
 
 2) karma-jspm is a karma plugin that allows us to use our jspm/es6 modules with Karma and Jasmine. In some instances Karma's server paths may cause conflicts with the paths set up in the jspm config.js file.  To work around this, there is a jspm object in karma.conf.js that can be used to tell Karma how to reconfigure paths for testing only.
+
+## Modules
+### Model
+The Model module reads a json string that represents the insights data and exposes a function for retrieving subsections of the data.  See the [csv-parser repo](https://github.com/unisaurus-rex/csv-parser) for more details about the structure of the data.
+### Checkboxes
+The default export from the Checkboxes module is the Checkboxes class.  Use this class for tracking the state of a checkbox or checkboxes. A checkbox can have a value of either ```true``` or ```false```.  The class considers a checkbox to be checked if it has a value of ```true```. The class exposes methods for getting the values of a single checkbox or all checkboxes, toggling a checkbox, and retrieving an a list of all boxes that are currently checkbox.
