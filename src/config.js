@@ -10,23 +10,22 @@ System.config({
   },
   paths: {
     "github:*": "jspm_packages/github/*",
-    "npm:*": "jspm_packages/npm/*"
+    "npm:*": "jspm_packages/npm/*",
+    "*": "scripts/*"
   },
 
   map: {
-    // internal project scripts
-    "checkboxes": "scripts/utils/checkboxes.js",
-    "data": "scripts/data.js",
-    "startup": "scripts/startup.js",
-    "model": "scripts/model/model.js",
-    // files in jspm_modules
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
+    "checkboxes": "scripts/utils/checkboxes.js",
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
+    "data": "scripts/data.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "jquery": "npm:jquery@3.1.1",
+    "model": "scripts/model/model.js",
+    "startup": "scripts/startup.js",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },
