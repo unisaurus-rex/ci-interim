@@ -1,7 +1,23 @@
 // Add custom font
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,700,300);
-$font-family-base: Foundry Context;
 
+@font-face { font-family: 'FoundryContext-RegularItalic'; 
+src: url('webfont/FoundryContext-RegularItalic.eot?#iefix') format('embedded-opentype'), 
+url('webfont/FoundryContext-RegularItalic.otf') format('opentype'), 
+url('webfont/FoundryContext-RegularItalic.woff') format('woff'), 
+url('webfont/FoundryContext-RegularItalic.ttf') format('truetype'), 
+url('webfont/FoundryContext-RegularItalic.svg#FoundryContext-RegularItalic') format('svg'); 
+font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'FoundryContext-Regular'; src: url('webfont/FoundryContext-Regular.eot?#iefix') format('embedded-opentype'), url('webfont/FoundryContext-Regular.otf') format('opentype'), url('webfont/FoundryContext-Regular.woff') format('woff'), url('webfont/FoundryContext-Regular.ttf') format('truetype'), url('webfont/FoundryContext-Regular.svg#FoundryContext-Regular') format('svg'); font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'FoundryContext-Medium'; src: url('webfont/FoundryContext-Medium.eot?#iefix') format('embedded-opentype'), url('webfont/FoundryContext-Medium.otf') format('opentype'), url('webfont/FoundryContext-Medium.woff') format('woff'), url('webfont/FoundryContext-Medium.ttf') format('truetype'), url('webfont/FoundryContext-Medium.svg#FoundryContext-Medium') format('svg'); font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'FoundryContext-ExtraBold'; src: url('webfont/FoundryContext-ExtraBold.eot?#iefix') format('embedded-opentype'), url('webfont/FoundryContext-ExtraBold.otf') format('opentype'), url('webfont/FoundryContext-ExtraBold.woff') format('woff'), url('webfont/FoundryContext-ExtraBold.ttf') format('truetype'), url('webfont/FoundryContext-ExtraBold.svg#FoundryContext-ExtraBold') format('svg'); font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'FoundryContext-Demi'; src: url('webfont/FoundryContext-Demi.eot?#iefix') format('embedded-opentype'), url('webfont/FoundryContext-Demi.otf') format('opentype'), url('webfont/FoundryContext-Demi.woff') format('woff'), url('webfont/FoundryContext-Demi.ttf') format('truetype'), url('webfont/FoundryContext-Demi.svg#FoundryContext-Demi') format('svg'); font-weight: normal; font-style: normal; }
+
+@font-face { font-family: 'FoundryContext-Bold'; src: url('webfont/FoundryContext-Bold.eot?#iefix') format('embedded-opentype'), url('webfont/FoundryContext-Bold.otf') format('opentype'), url('webfont/FoundryContext-Bold.woff') format('woff'), url('webfont/FoundryContext-Bold.ttf') format('truetype'), url('webfont/FoundryContext-Bold.svg#FoundryContext-Bold') format('svg'); font-weight: normal; font-style: normal; }
 
 
 // Import bootstrap and fontawesome
