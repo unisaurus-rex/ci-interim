@@ -1,0 +1,76 @@
+
+.fill-brand-info{
+  fill: $brand-info;
+}
+.fill-gray{
+  fill: $gray;
+}
+.fill-danger{
+  fill: $brand-danger;
+}
+.fill-success{
+  fill: $brand-success;
+}
+.fill-warning{
+  fill: $brand-warning;
+}
+
+.fill-blue{
+  fill: $vantiv-blue;
+}
+
+.fill-teal{
+  fill: $vantiv-teal;
+}
+
+.fill-orange-yellow{
+  fill: $vantiv-orange-yellow;
+}
+
+.fill-red{
+  fill: $vantiv-red;
+}
+.fill-gray-light{
+  fill: $gray-light;
+}
+
+.fill-gray-dark{
+  fill: $gray-dark;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: $gray-light;
+  opacity: 0.1;
+  shape-rendering: crispEdges;
+}
+
+.tick line{
+  opacity: 0.9;
+  fill: $gray;
+}
+
+.svg-content-responsive {
+  //axes
+  padding-left: 5em;
+  padding-top: 3em;
+  padding-bottom: 3em;
+  //scale graph
+  width: 100%;
+}
+
+#chartid{
+  background-color: white;
+}
+
+//donut
+$donut-width: 50%;
+svg.svg-content-responsive-pie{
+  display: block;
+  margin: auto;
+  width: $donut-width;
+  height: $donut-width;
+  padding: 2%;
+  overflow: visible;
+}

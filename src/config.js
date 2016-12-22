@@ -14,6 +14,9 @@ System.config({
   },
 
   map: {
+    "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
+    "table": "scripts/charts/table/table.js",
+    "donut": "scripts/charts/donut/donut.js",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
