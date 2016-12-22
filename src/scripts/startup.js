@@ -24,3 +24,4 @@ var cback = (value) => {
 };
 
 addCheckboxObserver(cboxEl, cback);
+

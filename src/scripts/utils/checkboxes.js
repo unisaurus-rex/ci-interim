@@ -120,3 +120,19 @@ function mutationFuncBuilder(callback) {
   }
 }
 
+/* Notes
+One function to add observers for every checkbox
+function addObservers(elementIds, value attribute of each element, default value of each value(true or false), callback(takes array of strings for each checked item)
+// this builds a callback that can be passed to mutation observer
+{
+CallbackBuilder(value, defaults, callback) {
+new Checkboxes (values, defaults)
+function(checkboxes, callback) {
+  return function(value){
+    callback(checkboxes.toggle(value));
+}}
+}
+}
+
+// for each id in id array, build new mutation observer with id and callback
+*/
