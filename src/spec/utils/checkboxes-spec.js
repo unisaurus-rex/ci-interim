@@ -1,4 +1,4 @@
-import Checkboxes from 'checkboxes'; 
+import {Checkboxes} from 'checkboxes'; 
 
 describe("Checkboxes: ", function() {
   describe("initialized with one parameter", function() {
@@ -43,5 +43,19 @@ describe("Checkboxes: ", function() {
       expect(err.message.length).toBeGreaterThan(0);
     });
        
+  });
+
+  describe("toggle function", function() {
+    var cbox = new Checkboxes(['one', 'two', 'three'], [true, false, false]);
+    var checkedArr = cbox.toggle('one');
+
+    it("flips the value of the toggle box", function() {
+      expect(cbox.getValue('one')).toBe(false);
+    });
+
+    it("returns array of checkboxes that are checked", function() {
+      expect(checkedArr.length).toBe(0);
+    });
+    
   });
 });

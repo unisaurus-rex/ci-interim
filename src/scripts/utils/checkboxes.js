@@ -3,7 +3,7 @@
  */
 
 /** Track a group of checkboxes and their state (checked or unchecked) */
-export default class Checkboxes {
+export class Checkboxes {
   /**
    * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
    * @param {string[]} namesArr - the name of each checkbox you want to track
@@ -62,9 +62,61 @@ export default class Checkboxes {
   /**
    * Flip the value of the checkbox associated with name
    * @param {string} name - name of the checkbox
+   * @returns {array}
    */
   toggle(name) {
     this.checkboxes[name] = !this.checkboxes[name];
+    return this.getAllChecked();
   }
 
 }
+
+/*
+ * @function addObserver
+ * @param el {DOM Node} a dom element 
+ * @param callback {function} a function to execute when a checkbox is checked or
+ *        unchecked.  The function will receive no arguments.
+ * @description execute a callback function when a bootstrap checkbox is checked
+ *              or unchecked
+ */
+export function addCheckboxObserver(el, callback) {
+  // wrap the callback so it can be used if the mutation alters the checkbox
+  var mutationFunc = mutationFuncBuilder(callback);
+  var observer = new MutationObserver(function(mutations){
+    mutations.forEach(mutationFunc);
+  });
+
+  // mutation observer config object, use oldValue: true so we can compare current value to old value
+  // otherwise we won't be able to tell if the active value changed
+  var config = {attributes: true, attributeOldValue: true, attributeFilter: ['class']};
+
+  // apply the observer to el
+  observer.observe(el, config);
+}
+
+/**
+ * Return a function that can be called by mutation observer
+ * @function mutationFuncBuilder
+ * @param {function} callback - function that takes a checkbox value 
+ */
+function mutationFuncBuilder(callback) {
+  return function(mutation) {
+    /* mutation will track the old and new value, two cases that we care about
+       1) added active class to the label
+       2) removed active class from the label
+       mutation will fire anytime a class is added or removed, the class may or may
+       not be the active class that signals a checkbox click
+       so we check to see if the active class is the class that changed betwee old and new
+    */
+    var newHasActive = mutation.target.classList.contains('active');
+    var oldHasActive = mutation.oldValue.includes('active');
+    if( (newHasActive && !oldHasActive) || (oldHasActive && !newHasActive) ){
+      var elArr =  mutation.target.getElementsByTagName('input');
+      if(elArr.length) {
+        var inputEl = elArr[0];
+        callback(inputEl.value);
+      }
+    }
+  }
+}
+
