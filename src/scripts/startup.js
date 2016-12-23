@@ -4,7 +4,8 @@ import bootstrap from 'bootstrap-sass';
 
 /***** local packages *****/
 import {getInsightsData} from 'model';
-import {Checkboxes, addCheckboxObserver, mutationFuncBuilder} from 'checkboxes';
+import Checkboxes from 'checkboxes';
+import {addCheckboxObserver, mutationFuncBuilder} from 'checkboxObserver';
 
 // console.log(getInsightsData("sig_credit"));
 // console.log(getInsightsData("sig_debit", "All Issuers"));

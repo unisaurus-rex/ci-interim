@@ -1,4 +1,4 @@
-import {Checkboxes} from 'checkboxes'; 
+import Checkboxes from 'checkboxes'; 
 
 describe("Checkboxes: ", function() {
   describe("initialized with one parameter", function() {
