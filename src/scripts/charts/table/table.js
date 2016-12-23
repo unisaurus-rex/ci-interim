@@ -4,7 +4,7 @@ export default function tableChart() {
 
 
   function buildTable(container, data) {
-
+    
     // declare variables for Table Head and Body
     var thead = container.select("thead");
     var tbody = container.select("tbody");

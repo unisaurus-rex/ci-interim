@@ -10,10 +10,11 @@ import tableChart from 'table';
 import donutChart from 'donut';
 import * as d3 from "d3";
 
- console.log(getInsightsData("sig_credit"));
- console.log(getInsightsData("sig_debit", "All Issuers"));
+// getInsightsData("sig_credit") will pull all the transacation data for every FI ("
+console.log(getInsightsData("sig_credit"));
+console.log(getInsightsData("sig_debit", "All Issuers"));
 
- var insightsData = getInsightsData("sig_credit");
+
 
 /***************** Grouped Bar Chart ****************/
 //chart parameters
@@ -178,7 +179,82 @@ test(svg, jsonObj);
 
 
 /***************** TABLE ****************/
+
+
+
+/**
+
+ Load all the FIs into an array to store the different tables for each FI.
+
+ A call to getInsigtsData("sig_credit") returns an Object with keys = FIs and
+ values are an array of objects
+
+ Object {All Issuers: Array[{ amt_fee: 684.33,
+                              amt_sale: 322.3,
+                              avg_fee: 0.54223,
+                              fee_pc: 1.9332,
+                              mcc: "5311",
+                              mcc_name: "Department Store",
+                              n_card: 4432,
+                              n_trans: 3322,
+                              sale_pc: 112.65,
+                              trans_pc: 3.223},
+                            { amt_fee: 684.33, ... mcc_name: "Grocery", ... },
+                            { amt_fee: 684.33, ... mcc_name: "Family Clothing", ... },
+                            { amt_fee: 684.33, ... mcc_name: "Fast Food", ... },
+                            { amt_fee: 684.33, ... mcc_name: "Pharmacies", ... },
+                            { amt_fee: 684.33, ... mcc_name: "Total", ... }],
+        Issuer 1: Array[6],
+        Issuer 2: Array[6],
+        Issuer 3: Array[6],
+        Issuer CUs: Array[6],
+        My Finantical Institution: Array[6]}
+
+ calling Object.keys(getInsightsData("sig_credit")) will return an array of only the FIs
+ e.g ["All Issuers", "Issuer 1", "Issuer 2", "Issuer 3", "Issuer CUs", "My Financial Institutions"]
+
+
+ */
+var FIs = Object.keys(getInsightsData("sig_credit"));
+console.log("FIs = ", FIs);
+
+/**
+ call all data belonging to a specific FI, "All Issuers"
+ returns an array of Objects
+ each Object contains transaction data -> {amt_fee: 6435, amt_sale: 3221, etc.}
+ for each mcc_name (Department Store, Grocery, Family Clothing, Fast Food, Pharmacies, Total)
+ */
+var insightsData = getInsightsData("sig_credit", FIs[0]);
+console.log("var insightsData = ", getInsightsData("sig_credit", FIs[0]));
+
+
+console.log("values of insightsData = ", Object.values(insightsData));
+
+/** store all the values into tableData [{amt_fee: 684.33, ...}{...},{...},{...},{...}] **/
+var tableData = Object.values(insightsData);
+
+/** create a columns property that has all the keys in the array of objects ["amt_fee", "amt_sale", ...] **/
+tableData.columns = Object.keys(insightsData[0]);
+
+/** shows all the different mcc_names for a specific FI ["Department Store", "Grocery", ...] **/
+insightsData.forEach(function(element) {console.log("element: ", element.mcc_name);});
+console.log(insightsData[FIs[0]]);
+console.log("tableData: ", tableData);
+
+
 //Create basic table with class of table for bootstrap
+
+/**
+ * create a title for the table that specifies which FI table is being displayed
+ * This can be built on later to swap tables between FIs by using the FIs array
+ * For now it is just taking the first element, FIs[0] which = "All Issuers" to
+ *
+ **/
+var title = d3.select("#drawtable")
+    .select("#tablename")
+    .append("p")
+    .text(FIs[0]); // "All Issuers"
+
 var table = d3.select("#drawtable")
     .append("table")
     .attr("class", "table");
@@ -191,10 +267,12 @@ var table = d3.select("#drawtable")
 var drawTable = tableChart();
 
 //call data and then return table with data inside
-d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
-  drawTable(d3.select("#drawtable"), data);
-});
+// d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
+//   console.log(data);
+//   drawTable(d3.select("#drawtable"), data);
+// });
 
+drawTable(d3.select("#drawtable"), tableData);
 
  /***************** DONUT ****************/
 var svg = d3.select("div#donutid")
