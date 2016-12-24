@@ -4,6 +4,42 @@
 import Checkboxes from 'checkboxes';
 
 /**
+ * Respond to bootstrap checkboxes being checked
+ * @function addBootstrapCheckboxObservers
+ * @param elementIds {string[]} elementIds - id strings for each checkbox to observer, strings should not contain a '#'
+ * @param values (string[]} values - values - strings corresponding to the value attributes of a group of checkboxes
+ * @param {boolean[]} defaults - default value of a group of checkbox input elements
+ * @param {changeCallback} callback 
+ */
+export default function addBootstrapCheckboxObservers(elementIds, values, defaults, callback) {
+  // build the callback that is passed to addCheckboxObserver 
+  var changeCallback = checkboxChangeBuilder(values, defaults, callback);
+
+  // get the DOM element tied to each id
+  var domEls = elementIds.map( (id) => document.getElementById(id) );
+
+  // add observers for each item
+  domEls.forEach( (el) => addCheckboxObserver(el, changeCallback) );  
+}
+
+/**
+ * Expose a way to track checkbox toggling it that can be used by other functions
+ * to drive their behavior
+ * @function checkboxChangeBuilder 
+ * @param {string[]} values - strings corresponding to the value attributes of a group of checkboxes 
+ * @param {boolean[]} defaults - default value of a group of checkbox input elements
+ * @param {changeCallback} callback  
+ * @returns {function} a function that accepts a single value, this function can be passed to mutationFuncBuilder  
+ */
+function checkboxChangeBuilder(values, defaults, callback) {
+  var boxes = new Checkboxes(values, defaults);
+
+  return function(value){
+    callback( boxes.toggle(value) ); 
+  };
+}
+
+/**
  * @callback changeCallback
  * @param {string[]} string values associated with the value attribute of input checkboxes
  */
@@ -14,7 +50,7 @@ import Checkboxes from 'checkboxes';
  * @param callback {function} function returned by checkboxChangeBuilder
  * @description execute a callback function when a bootstrap checkbox is checkedi or unchecked
  */
-export function addCheckboxObserver(el, callback) {
+function addCheckboxObserver(el, callback) {
   // wrap the callback so it can be used if the mutation alters the checkbox
   var mutationFunc = mutationFuncBuilder(callback);
   var observer = new MutationObserver(function(mutations){
@@ -53,53 +89,5 @@ function mutationFuncBuilder(changeCallback) {
         changeCallback(inputEl.value);
       }
     }
-  };
-}
-
-/**
- * Respond to bootstrap checkboxes being checked
- * @function addBootstrapCheckboxObservers
- * @param elementIds {string[]} elementIds - id strings for each checkbox to observer, strings should not contain a '#'
- * @param values (string[]} values - values - strings corresponding to the value attributes of a group of checkboxes
- * @param {boolean[]} defaults - default value of a group of checkbox input elements
- * @param {changeCallback} callback 
- */
-function addBootstrapCheckboxObservers(elementIds, values, defaults, callback) {
-  /* Notes
-     One function to add observers for every checkbox
-     function addObservers(elementIds, value attribute of each element, default value of each value(true or false), callback(takes array of strings for each checked item)
-     // this builds a callback that can be passed to mutation observer
-     {
-     CallbackBuilder(value, defaults, callback) {
-     new Checkboxes (values, defaults)
-     function(checkboxes, callback) {
-     return function(value){
-     callback(checkboxes.toggle(value));
-     }}
-     }
-     }
-
-     Add observers steps:
-     - call checkboxChangeBuilder 
-     for each id in id array
-     - get DOM element by id
-     - call addCheckboxObserver with element and result of observerCallbackBuilder
-  */
-}
-
-/**
- * Expose a way to track checkbox toggling that can be used by other functions
- * to drive their behavior
- * @function checkboxChangeBuilder 
- * @param {string[]} values - strings corresponding to the value attributes of a group of checkboxes 
- * @param {boolean[]} defaults - default value of a group of checkbox input elements
- * @param {changeCallback} callback  
- * @returns {function} a function that accepts a single value, this function can be passed to mutationFuncBuilder  
- */
-function checkboxChangeBuilder(values, defaults, callback) {
-  var boxes = new Checkboxes(values, defaults);
-
-  return function(value){
-    callback( boxes.toggle(value) ); 
   };
 }
