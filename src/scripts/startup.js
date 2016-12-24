@@ -23,4 +23,9 @@ var cback = (arr) => {
   }
 };
 
-addBootstrapCheckboxObservers(ids, vals, defaults, cback);
+var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
+    .values(vals)
+    .defaults(defaults)
+    .callback(cback);
+
+observersFunc();

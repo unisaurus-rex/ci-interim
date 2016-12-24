@@ -4,22 +4,72 @@
 import Checkboxes from 'checkboxes';
 
 /**
+ * @callback changeCallback
+ * @param {string[]} string values associated with the value attribute of input checkboxes
+ */
+
+
+/**
  * Respond to bootstrap checkboxes being checked
  * @function addBootstrapCheckboxObservers
- * @param elementIds {string[]} elementIds - id strings for each checkbox to observer, strings should not contain a '#'
- * @param values (string[]} values - values - strings corresponding to the value attributes of a group of checkboxes
- * @param {boolean[]} defaults - default value of a group of checkbox input elements
- * @param {changeCallback} callback 
+ * @returns {function} configurable function a la Mike Bostock style
  */
-export default function addBootstrapCheckboxObservers(elementIds, values, defaults, callback) {
-  // build the callback that is passed to addCheckboxObserver 
-  var changeCallback = checkboxChangeBuilder(values, defaults, callback);
+export default function addBootstrapCheckboxObservers() {
 
-  // get the DOM element tied to each id
-  var domEls = elementIds.map( (id) => document.getElementById(id) );
+  var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style) 
+      values, // array of strings, each string is the value attribute of an input checkbox
+      defaults, // array of bools, the starting state of each checkbox in values, true = checked 
+      callback; // changeCallback
 
-  // add observers for each item
-  domEls.forEach( (el) => addCheckboxObserver(el, changeCallback) );  
+  function observers() {
+    // build the callback that is passed to addCheckboxObserver 
+    var changeCallback = checkboxChangeBuilder(values, defaults, callback);
+
+    // get the DOM element tied to each id
+    var domEls = elementIds.map( (id) => document.getElementById(id) );
+
+    // add observers for each item
+    domEls.forEach( (el) => addCheckboxObserver(el, changeCallback) );  
+  }
+
+  // configuration functions (getters and setters)
+  observers.elementIds = function(arr) {
+    if(!arguments.length) {
+      return elementIds;
+    }
+
+    elementIds = arr;
+    return observers;
+  };
+
+  observers.values = function(arr) {
+    if(!arguments.length) {
+      return values;
+    }
+
+    values = arr;
+    return observers;
+  };
+
+  observers.defaults = function(arr) {
+    if(!arguments.length) {
+      return defaults;
+    }
+
+    defaults = arr;
+    return observers;
+  };
+
+  observers.callback = function(func) {
+    if(!arguments.length) {
+      return callback;
+    }
+
+    callback = func;
+    return observers;
+  };
+
+  return observers;
 }
 
 /**
@@ -38,11 +88,6 @@ function checkboxChangeBuilder(values, defaults, callback) {
     callback( boxes.toggle(value) ); 
   };
 }
-
-/**
- * @callback changeCallback
- * @param {string[]} string values associated with the value attribute of input checkboxes
- */
 
 /*
  * @function addObserver
