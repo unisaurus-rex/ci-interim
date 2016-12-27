@@ -6,16 +6,19 @@ import bootstrap from 'bootstrap-sass';
 import {getInsightsData} from 'model';
 import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
+import groupedBarController from 'groupedBarController';
 import tableChart from 'table';
 import donutChart from 'donut';
 import * as d3 from "d3";
 
- console.log(getInsightsData("sig_credit"));
- console.log(getInsightsData("sig_debit", "All Issuers"));
-
- var insightsData = getInsightsData("sig_credit");
+// console.log(getInsightsData("sig_credit"));
+// console.log(getInsightsData("sig_debit", "All Issuers"));
 
 /***************** Grouped Bar Chart ****************/
+
+//get data from controller
+var groupedBarData = groupedBarController();
+
 //chart parameters
 var width = 500;
 var height = 100;
@@ -23,6 +26,7 @@ var margin = {top: 20, right: 20, bottom: 0, left: 0};
 width = width - margin.right - margin.left;
 height = height - margin.top - margin.bottom;
 
+//create svg
 var svg = d3.select("div#chartid")
   .append("div")
   .classed("svg-container", true)
@@ -42,80 +46,19 @@ var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
 //formatting for y axis
-var formatPercent = d3.format(".1%");
+var formatPercent = function(d){ return d + "%"};
 
 //define function to define range for a group
 var groupRangeFunction = function(d) {return "translate(" + x0(d.Issuer) + ",0)"; };
-  
-var jsonObj = [
-  {
-    "Issuer": "Issuer 1",
-    "Department Store": 0.0175,
-    "Pharmacies": 0.0045,
-    "Fast Food": 0.0125,
-    "Grocery": 0.015,
-    "Family Clothing": 0.0175,
-    "Total": 0.014
-  },
-  {
-    "Issuer": "Issuer 2",
-    "Department Store": 0.004,
-    "Pharmacies": 0.006,
-    "Fast Food": 0.004,
-    "Grocery": 0.003,
-    "Family Clothing": 0.0174,
-    "Total": 0.016
-  },
-  {
-    "Issuer": "Issuer 3",
-    "Department Store": 0.0075,
-    "Pharmacies": 0.014,
-    "Fast Food": 0.01,
-    "Grocery": 0.012,
-    "Family Clothing": 0.0025,
-    "Total": 0.02
-  },
-  {
-    "Issuer": "Issuer 4",
-    "Department Store": 0.0114,
-    "Pharmacies": 0.019,
-    "Fast Food": 0.015,
-    "Grocery": 0.016,
-    "Family Clothing": 0.014,
-    "Total": 0.019
-  },
-  {
-    "Issuer": "Your Issues",
-    "Department Store": 0.008,
-    "Pharmacies": 0.02,
-    "Fast Food": 0.004,
-    "Grocery": 0.0075,
-    "Family Clothing": 0.01,
-    "Total": 0.015
-  },
-  {
-    "Issuer": "All",
-    "Department Store": 0.01,
-    "Pharmacies": 0.015,
-    "Fast Food": 0.005,
-    "Grocery": 0.006,
-    "Family Clothing": 0.0025,
-    "Total": 0.02
-  }
-];
-
-var jsonGroupNames = d3.keys(jsonObj[0]).filter(function(key) { return key !== "Issuer"; });
-
-jsonObj.forEach(function(d) {
-  d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-});
-
 
 //create scales
 var x0 = d3.scaleBand()
   .rangeRound([0, width])
-  .domain(jsonObj.map(function(d) { return d.Issuer; }))
+  .domain(groupedBarData.map(function(d) { return d.Issuer; }))
 ;
+console.log( groupedBarData)
+
+var jsonGroupNames = groupedBarData.columns;
 
 var x1 = d3.scaleBand()
   .paddingOuter(1)
@@ -124,10 +67,10 @@ var x1 = d3.scaleBand()
 ; 
 var y = d3.scaleLinear()
   .range([height, 0])
-  .domain([0, d3.max(jsonObj, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
+  .domain([0, d3.max(groupedBarData, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
 ;
 
-//axes
+//create axes
 var xAxis = d3.axisBottom()
   .scale(x0)
   .tickSizeInner(-height)
@@ -174,7 +117,7 @@ var test = groupedBarChart()
 
 window.test=test;
 
-test(svg, jsonObj);
+test(svg, groupedBarData);
 
 
 /***************** TABLE ****************/
@@ -196,7 +139,30 @@ d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
 });
 
 
- /***************** DONUT ****************/
+ /***************** DONUT SIGNATURE DEBIT INTERRCHANGE FEES ****************/
+
+
+ /***** USED FOR ALL DONUTS *****/
+//get data for donuts
+var myFinancialInstitution = getInsightsData("sig_debit", "My Financial Institution");
+
+//remove total from data
+myFinancialInstitution.splice(5, 1);
+
+var constancyFunction = function(d){
+  return d.mcc_name;
+}
+
+var classMapFunction = function(d){
+  return classMap[d.data.mcc_name];
+}
+
+var classMap = {"Department Store": "fill-blue", "Grocery": "fill-red",
+ "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+  "Pharmacies": "fill-teal"};
+
+
+// Donut 1 (AVG INTERCHANGE)
 var svg = d3.select("div#donutid")
   .classed("svg-container", true)
   .append("svg")
@@ -210,130 +176,103 @@ var svg = d3.select("div#donutid")
   .attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")")
 ;
 
-function type(d) {
-  d.number = +d.number;
-  return d;
-}
-
-/*
-var test = donutChart()
-  .innerText("NEW TEXT")
-  .padAngle(0.03)
-  .hoverRad(15)
-;
-
-d3.csv("scripts/donut/donutdata.csv", type, function(error, data) {
-  test(svg, data);
-  var filtered = data.filter( function(d){
-    if ( d.transactionType == "declines")
-      return true;
-    return false;
-  });
-
-  window.test = test;
-  window.filtered = filtered;
-  window.svg = svg;
-  window.data = data;
-});*/
-
-
-var jsonData = [
-  {
-    "mcc_name": "Department Store",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Grocery",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Family Clothing",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Fast Food",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Pharmacies",
-    "avg_fee": 0.29486
-  }
-];
-
 var valueFunction = function(d){
   return d.avg_fee;
 }
-var constancyFunction = function(d){
-  return d.mcc_name;
-}
-var classMapFunction = function(d){
-  return classMap[d.data.mcc_name];
-}
 
-//This data would be received by the controller
-//where txn_type = sig_debit and fi= "My Financial Institution"
-var classMap = {"Department Store": "fill-blue", "Grocery": "fill-red",
- "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-  "Pharmacies": "fill-teal"};
 
 var innerNumber = 0;
-jsonData.forEach(function(d,j){
+myFinancialInstitution.forEach(function(d,j){
   innerNumber += d.avg_fee;
 });
 
 
-innerNumber = innerNumber / jsonData.length;
+innerNumber = innerNumber / myFinancialInstitution.length;
 
-var testTwo = donutChart()
+var test = donutChart()
   .classMap(classMap)
   .valueFunction(valueFunction)
   .constancyFunction(constancyFunction)
   .classMapFunction(classMapFunction)
-  .innerRad(50)
+  .innerRad(90)
   .innerNumber(innerNumber)
   .innerText("AVG INTERCHANGE")
   .padAngle(0.03)
 ;
 
-testTwo(svg, jsonData);
+test(svg, myFinancialInstitution);
 
-//For testing in console
-//Change data sets using testTwo(svg, filteredJsonData) and testTwo(svg, jsonData)
 
-window.testTwo = testTwo;
-window.svg = svg;
-window.jsonData = jsonData;
 
-var filteredJsonData = [
-  {
-    "mcc_name": "Grocery",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Family Clothing",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Fast Food",
-    "avg_fee": 0.29486
-  },
-  {
-    "mcc_name": "Pharmacies",
-    "avg_fee": 0.29486
-  }
-];
+// Donut 2 (TOTAL SALES)
 
-var filteredJsonDataTwo = [
-  {
-    "mcc_name": "Grocery",
-    "avg_fee": 0.29486
-  }
-];
+var svgTwo = d3.select("div#donuttwo")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("viewBox", "0 0 " + 500 + " " + 500)
+  //class for responsivenesss
+  .classed("svg-content-responsive-pie", true)
+  .attr("width", 500)
+  .attr("height", 500)
+  .append("g")
+  .attr("id", "donutchart")
+  .attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")")
+;
 
-var filteredJsonDataThree = [
- 
-];
+var valueFunctionTwo = function(d){
+  return d.amt_sale;
+}
 
-window.filteredJsonData = filteredJsonData;
-window.filteredJsonDataTwo = filteredJsonDataTwo;
-window.filteredJsonDataThree = filteredJsonDataThree;
+var innerNumberTwo = 0;
+myFinancialInstitution.forEach(function(d,j){
+  innerNumberTwo += d.amt_sale;
+});
+
+var testTwo = donutChart()
+  .classMap(classMap)
+  .valueFunction(valueFunctionTwo)
+  .constancyFunction(constancyFunction)
+  .classMapFunction(classMapFunction)
+  .innerRad(90)
+  .innerNumber(innerNumberTwo)
+  .innerText("TOTAL SALES")
+  .padAngle(0.03)
+;
+
+testTwo(svgTwo, myFinancialInstitution)
+
+//Donut 3 (TOTAL TRANS)
+var svgThree = d3.select("div#donutthree")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("viewBox", "0 0 " + 500 + " " + 500)
+  //class for responsivenesss
+  .classed("svg-content-responsive-pie", true)
+  .attr("width", 500)
+  .attr("height", 500)
+  .append("g")
+  .attr("id", "donutchart")
+  .attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")")
+;
+
+var valueFunctionThree = function(d){
+  return d.n_trans;
+}
+
+var innerNumberThree = 0;
+myFinancialInstitution.forEach(function(d,j){
+  innerNumberThree += d.n_trans;
+});
+
+var testThree = donutChart()
+  .classMap(classMap)
+  .valueFunction(valueFunctionThree)
+  .constancyFunction(constancyFunction)
+  .classMapFunction(classMapFunction)
+  .innerRad(90)
+  .innerNumber(innerNumberThree)
+  .innerText("TOTAL TRANS")
+  .padAngle(0.03)
+;
+
+testThree(svgThree, myFinancialInstitution)
