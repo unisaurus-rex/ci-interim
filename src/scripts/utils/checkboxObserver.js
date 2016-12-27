@@ -73,7 +73,7 @@ export default function addBootstrapCheckboxObservers() {
 }
 
 /**
- * Expose a way to track checkbox toggling it that can be used by other functions
+ * Expose a way to track checkbox toggling that can be used by other functions
  * to drive their behavior
  * @function checkboxChangeBuilder 
  * @param {string[]} values - strings corresponding to the value attributes of a group of checkboxes 
@@ -128,6 +128,7 @@ function mutationFuncBuilder(changeCallback) {
     var newHasActive = mutation.target.classList.contains('active');
     var oldHasActive = mutation.oldValue.includes('active');
     if( (newHasActive && !oldHasActive) || (oldHasActive && !newHasActive) ){
+      // get the input element nested in the label element so we can pass its value to changeCallback
       var elArr =  mutation.target.getElementsByTagName('input');
       if(elArr.length) {
         var inputEl = elArr[0];
