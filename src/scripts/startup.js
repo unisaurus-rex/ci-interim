@@ -11,8 +11,7 @@ import tableChart from 'table';
 import donutChart from 'donut';
 import * as d3 from "d3";
 
-// console.log(getInsightsData("sig_credit"));
-// console.log(getInsightsData("sig_debit", "All Issuers"));
+import addBootstrapCheckboxObservers from 'checkboxObserver';
 
 /***************** Grouped Bar Chart ****************/
 
@@ -27,7 +26,7 @@ width = width - margin.right - margin.left;
 height = height - margin.top - margin.bottom;
 
 //create svg
-var svg = d3.select("div#chartid")
+var gBarSvg = d3.select("div#chartid")
   .append("div")
   .classed("svg-container", true)
   .append("svg")
@@ -87,12 +86,12 @@ var yAxis = d3.axisLeft()
 ;
   
 //draw axes
-svg.append("g")
+gBarSvg.append("g")
   .attr("class", "x axis")
   .attr("transform", "translate(0," + height + ")")
   .call(xAxis)
 ;
-svg.append("g")
+gBarSvg.append("g")
   .attr("class", "y axis")
   .call(yAxis)
   //.append("text")
@@ -117,7 +116,7 @@ var test = groupedBarChart()
 
 window.test=test;
 
-test(svg, groupedBarData);
+test(gBarSvg, groupedBarData);
 
 
 /***************** TABLE ****************/
@@ -189,7 +188,7 @@ myFinancialInstitution.forEach(function(d,j){
 
 innerNumber = innerNumber / myFinancialInstitution.length;
 
-var test = donutChart()
+var testDonut = donutChart()
   .classMap(classMap)
   .valueFunction(valueFunction)
   .constancyFunction(constancyFunction)
@@ -200,7 +199,7 @@ var test = donutChart()
   .padAngle(0.03)
 ;
 
-test(svg, myFinancialInstitution);
+testDonut(svg, myFinancialInstitution);
 
 
 
@@ -276,3 +275,39 @@ var testThree = donutChart()
 ;
 
 testThree(svgThree, myFinancialInstitution)
+
+ /***************** CHECKBOXES ****************/
+
+// add observers
+var ids = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
+
+var vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Total", "Grocery" ];
+var defaults = [true, true, true, true, true, true];
+
+console.log (groupedBarData);
+
+// function to execute when a change happens
+var cback = (arr) => {
+  arr.push( "Issuer" );
+  console.log(groupedBarData);
+  var filteredData = groupedBarData.map( (d) => {
+    return arr.reduce( (result, key) => {result[key] = d[key];
+      return result;}, {});
+  });  
+  console.log(filteredData);
+
+  var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
+  filteredData.forEach(function(d) {
+      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+test (gBarSvg, filteredData);
+};
+
+var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
+    .values(vals)
+    .defaults(defaults)
+    .callback(cback);
+
+observersFunc();
+

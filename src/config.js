@@ -10,7 +10,7 @@ System.config({
   },
   paths: {
     "github:*": "jspm_packages/github/*",
-    "npm:*": "jspm_packages/npm/*",
+    "npm:*": "jspm_packages/npm/*"
   },
 
   map: {
@@ -22,6 +22,7 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
     "checkboxes": "scripts/utils/checkboxes.js",
+    "checkboxObserver": "scripts/utils/checkboxObserver.js",
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",

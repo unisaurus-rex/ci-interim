@@ -93,3 +93,21 @@ When you try to run your new spec, you may encounter errors loading files import
 The Model module reads a json string that represents the insights data and exposes a function for retrieving subsections of the data.  See the [csv-parser repo](https://github.com/unisaurus-rex/csv-parser) for more details about the structure of the data.
 ### Checkboxes
 The default export from the Checkboxes module is the Checkboxes class.  Use this class for tracking the state of a checkbox or checkboxes. A checkbox can have a value of either ```true``` or ```false```.  The class considers a checkbox to be checked if it has a value of ```true```. The class exposes methods for getting the values of a single checkbox or all checkboxes, toggling a checkbox, and retrieving an a list of all boxes that are currently checkbox.
+In practice you should not need to use the Checkboxes module directly as it is used internally by the checkboxObserver module.
+### checkboxObserver
+This module is necessary because of [Bootstrap's checkbox implementation](http://getbootstrap.com/css/#checkboxes-and-radios). Bootstrap requires that you wrap an input element in a label. Checking or unchecking a Bootstrap checkbox is only guaranteed to add or remove the 'active' class from the label. 
+
+By default, the module exports a single function, ```addBootstrapCheckboxObservers```. This function is configurable in the style of Mike Bostock. Calling the function will create listeners that check for the addition or removal of the 'active' class from the label. If the listener detects this change, it will pass an array of strings representing the currently checked values to a callback function.
+
+Example usage:
+
+```
+// config observer function
+var observersFunc = addBootstrapCheckboxObservers().elementIds(<myIds>)
+    .values(<myVals>)
+    .defaults(<myDefaults>)
+    .callback(<myCallback>);
+
+// add observers
+observersFunc();
+```
