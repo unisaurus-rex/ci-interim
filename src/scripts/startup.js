@@ -14,13 +14,12 @@ import * as d3 from "d3";
 
 import addBootstrapCheckboxObservers from 'checkboxObserver';
 
-/***************** Grouped Bar Chart ****************/
+/************************************************ Grouped Bar Chart ************************************************//
 
 //get data from controller
 var getData = groupedBarController()
   .txnType("pin_debit")
 ;
-
 var groupedBarData = getData();
 
 //chart parameters
@@ -41,6 +40,7 @@ var gBarSvg = d3.select("div#chartid")
   .classed("svg-content-responsive", true)
 ;
 
+// stuff to pass to config
 var classMapFunctionBar = function (d){
   return classMapBar[ d.name ];
 }
@@ -49,20 +49,21 @@ var classMapBar =  {"Department Store": "fill-blue", "Grocery": "fill-red",
 "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
+// Axes
 //formatting for y axis
 var formatPercent = function(d){ return d + "%"};
-
 //define function to define range for a group
 var groupRangeFunction = function(d) {return "translate(" + x0(d.Issuer) + ",0)"; };
-
 //create scales
 var x0 = d3.scaleBand()
   .rangeRound([0, width])
   .domain(groupedBarData.map(function(d) { return d.Issuer; }))
 ;
 
+// used for scales
 var jsonGroupNames = groupedBarData.columns;
 
+// scales
 var x1 = d3.scaleBand()
   .paddingOuter(1)
   .domain(jsonGroupNames)
@@ -118,36 +119,39 @@ var test = groupedBarChart()
   .groupRangeFunction(groupRangeFunction)
 ;
 
-window.test=test;
-
+//draw chart
 test(gBarSvg, groupedBarData);
 
 
- /*** GROUPED BAR CHECKBOXES ***/
+/******* GROUPED BAR CHECKBOXES *******/
 
 // add observers
 var ids = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
-
 var vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Total", "Grocery" ];
 var defaults = [true, true, true, true, true, true];
 
 // function to execute when a change happens
 var cback = (arr) => {
+  //add issuer to object
   arr.push( "Issuer" );
 
+  //filter data
   var filteredData = groupedBarData.map( (d) => {
     return arr.reduce( (result, key) => {result[key] = d[key];
       return result;}, {});
   });  
 
+  //add group attribute
   var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
   filteredData.forEach(function(d) {
       d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
   });
 
+  //redraw chart
   test (gBarSvg, filteredData);
 };
 
+//config
 var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
     .values(vals)
     .defaults(defaults)
@@ -155,7 +159,8 @@ var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
 
 observersFunc();
 
-/***************** TABLE ****************/
+/************************************************ TABLE ************************************************//
+
 //Create basic table with class of table for bootstrap
 var table = d3.select("#drawtable")
     .append("table")
@@ -174,33 +179,31 @@ d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
 });
 
 
- /***************** DONUT SIGNATURE DEBIT INTERRCHANGE FEES ****************/
+ /************************************************ DONUTS ************************************************/
 
 
- /***** USED FOR ALL DONUTS *****/
+ /********** USED FOR ALL DONUTS **********/
 //get data from controller
 var getDonutData = donutController()
   .txnType("pin_debit")
   .fi("My Financial Institution")
 ;
-
 var myFinancialInstitution = getDonutData();
-//console.log(myFinancialInstitution);
 
+//config objects
 var constancyFunction = function(d){
   return d.mcc_name;
 }
-
 var classMapFunction = function(d){
   return classMap[d.data.mcc_name];
 }
-
 var classMap = {"Department Store": "fill-blue", "Grocery": "fill-red",
  "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
   "Pharmacies": "fill-teal"};
 
 
-// Donut 1 (AVG INTERCHANGE)
+/********* Donut 1 (AVG INTERCHANGE) *********/
+//draw svg
 var svg = d3.select("div#donutid")
   .classed("svg-container", true)
   .append("svg")
@@ -218,15 +221,13 @@ var valueFunction = function(d){
   return d.avg_fee;
 }
 
-
 var innerNumber = 0;
 myFinancialInstitution.forEach(function(d,j){
   innerNumber += d.avg_fee;
 });
-
-
 innerNumber = innerNumber / myFinancialInstitution.length;
 
+//config donut
 var testDonut = donutChart()
   .classMap(classMap)
   .valueFunction(valueFunction)
@@ -238,56 +239,51 @@ var testDonut = donutChart()
   .padAngle(0.03)
 ;
 
+//draw donut
 testDonut(svg, myFinancialInstitution);
 
-// DONUT 1 CHECKBOXES
- /*** GROUPED BAR CHECKBOXES ***/
+/********* DONUT 1 CHECKBOXES *********/
 
 // add observers
-var idsD = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
-
-var valsD = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
-var defaultsD = [true, true, true, true, true];
+var idsDonutOne = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
+var valsDonutOne = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
+var defaultsDonutOne = [true, true, true, true, true];
 
 // function to execute when a change happens
-var cbackD = (arr) => {
+var cbackDonutOne = (arr) => {
 
-  //pass in new inner number here
-  testDonut = donutChart()
-  .classMap(classMap)
-  .valueFunction(valueFunction)
-  .constancyFunction(constancyFunction)
-  .classMapFunction(classMapFunction)
-  .innerRad(90)
-  .innerNumber(innerNumber)
-  .innerText("NEW INNER TEXT")
-  .padAngle(0.03)
-;
-
-  var filteredDonut = myFinancialInstitution.filter(function (obj){
-    console.log(obj, obj.mcc_name)
+  //filter data
+  var filteredDonutOne = myFinancialInstitution.filter(function (obj){
     if (arr.indexOf(obj.mcc_name) == -1) {
       return false;
     }
-      return true;
-    
-    })
+    return true;
+  })
 
+  //update inner number
+  innerNumber = 0;
+  filteredDonutOne.forEach(function(d,j){
+    innerNumber += d.avg_fee;
+  });
+  innerNumber = innerNumber / filteredDonutOne.length;
+  if (!innerNumber || innerNumber == NaN){ innerNumber = 0;}
+  testDonut.innerNumber(innerNumber);
 
-  //console.log(filteredDonut)
-
-  testDonut (svg, filteredDonut);
+  //redraw donut
+  testDonut (svg, filteredDonutOne);
 };
 
-var observersFuncD = addBootstrapCheckboxObservers().elementIds(idsD)
-    .values(valsD)
-    .defaults(defaultsD)
-    .callback(cbackD);
+//config checkboxes
+var observersFuncDonutOne = addBootstrapCheckboxObservers().elementIds(idsDonutOne)
+    .values(valsDonutOne)
+    .defaults(defaultsDonutOne)
+    .callback(cbackDonutOne);
 
-observersFuncD();
+observersFuncDonutOne();
 
-// Donut 2 (TOTAL SALES)
+/********* Donut 2 (TOTAL SALES) *********/
 
+//draw svg
 var svgTwo = d3.select("div#donuttwo")
   .classed("svg-container", true)
   .append("svg")
@@ -310,6 +306,7 @@ myFinancialInstitution.forEach(function(d,j){
   innerNumberTwo += d.amt_sale;
 });
 
+//config
 var testTwo = donutChart()
   .classMap(classMap)
   .valueFunction(valueFunctionTwo)
@@ -321,9 +318,50 @@ var testTwo = donutChart()
   .padAngle(0.03)
 ;
 
+//draw donut
 testTwo(svgTwo, myFinancialInstitution)
 
-//Donut 3 (TOTAL TRANS)
+/********* DONUT 1 CHECKBOXES *********/
+
+// add observers
+var idsDonutTwo = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
+
+var valsDonutTwo = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
+var defaultsDonutTwo = [true, true, true, true, true];
+
+// function to execute when a change happens
+var cbackDonutTwo = (arr) => {
+
+  var filteredDonutTwo = myFinancialInstitution.filter(function (obj){
+    if (arr.indexOf(obj.mcc_name) == -1) {
+      return false;
+    }
+    return true;
+    })
+
+  //update inner number
+  innerNumberTwo = 0;
+  filteredDonutTwo.forEach(function(d,j){
+    innerNumberTwo += d.amt_sale;
+  });
+  testTwo.innerNumber(innerNumberTwo);
+
+  //redraw donut
+  testTwo (svgTwo, filteredDonutTwo);
+};
+
+//config checkboxes
+var observersFuncDonutTwo = addBootstrapCheckboxObservers().elementIds(idsDonutTwo)
+    .values(valsDonutTwo)
+    .defaults(defaultsDonutTwo)
+    .callback(cbackDonutTwo);
+
+observersFuncDonutTwo();
+
+
+
+/********* Donut 3 (TOTAL TRANS) *********/
+//draw svg
 var svgThree = d3.select("div#donutthree")
   .classed("svg-container", true)
   .append("svg")
@@ -346,6 +384,7 @@ myFinancialInstitution.forEach(function(d,j){
   innerNumberThree += d.n_trans;
 });
 
+//config
 var testThree = donutChart()
   .classMap(classMap)
   .valueFunction(valueFunctionThree)
@@ -357,6 +396,43 @@ var testThree = donutChart()
   .padAngle(0.03)
 ;
 
+//draw donut
 testThree(svgThree, myFinancialInstitution)
 
+/********* DONUT 3 CHECKBOXES *********/
 
+// add observers
+var idsDonutThree = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
+
+var valsDonutThree = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
+var defaultsDonutThree = [true, true, true, true, true];
+
+// function to execute when a change happens
+var cbackDonutThree = (arr) => {
+
+  //filter data
+  var filteredDonutThree = myFinancialInstitution.filter(function (obj){
+    if (arr.indexOf(obj.mcc_name) == -1) {
+      return false;
+    }
+    return true;
+    })
+
+  //update inner number
+  innerNumberThree = 0;
+  filteredDonutThree.forEach(function(d,j){
+    innerNumberThree += d.n_trans;
+  });
+  testThree.innerNumber(innerNumberThree);
+
+  //redraw donut
+  testThree (svgThree, filteredDonutThree);
+};
+
+//config checkboxes
+var observersFuncDonutThree = addBootstrapCheckboxObservers().elementIds(idsDonutThree)
+    .values(valsDonutThree)
+    .defaults(defaultsDonutThree)
+    .callback(cbackDonutThree);
+
+observersFuncDonutThree();
