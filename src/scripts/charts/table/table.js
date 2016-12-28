@@ -10,7 +10,7 @@ export default function tableChart() {
     var tbody = container.select("tbody");
 
     /***** Add header elements ******/
-    var thRowUpdate = thead.selectAll("tr").data([data.columns]);
+    var thRowUpdate = thead.selectAll("tr").data([data.headers]);
 
     var thRow = thRowUpdate.enter()
         .append("tr")
