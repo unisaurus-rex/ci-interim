@@ -11,13 +11,6 @@ import tableChart from 'table';
 import donutChart from 'donut';
 import {getData as getTableData} from 'tableController';
 
-
-// getInsightsData("sig_credit") will pull all the transacation data for every FI ("
-// console.log(getInsightsData("sig_credit"));
-// console.log(getInsightsData("sig_debit", "All Issuers"));
-
-
-
 /***************** Grouped Bar Chart ****************/
 //chart parameters
 var width = 500;
@@ -182,30 +175,23 @@ test(svg, jsonObj);
 
 /***************** TABLE ****************/
 
-var tableDataFunc = getTableData();
-tableDataFunc.txnType("sig_debit");
-var tableData = tableDataFunc('amt_fee');
-console.log(tableData);
-
-
+// add table to page
 var table = d3.select("#drawtable")
     .append("table")
     .attr("class", "table");
 
-
+// table should have a head and body
 table.append("thead");
 table.append("tbody");
 
-//add import function to variable for use
+// get data for drawing the table
+var tableDataFunc = getTableData();
+tableDataFunc.txnType("sig_debit");
+var tableData = tableDataFunc('n_trans');
+
+// draw the table
 var drawTable = tableChart();
-
-//call data and then return table with data inside
-// d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
-//   console.log(data);
-//   drawTable(d3.select("#drawtable"), data);
-// });
-
-drawTable(d3.select("#drawtable"), tableData);
+drawTable(table, tableData);
 
 /***************** DONUT ****************/
 var svg = d3.select("div#donutid")
