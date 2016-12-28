@@ -11,10 +11,9 @@ import donutController from 'donutController';
 import tableChart from 'table';
 import donutChart from 'donut';
 import * as d3 from "d3";
-
 import addBootstrapCheckboxObservers from 'checkboxObserver';
 
-/************************************************ Grouped Bar Chart ************************************************//
+/************************************************ Grouped Bar Chart ************************************************/
 
 //get data from controller
 var getData = groupedBarController()
@@ -159,7 +158,7 @@ var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
 
 observersFunc();
 
-/************************************************ TABLE ************************************************//
+/************************************************ TABLE ************************************************/
 
 //Create basic table with class of table for bootstrap
 var table = d3.select("#drawtable")
@@ -321,7 +320,7 @@ var testTwo = donutChart()
 //draw donut
 testTwo(svgTwo, myFinancialInstitution)
 
-/********* DONUT 1 CHECKBOXES *********/
+/********* DONUT 2 CHECKBOXES *********/
 
 // add observers
 var idsDonutTwo = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
