@@ -16,16 +16,11 @@ export function getData() {
   function dataBuilder(param) {
     var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
 
-    /**** get list of unique mcc_names ****/
+    // get list of unique mcc_names
     var mccNames = uniqueMccNames(insightsData); 
 
-    /**** use list of names to build array of row objects ****/
-    var tableData = buildTableData(insightsData, param);
-
-    tableData.columns = ["fi", ...mccNames];
-    tableData.headers = ["FI", ...mccNames];
-
-    return tableData;
+    // use list of names to build array of row objects
+    return buildTableData(insightsData, param, mccNames);
   };
 
   dataBuilder.txnType = function(type) {
@@ -40,7 +35,10 @@ export function getData() {
 }
 
 /***** Private Functions *****/
-
+// this var for exporting functions to be tested only, not intended to be used in code
+export var testing = {uniqueMccNames: uniqueMccNames,
+                      buildTableData: buildTableData
+                     };
 /**
  * Find the unique mcc_name properties
  * @private
@@ -64,7 +62,7 @@ function uniqueMccNames(data) {
   }, []);
 
   // remove repeated values 
-  return new Set(allMccNames); 
+  return Array.from(new Set(allMccNames)); 
 }
 
 /**
@@ -73,9 +71,10 @@ function uniqueMccNames(data) {
  * @function buildTableData
  * @param {Object} data - object belonging to transaction type in the model
  * @param {string} param - value to extract
+ * @param {string[]} mccNames - mccNames to use for columns and headers
  * @returns {Object[]} array of objects
  */
-function buildTableData(data, param) {
+function buildTableData(data, param, mccNames) {
   // need to build one object per fi
   var fiNames = Object.keys(data);
   // each object should have key/values = mcc_name: param
@@ -97,6 +96,9 @@ function buildTableData(data, param) {
     return rowObj;
     
   });
+
+  tableData.columns = ["fi", ...mccNames];
+  tableData.headers = ["FI", ...mccNames];
 
   return tableData;
 }
