@@ -4,13 +4,13 @@ export default function tableChart() {
 
 
   function buildTable(container, data) {
-
+    
     // declare variables for Table Head and Body
     var thead = container.select("thead");
     var tbody = container.select("tbody");
 
     /***** Add header elements ******/
-    var thRowUpdate = thead.selectAll("tr").data([data.columns]);
+    var thRowUpdate = thead.selectAll("tr").data([data.headers]);
 
     var thRow = thRowUpdate.enter()
         .append("tr")

@@ -10,13 +10,11 @@ System.config({
   },
   paths: {
     "github:*": "jspm_packages/github/*",
-    "npm:*": "jspm_packages/npm/*",
+    "npm:*": "jspm_packages/npm/*"
   },
 
   map: {
-    "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
-    "table": "scripts/charts/table/table.js",
-    "donut": "scripts/charts/donut/donut.js",
+    "tableController": 'scripts/controllers/tableController.js',
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
@@ -24,10 +22,13 @@ System.config({
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",
+    "donut": "scripts/charts/donut/donut.js",
     "font-awesome": "npm:font-awesome@4.6.3",
+    "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "scripts/model/model.js",
     "startup": "scripts/startup.js",
+    "table": "scripts/charts/table/table.js",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },

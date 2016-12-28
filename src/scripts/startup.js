@@ -1,6 +1,7 @@
 /***** jspm packages *****/
 import jquery from 'jquery';
 import bootstrap from 'bootstrap-sass';
+import * as d3 from "d3";
 
 /***** local packages *****/
 import {getInsightsData} from 'model';
@@ -8,12 +9,14 @@ import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import tableChart from 'table';
 import donutChart from 'donut';
-import * as d3 from "d3";
+import {getData as getTableData} from 'tableController';
 
- console.log(getInsightsData("sig_credit"));
- console.log(getInsightsData("sig_debit", "All Issuers"));
 
- var insightsData = getInsightsData("sig_credit");
+// getInsightsData("sig_credit") will pull all the transacation data for every FI ("
+// console.log(getInsightsData("sig_credit"));
+// console.log(getInsightsData("sig_debit", "All Issuers"));
+
+
 
 /***************** Grouped Bar Chart ****************/
 //chart parameters
@@ -24,13 +27,13 @@ width = width - margin.right - margin.left;
 height = height - margin.top - margin.bottom;
 
 var svg = d3.select("div#chartid")
-  .append("div")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")     
-  .attr("viewBox","0 0 " + width + " " + height)
-  //class to make it responsive
-  .classed("svg-content-responsive", true)
+    .append("div")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")     
+    .attr("viewBox","0 0 " + width + " " + height)
+//class to make it responsive
+    .classed("svg-content-responsive", true)
 ;
 
 var classMapFunction = function (d){
@@ -38,7 +41,7 @@ var classMapFunction = function (d){
 }
 
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
-"Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+                 "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
 //formatting for y axis
@@ -46,7 +49,7 @@ var formatPercent = d3.format(".1%");
 
 //define function to define range for a group
 var groupRangeFunction = function(d) {return "translate(" + x0(d.Issuer) + ",0)"; };
-  
+
 var jsonObj = [
   {
     "Issuer": "Issuer 1",
@@ -178,36 +181,44 @@ test(svg, jsonObj);
 
 
 /***************** TABLE ****************/
-//Create basic table with class of table for bootstrap
+
+var tableDataFunc = getTableData();
+tableDataFunc.txnType("sig_debit");
+var tableData = tableDataFunc('amt_fee');
+console.log(tableData);
+
+
 var table = d3.select("#drawtable")
     .append("table")
     .attr("class", "table");
 
 
- table.append("thead");
- table.append("tbody");
+table.append("thead");
+table.append("tbody");
 
 //add import function to variable for use
 var drawTable = tableChart();
 
 //call data and then return table with data inside
-d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
-  drawTable(d3.select("#drawtable"), data);
-});
+// d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
+//   console.log(data);
+//   drawTable(d3.select("#drawtable"), data);
+// });
 
+drawTable(d3.select("#drawtable"), tableData);
 
- /***************** DONUT ****************/
+/***************** DONUT ****************/
 var svg = d3.select("div#donutid")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("viewBox", "0 0 " + 500 + " " + 500)
-  //class for responsivenesss
-  .classed("svg-content-responsive-pie", true)
-  .attr("width", 500)
-  .attr("height", 500)
-  .append("g")
-  .attr("id", "donutchart")
-  .attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("viewBox", "0 0 " + 500 + " " + 500)
+//class for responsivenesss
+    .classed("svg-content-responsive-pie", true)
+    .attr("width", 500)
+    .attr("height", 500)
+    .append("g")
+    .attr("id", "donutchart")
+    .attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")")
 ;
 
 function type(d) {
@@ -216,7 +227,7 @@ function type(d) {
 }
 
 /*
-var test = donutChart()
+  var test = donutChart()
   .innerText("NEW TEXT")
   .padAngle(0.03)
   .hoverRad(15)
