@@ -7,6 +7,7 @@ import {getInsightsData} from 'model';
 import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
+import donutController from 'donutController';
 import tableChart from 'table';
 import donutChart from 'donut';
 import * as d3 from "d3";
@@ -16,7 +17,11 @@ import addBootstrapCheckboxObservers from 'checkboxObserver';
 /***************** Grouped Bar Chart ****************/
 
 //get data from controller
-var groupedBarData = groupedBarController();
+var getData = groupedBarController()
+  .txnType("pin_debit")
+;
+
+var groupedBarData = getData();
 
 //chart parameters
 var width = 500;
@@ -36,11 +41,11 @@ var gBarSvg = d3.select("div#chartid")
   .classed("svg-content-responsive", true)
 ;
 
-var classMapFunction = function (d){
-  return classMap[ d.name ];
+var classMapFunctionBar = function (d){
+  return classMapBar[ d.name ];
 }
 
-var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
+var classMapBar =  {"Department Store": "fill-blue", "Grocery": "fill-red",
 "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
@@ -55,7 +60,6 @@ var x0 = d3.scaleBand()
   .rangeRound([0, width])
   .domain(groupedBarData.map(function(d) { return d.Issuer; }))
 ;
-console.log( groupedBarData)
 
 var jsonGroupNames = groupedBarData.columns;
 
@@ -106,8 +110,8 @@ gBarSvg.append("g")
 var test = groupedBarChart()
   .width(width)
   .height(height)
-  .classMap(classMap)
-  .classMapFunction(classMapFunction)
+  .classMap(classMapBar)
+  .classMapFunction(classMapFunctionBar)
   .x0( x0 )
   .x1( x1 )
   .y( y )
@@ -118,6 +122,38 @@ window.test=test;
 
 test(gBarSvg, groupedBarData);
 
+
+ /*** GROUPED BAR CHECKBOXES ***/
+
+// add observers
+var ids = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
+
+var vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Total", "Grocery" ];
+var defaults = [true, true, true, true, true, true];
+
+// function to execute when a change happens
+var cback = (arr) => {
+  arr.push( "Issuer" );
+
+  var filteredData = groupedBarData.map( (d) => {
+    return arr.reduce( (result, key) => {result[key] = d[key];
+      return result;}, {});
+  });  
+
+  var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
+  filteredData.forEach(function(d) {
+      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  test (gBarSvg, filteredData);
+};
+
+var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
+    .values(vals)
+    .defaults(defaults)
+    .callback(cback);
+
+observersFunc();
 
 /***************** TABLE ****************/
 //Create basic table with class of table for bootstrap
@@ -142,11 +178,14 @@ d3.csv("scripts/charts/table/table-data-sample.csv", function (error, data) {
 
 
  /***** USED FOR ALL DONUTS *****/
-//get data for donuts
-var myFinancialInstitution = getInsightsData("sig_debit", "My Financial Institution");
+//get data from controller
+var getDonutData = donutController()
+  .txnType("pin_debit")
+  .fi("My Financial Institution")
+;
 
-//remove total from data
-myFinancialInstitution.splice(5, 1);
+var myFinancialInstitution = getDonutData();
+//console.log(myFinancialInstitution);
 
 var constancyFunction = function(d){
   return d.mcc_name;
@@ -201,7 +240,51 @@ var testDonut = donutChart()
 
 testDonut(svg, myFinancialInstitution);
 
+// DONUT 1 CHECKBOXES
+ /*** GROUPED BAR CHECKBOXES ***/
 
+// add observers
+var idsD = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
+
+var valsD = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
+var defaultsD = [true, true, true, true, true];
+
+// function to execute when a change happens
+var cbackD = (arr) => {
+
+  //pass in new inner number here
+  testDonut = donutChart()
+  .classMap(classMap)
+  .valueFunction(valueFunction)
+  .constancyFunction(constancyFunction)
+  .classMapFunction(classMapFunction)
+  .innerRad(90)
+  .innerNumber(innerNumber)
+  .innerText("NEW INNER TEXT")
+  .padAngle(0.03)
+;
+
+  var filteredDonut = myFinancialInstitution.filter(function (obj){
+    console.log(obj, obj.mcc_name)
+    if (arr.indexOf(obj.mcc_name) == -1) {
+      return false;
+    }
+      return true;
+    
+    })
+
+
+  //console.log(filteredDonut)
+
+  testDonut (svg, filteredDonut);
+};
+
+var observersFuncD = addBootstrapCheckboxObservers().elementIds(idsD)
+    .values(valsD)
+    .defaults(defaultsD)
+    .callback(cbackD);
+
+observersFuncD();
 
 // Donut 2 (TOTAL SALES)
 
@@ -276,38 +359,4 @@ var testThree = donutChart()
 
 testThree(svgThree, myFinancialInstitution)
 
- /***************** CHECKBOXES ****************/
-
-// add observers
-var ids = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
-
-var vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Total", "Grocery" ];
-var defaults = [true, true, true, true, true, true];
-
-console.log (groupedBarData);
-
-// function to execute when a change happens
-var cback = (arr) => {
-  arr.push( "Issuer" );
-  console.log(groupedBarData);
-  var filteredData = groupedBarData.map( (d) => {
-    return arr.reduce( (result, key) => {result[key] = d[key];
-      return result;}, {});
-  });  
-  console.log(filteredData);
-
-  var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
-  filteredData.forEach(function(d) {
-      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-  });
-
-test (gBarSvg, filteredData);
-};
-
-var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cback);
-
-observersFunc();
 

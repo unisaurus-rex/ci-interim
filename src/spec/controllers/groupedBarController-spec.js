@@ -1,12 +1,14 @@
 import groupedBarController from 'groupedBarController';
 
-
 describe("The grouped bar contoller should", function(){
 
 	var data;
-	
+	var getData;
+
 	beforeEach (function(){
-		data = groupedBarController();
+		getData = groupedBarController().txnType("pin_debit");
+    data = getData();
+
 	});
 
 	afterEach ( function(){
@@ -44,7 +46,6 @@ describe("The grouped bar contoller should", function(){
 
       for ( var i=0; i < data.length; i++){
    		for(var j=0; j < keys.length; j++){
-   			console.log(data[i] [keys[j]]);
    			expect(data[i][keys[j] ]).not.toBeNull();
    			expect(data[i] [ keys[j] ]).toBeDefined();
    		}   	

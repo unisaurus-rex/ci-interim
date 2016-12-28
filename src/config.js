@@ -15,6 +15,7 @@ System.config({
 
   map: {
     "groupedBarController": "scripts/controllers/groupedBarController.js",
+    "donutController": "scripts/controllers/donutController.js",
     "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
     "table": "scripts/charts/table/table.js",
     "donut": "scripts/charts/donut/donut.js",
