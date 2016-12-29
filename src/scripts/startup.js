@@ -28,4 +28,5 @@ var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
     .defaults(defaults)
     .callback(cback);
 
-observersFunc();
+// result of calling observersFunc is checkboxes object
+var boxes = observersFunc();
