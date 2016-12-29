@@ -15,10 +15,17 @@ System.config({
 
   map: {
     "tableController": 'scripts/controllers/tableController.js',
+
+    "groupedBarController": "scripts/controllers/groupedBarController.js",
+    "donutController": "scripts/controllers/donutController.js",
+    "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
+    "table": "scripts/charts/table/table.js",
+    "donut": "scripts/charts/donut/donut.js",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
     "checkboxes": "scripts/utils/checkboxes.js",
+    "checkboxObserver": "scripts/utils/checkboxObserver.js",
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",

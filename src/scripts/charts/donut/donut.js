@@ -26,7 +26,6 @@ export default function donutChart(){
   
   function chart(container, dataArr){
 
-
     //remove current number
     container.select( "text.data" )
       .transition()

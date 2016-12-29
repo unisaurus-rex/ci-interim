@@ -208,6 +208,10 @@ $btn-gray-light-color:    		 #fff !default;
 $btn-gray-light-bg:       		 $gray-light !default;
 $btn-gray-light-border:   		 darken($btn-gray-light-bg, 5%) !default;
 
+$btn-gray-dark-color:    		 #fff !default;
+$btn-gray-dark-bg:       		 $gray-dark !default;
+$btn-gray-dark-border:   		 darken($btn-gray-dark-bg, 5%) !default;
+
 $btn-link-disabled-color:        $gray-light !default;
 
 // Allows for customizing button radius independently from global border radius
