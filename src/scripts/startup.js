@@ -181,14 +181,14 @@ var tableData = tableDataFunc('n_trans');
 var drawTable = tableChart();
 drawTable(table, tableData);
 
- /************************************************ DONUTS ************************************************/
+/************************************************ DONUTS ************************************************/
 
 
- /********** USED FOR ALL DONUTS **********/
+/********** USED FOR ALL DONUTS **********/
 //get data from controller
 var getDonutData = donutController()
-  .txnType("pin_debit")
-  .fi("My Financial Institution")
+    .txnType("pin_debit")
+    .fi("My Financial Institution")
 ;
 var myFinancialInstitution = getDonutData();
 

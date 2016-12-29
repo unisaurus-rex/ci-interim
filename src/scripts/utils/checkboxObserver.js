@@ -21,15 +21,24 @@ export default function addBootstrapCheckboxObservers() {
       defaults, // array of bools, the starting state of each checkbox in values, true = checked 
       callback; // changeCallback
 
+  /**
+   * Add mutation observers for each element in elementIds
+   * @function observers
+   * @returns {Object} Checkboxes class
+   */
   function observers() {
+    var boxes = new Checkboxes(values, defaults);
+    
     // build the callback that is passed to addCheckboxObserver 
-    var changeCallback = checkboxChangeBuilder(values, defaults, callback);
+    var changeCallback = checkboxChangeBuilder(boxes, callback);
 
     // get the DOM element tied to each id
     var domEls = elementIds.map( (id) => document.getElementById(id) );
 
     // add observers for each item
     domEls.forEach( (el) => addCheckboxObserver(el, changeCallback) );  
+
+    return boxes;
   }
 
   // configuration functions (getters and setters)
@@ -76,14 +85,11 @@ export default function addBootstrapCheckboxObservers() {
  * Expose a way to track checkbox toggling that can be used by other functions
  * to drive their behavior
  * @function checkboxChangeBuilder 
- * @param {string[]} values - strings corresponding to the value attributes of a group of checkboxes 
- * @param {boolean[]} defaults - default value of a group of checkbox input elements
+ * @param {Object} boxes - Checkboxes class
  * @param {changeCallback} callback  
  * @returns {function} a function that accepts a single value, this function can be passed to mutationFuncBuilder  
  */
-function checkboxChangeBuilder(values, defaults, callback) {
-  var boxes = new Checkboxes(values, defaults);
-
+function checkboxChangeBuilder(boxes, callback) {
   return function(value){
     callback( boxes.toggle(value) ); 
   };

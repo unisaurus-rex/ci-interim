@@ -97,7 +97,7 @@ In practice you should not need to use the Checkboxes module directly as it is u
 ### checkboxObserver
 This module is necessary because of [Bootstrap's checkbox implementation](http://getbootstrap.com/css/#checkboxes-and-radios). Bootstrap requires that you wrap an input element in a label. Checking or unchecking a Bootstrap checkbox is only guaranteed to add or remove the 'active' class from the label. 
 
-By default, the module exports a single function, ```addBootstrapCheckboxObservers```. This function is configurable in the style of Mike Bostock. Calling the function will create listeners that check for the addition or removal of the 'active' class from the label. If the listener detects this change, it will pass an array of strings representing the currently checked values to a callback function.
+By default, the module exports a single function, ```addBootstrapCheckboxObservers```. Calling ```addBoostrapCheckboxObserver``` returns a configurable function in the style of Mike Bostock. Calling the returned function will create listeners that check for the addition or removal of the 'active' class from the label. If the listener detects this change, it will pass an array of strings representing the currently checked values to a callback function. In addition, calling the returned function will return a Checkboxes object that can be used to get the current checked values. 
 
 Example usage:
 
@@ -109,5 +109,6 @@ var observersFunc = addBootstrapCheckboxObservers().elementIds(<myIds>)
     .callback(<myCallback>);
 
 // add observers
-observersFunc();
+// observersFunc returns a Checkbox object that can be used to get checked values
+var boxes = observersFunc();
 ```
