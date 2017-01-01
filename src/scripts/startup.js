@@ -11,6 +11,7 @@ import groupedBarController from 'groupedBarController';
 import donutController from 'donutController';
 import tableChart from 'table';
 import donutChart from 'donut';
+import stackChart from 'stacked';
 import {getData as getTableData} from 'tableController';
 import addBootstrapCheckboxObservers from 'checkboxObserver';
 
@@ -439,3 +440,51 @@ var observersFuncDonutThree = addBootstrapCheckboxObservers().elementIds(idsDonu
     .callback(cbackDonutThree);
 
 observersFuncDonutThree();
+
+
+/************************************************ Stacked Chart ************************************************/
+
+
+var stackedData= [ { "All Others": 0.2,
+  "Department Store": 0.2,
+  "Family Clothing": 0.2,
+  "Fast Food": 0.2,
+  "Grocery": 0.1,
+  "Pharmacies": 0.1,
+  total: 1 } ];
+
+//add columns attribute
+stackedData.columns = Object.keys(stackedData[0]).filter(function (obj){
+  return obj != "total";
+})
+  
+var svgStacked = d3.select("#stackid")  .append("div")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("viewBox","0 0 " + 900 + " " + 300)
+;
+
+var stackedClassMapFunction = function (d){
+    return stackedClassMap[ d.key ];
+  }
+
+var stackedClassMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
+  "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+  "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
+
+
+
+var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
+var stackedWidth =900;
+var stackedHeight =300;
+
+var testStack = stackChart()
+  .margin(stackedMargin)
+  .width(stackedWidth)
+  .height(stackedHeight)
+  .classMap(stackedClassMap)
+  .classMapFunction(stackedClassMapFunction)
+;
+
+testStack(svgStacked, stackedData);
