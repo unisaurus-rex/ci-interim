@@ -2,45 +2,31 @@
 Prototype of interim data insights email
 
 ## Install
-First, run
-
-    npm install
+First, run ```npm install```
     
-Then, run
-
-    jspm install
+Then, run ```jspm install```
     
 ## Installing Dependencies
 Any dev dependencies should be installed with npm.  Any client side dependencies should be installed with jspm.
-
-## This Project is a Dev Envrionment
-The files and folders have been organized to support a development workflow.  If you would like to produce a production build, there are npm scripts you can run to install files in the build folder.
 ## Serving the Development Version
 Download your favorite server package of choice ([http-server](https://www.npmjs.com/package/http-server) is nice). 
+## Creating the Production Version
+
+1) From the project root run ```npm run build``` 
+
+2) Copy ```src/index.html``` to  ```build```
+
+3) Find the comments at the end of ```build/index.html```. Remove the scripts needed for the development version only and uncomment the script needed for the build version. 
+
 ### A Note on JavaScript Modules
 Any module you write needs to be imported in ```scripts/startup.js```, or used by a module imported in ```startup.js```
 ## Custom NPM Scripts
-The following scripts can be run using
-
-    npm run <command-name>
-    
-For more information see the package.json file
-
-```npm run bundle-js```
-
-Package all javascript dependencies into a single file, minify and write the file to build/build.js
-
-```npm run bundle-sass```
-
-Compile sass files in styles/sass and output the result to build/styles
+The following scripts can be run using ```npm run <command-name>```
 
 ```npm run build```
 
-Run bundle-js and bundle-sass
+Create a production version of the site in ```build``` folder 
 
-```npm run clean-styles```
-
-Remove build/styles/css and build/styles/fonts folders
 
 ```npm run sass```
 
@@ -50,13 +36,10 @@ Compile sass files in styles/sass and output to styles/css
 
 Watch styles/sass for changes. On any change, compile to styles/css
 
-## Serving the Production Version
-Run your server with a root folder of ```./build```
-
 ## Testing
 
 ### Unit Testing
-[Jasmine](https://jasmine.github.io/) and [Karma](https://karma-runner.github.io/1.0/index.html) are used for unit testing.  Jasmine is a testing framework and Karma is a test runner. What's the difference, you ask?  You write your tests using Jasmine and it's libraries.  Once you write your tests, you need to run the code in a browser javascript engine.  We use Karma to handle a lot of the annoying things that come with trying to run your code in different browser engines.  
+[Jasmine](https://jasmine.github.io/) and [Karma](https://karma-runner.github.io/1.0/index.html) are used for unit testing.  Jasmine is a testing framework and Karma is a test runner. What's the difference, you ask?  You write your tests using Jasmine and it's libraries.  Once you write your tests, you need to run the code in a browser javascript engine.  Karma handles a lot of the annoying things that come with trying to run your code in different browser engines.  
 
 #### Set up
 Most of what you need to run tests will be installed when you run ```npm install```, but there are some additional steps you also need to take.
