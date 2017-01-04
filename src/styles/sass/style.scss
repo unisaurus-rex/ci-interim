@@ -1,5 +1,5 @@
 // Add custom font
-@import url(http://fonts.googleapis.com/css?family=Raleway:400,700,300);
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700');
 
 @font-face { font-family: 'FoundryContext-RegularItalic'; 
 src: url('webfont/FoundryContext-RegularItalic.eot?#iefix') format('embedded-opentype'), 
@@ -178,4 +178,26 @@ font-weight: normal; font-style: normal; }
 .flex-row img {
     width: 100%;
 }
+}
+
+//** Custom Table **//
+tbody {
+    color: #8b8c8d;
+}
+
+//** D3 axis text **//
+.tick text {
+    font-family: "Source Sans Pro";
+    font-size: 9px;
+    fill: #8b8c8d;
+}
+
+//** Header Fonts **//
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Foundry Context", "Source Sans Pro"; 
+}
+
+//** SVG **//
+svg, svg:not(:root) {
+    overflow: visible;
 }

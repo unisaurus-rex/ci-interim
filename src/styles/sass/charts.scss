@@ -43,7 +43,6 @@
   fill: none;
   stroke: $gray-light;
   opacity: 0.1;
-  shape-rendering: crispEdges;
 }
 
 .tick line{
@@ -76,5 +75,13 @@ svg.svg-content-responsive-pie{
 }
 text.data, text.inside{
   font-size: 2.5em;
+}
+text.data {
+  font-family: "Foundry Context";
+  fill: $gray-darker;
+}
+text.inside {
+  font-family: "Source Sans Pro";
+  fill: $vantiv-blue;
 }
 

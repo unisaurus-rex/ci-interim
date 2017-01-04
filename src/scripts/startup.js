@@ -78,18 +78,17 @@ var y = d3.scaleLinear()
 
 //create axes
 var xAxis = d3.axisBottom()
-  .scale(x0)
-  .tickSizeInner(-height)
-  .tickSizeOuter(0)
-  .tickPadding(10)
+    .scale(x0)
+    .tickSize(0)
+    .tickPadding(10)
 ;
 var yAxis = d3.axisLeft()
-  .scale(y)
-  .tickFormat(formatPercent)
-  .ticks(5)
-  .tickSizeInner(-width)
-  .tickSizeOuter(0)
-  .tickPadding(10)
+    .scale(y)
+    .tickFormat(formatPercent)
+    .ticks(5)
+    .tickSizeInner(-width)
+    .tickSizeOuter(0)
+    .tickPadding(0)
 ;
   
 //draw axes
@@ -101,24 +100,24 @@ gBarSvg.append("g")
 gBarSvg.append("g")
   .attr("class", "y axis")
   .call(yAxis)
-  //.append("text")
-  //.attr("transform", "rotate(-90)")
-  //.attr("y", 6)
-  //.attr("dy", ".71em")
-  //.style("text-anchor", "end")
-  //.text("percentage")
+//.append("text")
+//.attr("transform", "rotate(-90)")
+//.attr("y", 6)
+//.attr("dy", ".71em")
+//.style("text-anchor", "end")
+//.text("percentage")
 ;
 
 //chart config
 var test = groupedBarChart()
-  .width(width)
-  .height(height)
-  .classMap(classMapBar)
-  .classMapFunction(classMapFunctionBar)
-  .x0( x0 )
-  .x1( x1 )
-  .y( y )
-  .groupRangeFunction(groupRangeFunction)
+    .width(width)
+    .height(height)
+    .classMap(classMapBar)
+    .classMapFunction(classMapFunctionBar)
+    .x0( x0 )
+    .x1( x1 )
+    .y( y )
+    .groupRangeFunction(groupRangeFunction)
 ;
 
 //draw chart
@@ -140,13 +139,13 @@ var cback = (arr) => {
   //filter data
   var filteredData = groupedBarData.map( (d) => {
     return arr.reduce( (result, key) => {result[key] = d[key];
-      return result;}, {});
+                                         return result;}, {});
   });  
 
   //add group attribute
   var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
   filteredData.forEach(function(d) {
-      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
   });
 
   //redraw chart
