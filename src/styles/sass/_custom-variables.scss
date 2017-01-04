@@ -26,6 +26,11 @@ $brand-purple:          #7100B4 !default;
 $brand-yellow:          #FED100 !default;
 $brand-green:           #CEDC00 !default;
 
+$vantiv-blue: 			#00a9e0;
+$vantiv-teal:			#40c1ac;
+$vantiv-orange-yellow:	#ffa300;
+$vantiv-red:			#fd0000;
+
 
 //== Scaffolding
 //
@@ -48,7 +53,7 @@ $link-hover-decoration: none !default;
 //
 //## Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-sans-serif:  "Source Sans Pro", Helvetica, Arial, sans-serif !default;
 $font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 $font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
@@ -181,6 +186,31 @@ $btn-warning-border:             $btn-warning-bg !default;
 $btn-danger-color:               #fff !default;
 $btn-danger-bg:                  $brand-danger !default;
 $btn-danger-border:              darken($btn-danger-bg, 5%) !default;
+
+//For custom buttons and checkboxes
+$btn-blue-color:              	 #fff !default;
+$btn-blue-bg:                 	 $vantiv-blue !default;
+$btn-blue-border:             	 darken($btn-blue-bg, 5%) !default;
+
+$btn-teal-color:              	 #fff !default;
+$btn-teal-bg:                 	 $vantiv-teal !default;
+$btn-teal-border:             	 darken($btn-teal-bg, 5%) !default;
+
+$btn-red-color:              	 #fff !default;
+$btn-red-bg:                 	 $vantiv-red !default;
+$btn-red-border:             	 darken($btn-red-bg, 5%) !default;
+
+$btn-orange-yellow-color:    	 #fff !default;
+$btn-orange-yellow-bg:      	 $vantiv-orange-yellow !default;
+$btn-orange-yellow-border:   	 darken($btn-orange-yellow-bg, 5%) !default;
+
+$btn-gray-light-color:    		 #fff !default;
+$btn-gray-light-bg:       		 $gray-light !default;
+$btn-gray-light-border:   		 darken($btn-gray-light-bg, 5%) !default;
+
+$btn-gray-dark-color:    		 #fff !default;
+$btn-gray-dark-bg:       		 $gray-dark !default;
+$btn-gray-dark-border:   		 darken($btn-gray-dark-bg, 5%) !default;
 
 $btn-link-disabled-color:        $gray-light !default;
 

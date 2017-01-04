@@ -62,9 +62,12 @@ export default class Checkboxes {
   /**
    * Flip the value of the checkbox associated with name
    * @param {string} name - name of the checkbox
+   * @returns {array}
    */
   toggle(name) {
     this.checkboxes[name] = !this.checkboxes[name];
+    return this.getAllChecked();
   }
 
 }
+
