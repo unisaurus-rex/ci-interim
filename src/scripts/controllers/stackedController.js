@@ -13,17 +13,13 @@ export function getSpendByMerchantSegmentData(){
       return obj.mcc_name != "Total"
     })
 
-    console.log(bin1Data);
-
     var bin2Data = getInsightsData("bin 2", fi);
 
     bin2Data = bin1Data.filter(function (obj){
       return obj.mcc_name != "Total"
     })
-    console.log (bin2Data); 
 
     var data = bin1Data.concat(bin2Data);
-    console.log(data);
 
     var amtSaleDepartmentStore = 0;
     var amtSaleGrocery = 0;
@@ -100,17 +96,13 @@ export function getPurchaseByMerchantSegmentData(){
       return obj.mcc_name != "Total"
     })
 
-    console.log(bin1Data);
-
     var bin2Data = getInsightsData("bin 2", fi);
 
     bin2Data = bin1Data.filter(function (obj){
       return obj.mcc_name != "Total"
     })
-    console.log (bin2Data); 
 
     var data = bin1Data.concat(bin2Data);
-    console.log(data);
 
     var salePcDepartmentStore = 0;
     var salePcGrocery = 0;
