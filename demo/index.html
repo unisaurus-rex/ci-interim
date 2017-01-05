@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Cardholder Insights</title>
+
+    <!-- Bootstrap Core CSS -->
+
+
+    <!-- Custom CSS -->
+    <link href="styles/css/style.css" rel="stylesheet">
+
+    <!--&lt;!&ndash; HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries &ndash;&gt;-->
+    <!--&lt;!&ndash; WARNING: Respond.js doesn't work if you view the page via file:// &ndash;&gt;-->
+    <!--&lt;!&ndash;[if lt IE 9]>-->
+    <!--<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>-->
+    <!--<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>-->
+    <!--<![endif]&ndash;&gt;-->
+
+  </head>
+
+  <body>
+
+    <div id="wrapper">
+
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <nav class="navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                      aria-expanded="false"
+                      aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <img class="navbar-brand" src="img/vantiv%20logo%20gray.jpg">
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav navbar-right">
+                <!-- <li><a href="#menu-toggle" class="" id="menu-toggle">Toggle Menu</a></li> -->
+                <li><a href="#">Back to iQ &nbsp;<i class="fa fa-reply" aria-hidden="true"></i></a></li>
+                <li><a href="#">Logout &nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <!-- StackedBar and Table Row with one column: 12 -->
+        <div class="flex-row row">
+          <div class="col-sm-12 ">
+            <div class="panel">
+              <div class="panel-heading">
+                <!--Title, help icon and dropdown button filters go here-->
+                <div class="col-lg-6 col-md-12"><h2>Title</h2></div>
+                <div class="col-lg-6 col-md-12 col-sm-12 text-left">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                      Dropdown <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li value="n_trans">Number of Transactions</li>
+                      <li value="amt_sale">Total Amount of Sales</li>
+                      <li value="amt_fee">Total Amount of Interchange Fee</li>
+                      <li value="n_card">Total Number of Cards Used</li>
+                      <li value="avg_sale">Average Sales Amount</option>
+                        <li value="avg_fee">Average Interchange Fee Amount</li>
+                        <li value="trans_pc">Transactions Per Card</li>
+                        <li value="sale_pc">Dollar Amount Per Card</li>
+                        <li value="fee_pc">Interchange Fee Per Card</li>
+                    </ul>
+                  </div>
+                  <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                </div>
+
+
+              </div>
+              <div class="panel-body">
+
+                <div class="col-sm-8">
+                  <div id="chartid">
+
+                  </div>
+
+                </div>
+                <div class="col-sm-4">
+                  <div id="drawtable">
+                    <p id="tablename"></p>
+
+                  </div>
+                </div>
+                <!--Charts and tables go here-->
+
+              </div>
+              <div class="panel-footer">
+                <div class="checkboxes">
+                  <ul class="list-inline text-center">
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox1">
+                        <input type="checkbox" autocomplete="off" value="Department Store"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Department Store
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox2">
+                        <input type="checkbox" autocomplete="off" value="Grocery"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Grocery
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-gray-light active" name="transactionType"
+                             id="groupedCbox3">
+                        <input type="checkbox" autocomplete="off" value="Family Clothing"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Family Clothing
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-orange-yellow active" name="transactionType"
+                             id="groupedCbox4">
+                        <input type="checkbox" autocomplete="off" value="Fast Food"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Fast Food
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox5">
+                        <input type="checkbox" autocomplete="off" value="Pharmacies"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Pharmacies
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-gray-dark active" name="transactionType"
+                             id="groupedCbox6">
+                        <input type="checkbox" autocomplete="off" value="Total" name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Total
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second row that contains 3 columns: 4, 4, and 4 -->
+        <div class="flex-row row">
+          <div class="col-lg-4 col-md-12 col-sm-12 ">
+            <div class="panel">
+              <div class="panel-heading">
+                <div class="col-sm-12"><h2>Title</h2></div>
+                <div class=" col-sm-12 text-left">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                      Dropdown <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li value="n_trans">Number of Transactions</li>
+                      <li value="amt_sale">Total Amount of Sales</li>
+                      <li value="amt_fee">Total Amount of Interchange Fee</li>
+                      <li value="n_card">Total Number of Cards Used</li>
+                      <li value="avg_sale">Average Sales Amount</option>
+                        <li value="avg_fee">Average Interchange Fee Amount</li>
+                        <li value="trans_pc">Transactions Per Card</li>
+                        <li value="sale_pc">Dollar Amount Per Card</li>
+                        <li value="fee_pc">Interchange Fee Per Card</li>
+                    </ul>
+                  </div>
+                  <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="donutid">
+                </div>
+              </div>
+              <div class="panel-footer">
+                <div class="checkboxes">
+                  <ul class="list-inline text-center">
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox7">
+                        <input type="checkbox" autocomplete="off" value="Department Store"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Department Store
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox8">
+                        <input type="checkbox" autocomplete="off" value="Grocery"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Grocery
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-gray-light active" name="transactionType"
+                             id="groupedCbox9">
+                        <input type="checkbox" autocomplete="off" value="Family Clothing"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Family Clothing
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-orange-yellow active" name="transactionType"
+                             id="groupedCbox10">
+                        <input type="checkbox" autocomplete="off" value="Fast Food"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Fast Food
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox11">
+                        <input type="checkbox" autocomplete="off" value="Pharmacies"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Pharmacies
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12 col-sm-12">
+            <div class="panel">
+              <div class="panel-heading">
+                <div class="col-sm-12"><h2>Title</h2></div>
+                <div class=" col-sm-12 text-left">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                      Dropdown <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li value="n_trans">Number of Transactions</li>
+                      <li value="amt_sale">Total Amount of Sales</li>
+                      <li value="amt_fee">Total Amount of Interchange Fee</li>
+                      <li value="n_card">Total Number of Cards Used</li>
+                      <li value="avg_sale">Average Sales Amount</option>
+                        <li value="avg_fee">Average Interchange Fee Amount</li>
+                        <li value="trans_pc">Transactions Per Card</li>
+                        <li value="sale_pc">Dollar Amount Per Card</li>
+                        <li value="fee_pc">Interchange Fee Per Card</li>
+                    </ul>
+                  </div>
+                  <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="donuttwo">
+                </div>
+              </div>
+              <div class="panel-footer">
+                <div class="checkboxes">
+                  <ul class="list-inline text-center">
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox12">
+                        <input type="checkbox" autocomplete="off" value="Department Store"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Department Store
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox13">
+                        <input type="checkbox" autocomplete="off" value="Grocery"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Grocery
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-gray-light active" name="transactionType"
+                             id="groupedCbox14">
+                        <input type="checkbox" autocomplete="off" value="Family Clothing"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Family Clothing
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-orange-yellow active" name="transactionType"
+                             id="groupedCbox15">
+                        <input type="checkbox" autocomplete="off" value="Fast Food"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Fast Food
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox16">
+                        <input type="checkbox" autocomplete="off" value="Pharmacies"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Pharmacies
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12 col-sm-12">
+            <div class="panel">
+              <div class="panel-heading">
+                <div class="col-sm-12"><h2>Title</h2></div>
+                <div class=" col-sm-12 text-left">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                      Dropdown <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li value="n_trans">Number of Transactions</li>
+                      <li value="amt_sale">Total Amount of Sales</li>
+                      <li value="amt_fee">Total Amount of Interchange Fee</li>
+                      <li value="n_card">Total Number of Cards Used</li>
+                      <li value="avg_sale">Average Sales Amount</option>
+                        <li value="avg_fee">Average Interchange Fee Amount</li>
+                        <li value="trans_pc">Transactions Per Card</li>
+                        <li value="sale_pc">Dollar Amount Per Card</li>
+                        <li value="fee_pc">Interchange Fee Per Card</li>
+                    </ul>
+                  </div>
+                  <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="donutthree">
+                </div>
+              </div>
+              <div class="panel-footer">
+                <div class="checkboxes">
+                  <ul class="list-inline text-center" role="group">
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox17">
+                        <input type="checkbox" autocomplete="off" value="Department Store"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Department Store
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox18">
+                        <input type="checkbox" autocomplete="off" value="Grocery"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Grocery
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-gray-light active" name="transactionType"
+                             id="groupedCbox19">
+                        <input type="checkbox" autocomplete="off" value="Family Clothing"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Family Clothing
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-orange-yellow active" name="transactionType"
+                             id="groupedCbox20">
+                        <input type="checkbox" autocomplete="off" value="Fast Food"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Fast Food
+                    </li>
+                    <li data-toggle="buttons">
+                      <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox21">
+                        <input type="checkbox" autocomplete="off" value="Pharmacies"
+                               name="transactionType">
+                        <i class="fa fa-check"></i>
+                      </label>
+                      Pharmacies
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Third row that contains 2 columns: 6 and 6 -->
+      <div class="flex-row row">
+        <div class="col-lg-6 col-md-6 col-sm-12 ">
+          <div class="panel">
+            <div class="panel-heading">
+            </div>
+            <div class="panel-body">
+            </div>
+            <div class="panel-footer">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+          <div class="panel">
+            <div class="panel-heading">
+            </div>
+            <div class="panel-body">
+            </div>
+            <div class="panel-footer">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- /#page-content-wrapper -->
+    </div>
+
+    <!-- /#wrapper -->
+    <footer></footer>
+    <script src="build.js"></script>
+
+
+  </body>
+
+
+</html>
+
