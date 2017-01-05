@@ -194,10 +194,20 @@ tbody {
 
 //** Header Fonts **//
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Foundry Context", "Source Sans Pro"; 
+    font-family: "FoundryContext-Regular", "Source Sans Pro"; 
 }
 
 //** SVG **//
 svg, svg:not(:root) {
     overflow: visible;
+}
+
+.titles {
+  font-family: Foundry Context;
+  font-size: 20px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  text-align: left;
+  color:$brand-primary
 }
