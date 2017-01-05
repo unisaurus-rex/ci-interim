@@ -9,8 +9,10 @@ import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
 import donutController from 'donutController';
+import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
+import stackChart from 'stacked';
 import {getData as getTableData} from 'tableController';
 import addBootstrapCheckboxObservers from 'checkboxObserver';
 
@@ -438,3 +440,81 @@ var observersFuncDonutThree = addBootstrapCheckboxObservers().elementIds(idsDonu
     .callback(cbackDonutThree);
 
 observersFuncDonutThree();
+
+
+/************************************************ Stacked Chart ************************************************/
+
+/****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
+
+var getStackedData = getSpendByMerchantSegmentData();
+
+var stackedDataTest = getStackedData();
+
+//add columns attribute
+stackedDataTest.columns = Object.keys(stackedDataTest[0]).filter(function (obj){
+  return obj != "total";
+})
+
+  
+var svgStacked = d3.select("#stackid")  .append("div")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("viewBox","0 0 " + 900 + " " + 300)
+;
+
+var stackedClassMapFunction = function (d){
+    return stackedClassMap[ d.key ];
+  }
+
+var stackedClassMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
+  "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+  "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
+
+
+
+var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
+var stackedWidth =900;
+var stackedHeight =300;
+
+var testStack = stackChart()
+  .margin(stackedMargin)
+  .width(stackedWidth)
+  .height(stackedHeight)
+  .classMap(stackedClassMap)
+  .classMapFunction(stackedClassMapFunction)
+;
+
+testStack(svgStacked, stackedDataTest);
+
+/*window.stackedData = stackedData;
+window.stackedDataTest = stackedDataTest;
+window.testStack = testStack;
+window.svgStacked = svgStacked;*/
+
+
+
+/****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
+
+var getStackedDataTwo = getPurchaseByMerchantSegmentData();
+
+var stackedDataTwo = getStackedDataTwo();
+
+//add columns attribute
+stackedDataTwo.columns = Object.keys(stackedDataTwo[0]).filter(function (obj){
+  return obj != "total";
+})
+
+//add columns attribute
+stackedDataTwo.columns = Object.keys(stackedDataTwo[0]).filter(function (obj){
+  return obj != "total";
+})
+
+var svgStackedTwo = d3.select("#purchasestack")  .append("div")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("viewBox","0 0 " + 900 + " " + 300)
+;
+
+testStack(svgStackedTwo, stackedDataTwo);
