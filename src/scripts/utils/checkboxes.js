@@ -60,6 +60,14 @@ export default class Checkboxes {
   }
 
   /**
+   * Set all checkbox values to true
+   */
+  checkAll() {
+    let keys = Object.keys(this.checkboxes);
+    keys.forEach( (k) => {this.checkboxes[k] = true;});
+  }
+
+  /**
    * Flip the value of the checkbox associated with name
    * @param {string} name - name of the checkbox
    * @returns {array}
