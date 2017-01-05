@@ -8647,7 +8647,183 @@ $__System.register("b", ["7", "9"], function (_export) {
 		execute: function () {}
 	};
 });
-$__System.register("c", ["7"], function (_export) {
+$__System.register("c", ["7", "9"], function (_export) {
+  "use strict";
+
+  var d3, getInsightsData;
+
+  _export("getSpendByMerchantSegmentData", getSpendByMerchantSegmentData);
+
+  _export("getPurchaseByMerchantSegmentData", getPurchaseByMerchantSegmentData);
+
+  function getSpendByMerchantSegmentData() {
+
+    var fi = "My Financial Institution";
+
+    function getData() {
+      var bin1Data = getInsightsData("bin 1", fi);
+
+      bin1Data = bin1Data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      var bin2Data = getInsightsData("bin 2", fi);
+
+      bin2Data = bin1Data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      var data = bin1Data.concat(bin2Data);
+
+      var amtSaleDepartmentStore = 0;
+      var amtSaleGrocery = 0;
+      var amtSalePharmacies = 0;
+      var amtSaleFamilyClothing = 0;
+      var amtSaleFastFood = 0;
+      var amtSaleTotal = 0;
+
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].mcc_name == "Department Store") {
+          amtSaleDepartmentStore = data[i].amt_sale + amtSaleDepartmentStore;
+        }
+        if (data[i].mcc_name == "Grocery") {
+          amtSaleGrocery = data[i].amt_sale + amtSaleGrocery;
+        }
+        if (data[i].mcc_name == "Pharmacies") {
+          amtSalePharmacies = data[i].amt_sale + amtSalePharmacies;
+        }
+        if (data[i].mcc_name == "Family Clothing") {
+          amtSaleFamilyClothing = data[i].amt_sale + amtSaleFamilyClothing;
+        }
+        if (data[i].mcc_name == "Fast Food") {
+          amtSaleFastFood = data[i].amt_sale + amtSaleFastFood;
+        }
+        amtSaleTotal = amtSaleTotal + data[i].amt_sale;
+      }
+
+      //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
+
+      var percentageDepartmentStore = amtSaleDepartmentStore / amtSaleTotal;
+      var percentageGrocery = amtSaleGrocery / amtSaleTotal;
+      var percentagePharmacies = amtSalePharmacies / amtSaleTotal;
+      var percentageFamilyClothing = amtSaleFamilyClothing / amtSaleTotal;
+      var percentageFastFood = amtSaleFastFood / amtSaleTotal;
+      //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);   
+
+      var finalData = [];
+
+      var obj = {
+        "Department Store": percentageDepartmentStore,
+        "Grocery": percentageGrocery,
+        "Pharmacies": percentagePharmacies,
+        "Fast Food": percentageFastFood,
+        "Family Clothing": percentageFamilyClothing,
+        total: 1
+      };
+
+      finalData[0] = obj;
+
+      return finalData;
+    }
+
+    getData.fi = function (value) {
+      if (!arguments.length) return fi;
+      fi = value;
+      return getData;
+    };
+
+    return getData;
+  }
+
+  function getPurchaseByMerchantSegmentData() {
+
+    var fi = "My Financial Institution";
+
+    function getData() {
+      var bin1Data = getInsightsData("bin 1", fi);
+
+      bin1Data = bin1Data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      var bin2Data = getInsightsData("bin 2", fi);
+
+      bin2Data = bin1Data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      var data = bin1Data.concat(bin2Data);
+
+      var salePcDepartmentStore = 0;
+      var salePcGrocery = 0;
+      var salePcPharmacies = 0;
+      var salePcFamilyClothing = 0;
+      var salePcFastFood = 0;
+      var salePcTotal = 0;
+
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].mcc_name == "Department Store") {
+          salePcDepartmentStore = data[i].sale_pc + salePcDepartmentStore;
+        }
+        if (data[i].mcc_name == "Grocery") {
+          salePcGrocery = data[i].sale_pc + salePcGrocery;
+        }
+        if (data[i].mcc_name == "Pharmacies") {
+          salePcPharmacies = data[i].sale_pc + salePcPharmacies;
+        }
+        if (data[i].mcc_name == "Family Clothing") {
+          salePcFamilyClothing = data[i].sale_pc + salePcFamilyClothing;
+        }
+        if (data[i].mcc_name == "Fast Food") {
+          salePcFastFood = data[i].sale_pc + salePcFastFood;
+        }
+        salePcTotal = salePcTotal + data[i].sale_pc;
+      }
+
+      //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
+
+      var percentageDepartmentStore = salePcDepartmentStore / salePcTotal;
+      var percentageGrocery = salePcGrocery / salePcTotal;
+      var percentagePharmacies = salePcPharmacies / salePcTotal;
+      var percentageFamilyClothing = salePcFamilyClothing / salePcTotal;
+      var percentageFastFood = salePcFastFood / salePcTotal;
+      //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);   
+
+      var finalData = [];
+
+      var obj = {
+        "Department Store": percentageDepartmentStore,
+        "Grocery": percentageGrocery,
+        "Pharmacies": percentagePharmacies,
+        "Fast Food": percentageFastFood,
+        "Family Clothing": percentageFamilyClothing,
+        total: 1
+      };
+
+      finalData[0] = obj;
+
+      return finalData;
+    }
+
+    getData.fi = function (value) {
+      if (!arguments.length) return fi;
+      fi = value;
+      return getData;
+    };
+
+    return getData;
+  }
+
+  return {
+    setters: [function (_2) {
+      d3 = _2;
+    }, function (_) {
+      getInsightsData = _.getInsightsData;
+    }],
+    execute: function () {}
+  };
+});
+$__System.register("d", ["7"], function (_export) {
     "use strict";
 
     var d3;
@@ -8713,7 +8889,158 @@ $__System.register("c", ["7"], function (_export) {
         execute: function () {}
     };
 });
-$__System.registerDynamic('d', [], true, function ($__require, exports, module) {
+$__System.register("e", ["7"], function (_export) {
+  "use strict";
+
+  var d3;
+
+  _export("default", donutChart);
+
+  function donutChart() {
+
+    var width = 500,
+        height = 500,
+        innerText = "TOTAL TRANS";
+    var radius = Math.min(width, height) / 2;
+    var innerRad = radius / 4;
+    var hoverRad = 15;
+    var padAngle = 0;
+    var valueFunction = function valueFunction(d) {
+      return d.number;
+    };
+    var constancyFunction = function constancyFunction(d) {
+      return d.transactionType;
+    };
+    var classMap = { "declines": "fill-danger", "authorizations": "fill-success", "chargebacks": "fill-warning" };
+    var classMapFunction = function classMapFunction(d) {
+      return classMap[d.data.transactionType];
+    };
+
+    var innerNumber = 0;
+
+    function chart(container, dataArr) {
+
+      //remove current number
+      container.select("text.data").transition().duration(100).style("opacity", 0).remove();
+
+      //update number
+      container.append("text").attr("dy", ".95em").style("text-anchor", "middle").style("opacity", 0).attr("class", "data").text(function (d) {
+        return innerNumber;
+      }).transition().duration(1000).style("opacity", 1);
+
+      //remove and add inner text
+      container.selectAll("text.inside").remove();
+      container.append("text").attr("dy", "-0.5em").style("text-anchor", "middle").attr("class", "inside").text(function () {
+        return innerText;
+      });
+
+      var arc = d3.arc().outerRadius(radius).innerRadius(radius - innerRad);
+
+      var hoverArc = d3.arc().outerRadius(radius - innerRad).innerRadius(radius + hoverRad);
+
+      var pie = d3.pie().sort(null).value(valueFunction).padAngle(padAngle);
+
+      var sel = container.selectAll("path").data(pie(dataArr), constancyFunction);
+
+      sel.data(pie(dataArr)).enter().append("path").merge(sel).data(pie(dataArr)).on("mouseover", function (d) {
+        d3.select(this).transition().duration(1000).attr("d", hoverArc);
+      }).on("mouseout", function (d) {
+        d3.select(this).transition().duration(1000).attr("d", arc);
+      }).attr("class", classMapFunction).transition().duration(700).attrTween('d', function (d) {
+        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+        return function (t) {
+          return arc(interpolate(t));
+        };
+      });
+
+      sel.exit().transition().duration(700).attrTween('d', function (d) {
+        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+        return function (t) {
+          return arc(interpolate(t));
+        };
+      }).style("opacity", 0).remove();
+
+      function arcTween(a) {
+        var startAngle = a.startAngle; //<-- keep reference to start angle
+        var i = d3.interpolate(a.startAngle, a.endAngle, a); //<-- interpolate start to end
+        return function (t) {
+          return arc({ //<-- return arc at each iteration from start to interpolate end
+            startAngle: startAngle,
+            endAngle: i(t)
+          });
+        };
+      }
+    }
+
+    chart.width = function (value) {
+      if (!arguments.length) return width;
+      width = value;
+      return chart;
+    };
+
+    chart.height = function (value) {
+      if (!arguments.length) return height;
+      height = value;
+      return chart;
+    };
+    chart.innerText = function (value) {
+      if (!arguments.length) return innerText;
+      innerText = value;
+      return chart;
+    };
+    chart.innerRad = function (value) {
+      if (!arguments.length) return innerRad;
+      innerRad = value;
+      return chart;
+    };
+    chart.hoverRad = function (value) {
+      if (!arguments.length) return hoverRad;
+      hoverRad = value;
+      return chart;
+    };
+    chart.padAngle = function (value) {
+      if (!arguments.length) return padAngle;
+      padAngle = value;
+      return chart;
+    };
+    chart.constancyFunction = function (value) {
+      if (!arguments.length) return constancyFunction;
+      constancyFunction = value;
+      return chart;
+    };
+    chart.valueFunction = function (value) {
+      if (!arguments.length) return valueFunction;
+      valueFunction = value;
+      return chart;
+    };
+    chart.classMap = function (value) {
+      if (!arguments.length) return classMap;
+      classMap = value;
+      return chart;
+    };
+    chart.classMapFunction = function (value) {
+      if (!arguments.length) return classMapFunction;
+      classMapFunction = value;
+      return chart;
+    };
+
+    chart.innerNumber = function (value) {
+      if (!arguments.length) return innerNumber;
+      innerNumber = value;
+      return chart;
+    };
+
+    return chart;
+  }
+
+  return {
+    setters: [function (_) {
+      d3 = _;
+    }],
+    execute: function () {}
+  };
+});
+$__System.registerDynamic('f', [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -8836,14 +9163,14 @@ $__System.registerDynamic('d', [], true, function ($__require, exports, module) 
 	})(typeof exports === 'undefined' ? this.base64js = {} : exports);
 	return module.exports;
 });
-$__System.registerDynamic("e", ["d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("10", ["f"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d");
+  module.exports = $__require("f");
   return module.exports;
 });
-$__System.registerDynamic("f", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("11", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -8934,14 +9261,14 @@ $__System.registerDynamic("f", [], true, function ($__require, exports, module) 
   };
   return module.exports;
 });
-$__System.registerDynamic("10", ["f"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12", ["11"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("f");
+  module.exports = $__require("11");
   return module.exports;
 });
-$__System.registerDynamic('11', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('13', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -8953,14 +9280,14 @@ $__System.registerDynamic('11', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("12", ["11"], true, function ($__require, exports, module) {
+$__System.registerDynamic("14", ["13"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("11");
+  module.exports = $__require("13");
   return module.exports;
 });
-$__System.registerDynamic('13', ['e', '10', '12'], true, function ($__require, exports, module) {
+$__System.registerDynamic('15', ['10', '12', '14'], true, function ($__require, exports, module) {
   /*!
    * The buffer module from node.js, for the browser.
    *
@@ -8974,9 +9301,9 @@ $__System.registerDynamic('13', ['e', '10', '12'], true, function ($__require, e
   var define,
       global = this || self,
       GLOBAL = global;
-  var base64 = $__require('e');
-  var ieee754 = $__require('10');
-  var isArray = $__require('12');
+  var base64 = $__require('10');
+  var ieee754 = $__require('12');
+  var isArray = $__require('14');
 
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
@@ -10479,21 +10806,6 @@ $__System.registerDynamic('13', ['e', '10', '12'], true, function ($__require, e
   }
   return module.exports;
 });
-$__System.registerDynamic("14", ["13"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("13");
-  return module.exports;
-});
-$__System.registerDynamic('15', ['14'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('14');
-  return module.exports;
-});
 $__System.registerDynamic("16", ["15"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
@@ -10501,7 +10813,22 @@ $__System.registerDynamic("16", ["15"], true, function ($__require, exports, mod
   module.exports = $__require("15");
   return module.exports;
 });
-$__System.registerDynamic('17', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('17', ['16'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('16');
+  return module.exports;
+});
+$__System.registerDynamic("18", ["17"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("17");
+  return module.exports;
+});
+$__System.registerDynamic('19', [], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
@@ -10686,20 +11013,6 @@ $__System.registerDynamic('17', [], true, function ($__require, exports, module)
     };
     return module.exports;
 });
-$__System.registerDynamic("18", ["17"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("17");
-  return module.exports;
-});
-$__System.registerDynamic('19', ['18'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__System._nodeRequire ? process : $__require('18');
-  return module.exports;
-});
 $__System.registerDynamic("1a", ["19"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
@@ -10707,7 +11020,21 @@ $__System.registerDynamic("1a", ["19"], true, function ($__require, exports, mod
   module.exports = $__require("19");
   return module.exports;
 });
-$__System.registerDynamic('1b', ['16', '1a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('1b', ['1a'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__System._nodeRequire ? process : $__require('1a');
+  return module.exports;
+});
+$__System.registerDynamic("1c", ["1b"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("1b");
+  return module.exports;
+});
+$__System.registerDynamic('1d', ['18', '1c'], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -24436,97 +24763,75 @@ $__System.registerDynamic('1b', ['16', '1a'], true, function ($__require, export
       exports.geoTransverseMercatorRaw = transverseMercatorRaw;
       Object.defineProperty(exports, '__esModule', { value: true });
     });
-  })($__require('16').Buffer, $__require('1a'));
+  })($__require('18').Buffer, $__require('1c'));
   return module.exports;
 });
-$__System.registerDynamic("7", ["1b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("7", ["1d"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("1b");
+  module.exports = $__require("1d");
   return module.exports;
 });
-$__System.register("1c", ["7"], function (_export) {
+$__System.register("1e", ["7"], function (_export) {
   "use strict";
 
   var d3;
 
-  _export("default", donutChart);
+  _export("default", stackChart);
 
-  function donutChart() {
+  function stackChart() {
+    var margin = { top: 30, right: 40, bottom: 50, left: 40 };
+    var width = 0; // 900 - margin.left - margin.right;
+    var height = 0; // 300 - margin.top - margin.bottom;
 
-    var width = 500,
-        height = 500,
-        innerText = "TOTAL TRANS";
-    var radius = Math.min(width, height) / 2;
-    var innerRad = radius / 4;
-    var hoverRad = 15;
-    var padAngle = 0;
-    var valueFunction = function valueFunction(d) {
-      return d.number;
-    };
-    var constancyFunction = function constancyFunction(d) {
-      return d.transactionType;
-    };
-    var classMap = { "declines": "fill-danger", "authorizations": "fill-success", "chargebacks": "fill-warning" };
+    var x = d3.scaleBand();
+    var y = d3.scaleLinear();
+    var y2 = d3.scaleLinear();
+    var z = d3.scaleOrdinal(d3.schemeCategory20);
     var classMapFunction = function classMapFunction(d) {
-      return classMap[d.data.transactionType];
+      return classMap[d.key];
     };
 
-    var innerNumber = 0;
+    var classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
+      "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+      "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
 
-    function chart(container, dataArr) {
+    function chart(svg, data) {
+      x.rangeRound([0, height - margin.top - margin.bottom]);
 
-      //remove current number
-      container.select("text.data").transition().duration(100).style("opacity", 0).remove();
+      y.rangeRound([width - margin.left - margin.right, 0]).domain([0, d3.max(data, function (d) {
+        return d.total;
+      })]).nice();
 
-      //update number
-      container.append("text").attr("dy", ".95em").style("text-anchor", "middle").style("opacity", 0).attr("class", "data").text(function (d) {
-        return innerNumber;
-      }).transition().duration(1000).style("opacity", 1);
+      y2.rangeRound([0, width - margin.right - margin.left]).domain([0, d3.max(data, function (d) {
+        return d.total;
+      })]).nice();
 
-      //remove and add inner text
-      container.selectAll("text.inside").remove();
-      container.append("text").attr("dy", "-0.5em").style("text-anchor", "middle").attr("class", "inside").text(function () {
-        return innerText;
+      var stack = d3.stack().keys(data.columns);
+
+      var gUpdate = svg.selectAll("g").data([data]);
+
+      var g = gUpdate.enter().append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").merge(gUpdate);
+
+      var rectUpdate = g.selectAll("rect").data(stack, function (d) {
+        return d.key;
       });
 
-      var arc = d3.arc().outerRadius(radius).innerRadius(radius - innerRad);
+      //add and update all rectangles
+      var rect = rectUpdate.enter().append("rect").merge(rectUpdate).attr("y", height / 8).attr("height", height / 2).transition().duration(1000).attr("x", function (d) {
+        return y2(d[0][0]);
+      }).attr("width", function (d) {
+        return y(d[0][0]) - y(d[0][1]);
+      }).attr("class", classMapFunction);
 
-      var hoverArc = d3.arc().outerRadius(radius - innerRad).innerRadius(radius + hoverRad);
+      //remove rectangles
+      rectUpdate.exit().transition().duration(1000).attr("width", 0).remove();
 
-      var pie = d3.pie().sort(null).value(valueFunction).padAngle(padAngle);
-
-      var sel = container.selectAll("path").data(pie(dataArr), constancyFunction);
-
-      sel.data(pie(dataArr)).enter().append("path").merge(sel).data(pie(dataArr)).on("mouseover", function (d) {
-        d3.select(this).transition().duration(1000).attr("d", hoverArc);
-      }).on("mouseout", function (d) {
-        d3.select(this).transition().duration(1000).attr("d", arc);
-      }).attr("class", classMapFunction).transition().duration(700).attrTween('d', function (d) {
-        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
-        return function (t) {
-          return arc(interpolate(t));
-        };
-      });
-
-      sel.exit().transition().duration(700).attrTween('d', function (d) {
-        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
-        return function (t) {
-          return arc(interpolate(t));
-        };
-      }).style("opacity", 0).remove();
-
-      function arcTween(a) {
-        var startAngle = a.startAngle; //<-- keep reference to start angle
-        var i = d3.interpolate(a.startAngle, a.endAngle, a); //<-- interpolate start to end
-        return function (t) {
-          return arc({ //<-- return arc at each iteration from start to interpolate end
-            startAngle: startAngle,
-            endAngle: i(t)
-          });
-        };
-      }
+      //x axis
+      var newY = height - margin.top - margin.bottom;
+      svg.selectAll("g .x-axis").remove();
+      g.append("g").attr("class", "x-axis").attr("transform", "translate(0," + newY + ")").call(d3.axisBottom(y2).ticks(4, "%"));
     }
 
     chart.width = function (value) {
@@ -24534,40 +24839,14 @@ $__System.register("1c", ["7"], function (_export) {
       width = value;
       return chart;
     };
-
+    chart.margin = function (value) {
+      if (!arguments.length) return margin;
+      margin = value;
+      return chart;
+    };
     chart.height = function (value) {
       if (!arguments.length) return height;
       height = value;
-      return chart;
-    };
-    chart.innerText = function (value) {
-      if (!arguments.length) return innerText;
-      innerText = value;
-      return chart;
-    };
-    chart.innerRad = function (value) {
-      if (!arguments.length) return innerRad;
-      innerRad = value;
-      return chart;
-    };
-    chart.hoverRad = function (value) {
-      if (!arguments.length) return hoverRad;
-      hoverRad = value;
-      return chart;
-    };
-    chart.padAngle = function (value) {
-      if (!arguments.length) return padAngle;
-      padAngle = value;
-      return chart;
-    };
-    chart.constancyFunction = function (value) {
-      if (!arguments.length) return constancyFunction;
-      constancyFunction = value;
-      return chart;
-    };
-    chart.valueFunction = function (value) {
-      if (!arguments.length) return valueFunction;
-      valueFunction = value;
       return chart;
     };
     chart.classMap = function (value) {
@@ -24581,12 +24860,6 @@ $__System.register("1c", ["7"], function (_export) {
       return chart;
     };
 
-    chart.innerNumber = function (value) {
-      if (!arguments.length) return innerNumber;
-      innerNumber = value;
-      return chart;
-    };
-
     return chart;
   }
 
@@ -24597,14 +24870,14 @@ $__System.register("1c", ["7"], function (_export) {
     execute: function () {}
   };
 });
-$__System.registerDynamic("1d", ["1e"], true, function ($__require, exports, module) {
+$__System.registerDynamic("1f", ["20"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var _Array$from = $__require("1e")["default"];
+  var _Array$from = $__require("20")["default"];
   exports["default"] = function (arr) {
     if (Array.isArray(arr)) {
       for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -24616,12 +24889,12 @@ $__System.registerDynamic("1d", ["1e"], true, function ($__require, exports, mod
   exports.__esModule = true;
   return module.exports;
 });
-$__System.registerDynamic('1f', ['20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('21', ['22'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var ITERATOR = $__require('20')('iterator'),
+  var ITERATOR = $__require('22')('iterator'),
       SAFE_CLOSING = false;
   try {
     var riter = [7][ITERATOR]();
@@ -24650,21 +24923,21 @@ $__System.registerDynamic('1f', ['20'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('21', ['22', '23', '24', '25', '26', '27', '28', '1f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('23', ['24', '25', '26', '27', '28', '29', '2a', '21'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var ctx = $__require('22'),
-      $export = $__require('23'),
-      toObject = $__require('24'),
-      call = $__require('25'),
-      isArrayIter = $__require('26'),
-      toLength = $__require('27'),
-      getIterFn = $__require('28');
-  $export($export.S + $export.F * !$__require('1f')(function (iter) {
+  var ctx = $__require('24'),
+      $export = $__require('25'),
+      toObject = $__require('26'),
+      call = $__require('27'),
+      isArrayIter = $__require('28'),
+      toLength = $__require('29'),
+      getIterFn = $__require('2a');
+  $export($export.S + $export.F * !$__require('21')(function (iter) {
     Array.from(iter);
   }), 'Array', { from: function from(arrayLike) {
       var O = toObject(arrayLike),
@@ -24695,25 +24968,25 @@ $__System.registerDynamic('21', ['22', '23', '24', '25', '26', '27', '28', '1f']
     } });
   return module.exports;
 });
-$__System.registerDynamic('29', ['2a', '21', '2b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2b', ['2c', '23', '2d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('2a');
-  $__require('21');
-  module.exports = $__require('2b').Array.from;
+  $__require('2c');
+  $__require('23');
+  module.exports = $__require('2d').Array.from;
   return module.exports;
 });
-$__System.registerDynamic("1e", ["29"], true, function ($__require, exports, module) {
+$__System.registerDynamic("20", ["2b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("29"), __esModule: true };
+  module.exports = { "default": $__require("2b"), __esModule: true };
   return module.exports;
 });
-$__System.registerDynamic("2c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("2e", [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -24722,13 +24995,13 @@ $__System.registerDynamic("2c", [], true, function ($__require, exports, module)
       GLOBAL = global;
   return module.exports;
 });
-$__System.registerDynamic('2d', ['2e', '2f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2f', ['30', '31'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var toInteger = $__require('2e'),
-      defined = $__require('2f');
+  var toInteger = $__require('30'),
+      defined = $__require('31');
   module.exports = function (TO_STRING) {
     return function (that, pos) {
       var s = String(defined(that)),
@@ -24743,15 +25016,15 @@ $__System.registerDynamic('2d', ['2e', '2f'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic('2a', ['2d', '30'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2c', ['2f', '32'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $at = $__require('2d')(true);
-  $__require('30')(String, 'String', function (iterated) {
+  var $at = $__require('2f')(true);
+  $__require('32')(String, 'String', function (iterated) {
     this._t = String(iterated);
     this._i = 0;
   }, function () {
@@ -24771,7 +25044,7 @@ $__System.registerDynamic('2a', ['2d', '30'], true, function ($__require, export
   });
   return module.exports;
 });
-$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -24779,41 +25052,41 @@ $__System.registerDynamic("31", [], true, function ($__require, exports, module)
   module.exports = function () {/* empty */};
   return module.exports;
 });
-$__System.registerDynamic('32', ['33'], true, function ($__require, exports, module) {
+$__System.registerDynamic('34', ['35'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var cof = $__require('33');
+  var cof = $__require('35');
   module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
     return cof(it) == 'String' ? it.split('') : Object(it);
   };
   return module.exports;
 });
-$__System.registerDynamic('34', ['32', '2f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('36', ['34', '31'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var IObject = $__require('32'),
-      defined = $__require('2f');
+  var IObject = $__require('34'),
+      defined = $__require('31');
   module.exports = function (it) {
     return IObject(defined(it));
   };
   return module.exports;
 });
-$__System.registerDynamic('35', ['31', '36', '37', '34', '30'], true, function ($__require, exports, module) {
+$__System.registerDynamic('37', ['33', '38', '39', '36', '32'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var addToUnscopables = $__require('31'),
-      step = $__require('36'),
-      Iterators = $__require('37'),
-      toIObject = $__require('34');
-  module.exports = $__require('30')(Array, 'Array', function (iterated, kind) {
+  var addToUnscopables = $__require('33'),
+      step = $__require('38'),
+      Iterators = $__require('39'),
+      toIObject = $__require('36');
+  module.exports = $__require('32')(Array, 'Array', function (iterated, kind) {
     this._t = toIObject(iterated);
     this._i = 0;
     this._k = kind;
@@ -24835,17 +25108,17 @@ $__System.registerDynamic('35', ['31', '36', '37', '34', '30'], true, function (
   addToUnscopables('entries');
   return module.exports;
 });
-$__System.registerDynamic('38', ['35', '37'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3a', ['37', '39'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('35');
-  var Iterators = $__require('37');
+  $__require('37');
+  var Iterators = $__require('39');
   Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
   return module.exports;
 });
-$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -24853,18 +25126,18 @@ $__System.registerDynamic("39", [], true, function ($__require, exports, module)
   module.exports = true;
   return module.exports;
 });
-$__System.registerDynamic('3a', ['3b', '3c', '3d', '3e', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3c', ['3d', '3e', '3f', '40', '22'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('3b'),
-      descriptor = $__require('3c'),
-      setToStringTag = $__require('3d'),
+  var $ = $__require('3d'),
+      descriptor = $__require('3e'),
+      setToStringTag = $__require('3f'),
       IteratorPrototype = {};
-  $__require('3e')(IteratorPrototype, $__require('20')('iterator'), function () {
+  $__require('40')(IteratorPrototype, $__require('22')('iterator'), function () {
     return this;
   });
   module.exports = function (Constructor, NAME, next) {
@@ -24873,23 +25146,23 @@ $__System.registerDynamic('3a', ['3b', '3c', '3d', '3e', '20'], true, function (
   };
   return module.exports;
 });
-$__System.registerDynamic('30', ['39', '23', '3f', '3e', '40', '37', '3a', '3d', '3b', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('32', ['3b', '25', '41', '40', '42', '39', '3c', '3f', '3d', '22'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var LIBRARY = $__require('39'),
-      $export = $__require('23'),
-      redefine = $__require('3f'),
-      hide = $__require('3e'),
-      has = $__require('40'),
-      Iterators = $__require('37'),
-      $iterCreate = $__require('3a'),
-      setToStringTag = $__require('3d'),
-      getProto = $__require('3b').getProto,
-      ITERATOR = $__require('20')('iterator'),
+  var LIBRARY = $__require('3b'),
+      $export = $__require('25'),
+      redefine = $__require('41'),
+      hide = $__require('40'),
+      has = $__require('42'),
+      Iterators = $__require('39'),
+      $iterCreate = $__require('3c'),
+      setToStringTag = $__require('3f'),
+      getProto = $__require('3d').getProto,
+      ITERATOR = $__require('22')('iterator'),
       BUGGY = !([].keys && 'next' in [].keys()),
       FF_ITERATOR = '@@iterator',
       KEYS = 'keys',
@@ -24953,7 +25226,7 @@ $__System.registerDynamic('30', ['39', '23', '3f', '3e', '40', '37', '3a', '3d',
   };
   return module.exports;
 });
-$__System.registerDynamic("36", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("38", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -24963,17 +25236,17 @@ $__System.registerDynamic("36", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('41', ['2b', '3b', '42', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('43', ['2d', '3d', '44', '22'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var core = $__require('2b'),
-      $ = $__require('3b'),
-      DESCRIPTORS = $__require('42'),
-      SPECIES = $__require('20')('species');
+  var core = $__require('2d'),
+      $ = $__require('3d'),
+      DESCRIPTORS = $__require('44'),
+      SPECIES = $__require('22')('species');
   module.exports = function (KEY) {
     var C = core[KEY];
     if (DESCRIPTORS && C && !C[SPECIES]) $.setDesc(C, SPECIES, {
@@ -24985,27 +25258,27 @@ $__System.registerDynamic('41', ['2b', '3b', '42', '20'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('43', ['3b', '3e', '44', '22', '45', '2f', '46', '30', '36', '47', '40', '48', '41', '42'], true, function ($__require, exports, module) {
+$__System.registerDynamic('45', ['3d', '40', '46', '24', '47', '31', '48', '32', '38', '49', '42', '4a', '43', '44'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('3b'),
-      hide = $__require('3e'),
-      redefineAll = $__require('44'),
-      ctx = $__require('22'),
-      strictNew = $__require('45'),
-      defined = $__require('2f'),
-      forOf = $__require('46'),
-      $iterDefine = $__require('30'),
-      step = $__require('36'),
-      ID = $__require('47')('id'),
-      $has = $__require('40'),
-      isObject = $__require('48'),
-      setSpecies = $__require('41'),
-      DESCRIPTORS = $__require('42'),
+  var $ = $__require('3d'),
+      hide = $__require('40'),
+      redefineAll = $__require('46'),
+      ctx = $__require('24'),
+      strictNew = $__require('47'),
+      defined = $__require('31'),
+      forOf = $__require('48'),
+      $iterDefine = $__require('32'),
+      step = $__require('38'),
+      ID = $__require('49')('id'),
+      $has = $__require('42'),
+      isObject = $__require('4a'),
+      setSpecies = $__require('43'),
+      DESCRIPTORS = $__require('44'),
       isExtensible = Object.isExtensible || isObject,
       SIZE = DESCRIPTORS ? '_s' : 'size',
       id = 0;
@@ -25125,7 +25398,7 @@ $__System.registerDynamic('43', ['3b', '3e', '44', '22', '45', '2f', '46', '30',
   };
   return module.exports;
 });
-$__System.registerDynamic("3c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("3e", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25140,14 +25413,14 @@ $__System.registerDynamic("3c", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('3e', ['3b', '3c', '42'], true, function ($__require, exports, module) {
+$__System.registerDynamic('40', ['3d', '3e', '44'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var $ = $__require('3b'),
-      createDesc = $__require('3c');
-  module.exports = $__require('42') ? function (object, key, value) {
+  var $ = $__require('3d'),
+      createDesc = $__require('3e');
+  module.exports = $__require('44') ? function (object, key, value) {
     return $.setDesc(object, key, createDesc(1, value));
   } : function (object, key, value) {
     object[key] = value;
@@ -25155,27 +25428,27 @@ $__System.registerDynamic('3e', ['3b', '3c', '42'], true, function ($__require, 
   };
   return module.exports;
 });
-$__System.registerDynamic('3f', ['3e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('41', ['40'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = $__require('3e');
+  module.exports = $__require('40');
   return module.exports;
 });
-$__System.registerDynamic('44', ['3f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('46', ['41'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var redefine = $__require('3f');
+  var redefine = $__require('41');
   module.exports = function (target, src) {
     for (var key in src) redefine(target, key, src[key]);
     return target;
   };
   return module.exports;
 });
-$__System.registerDynamic("45", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("47", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25186,7 +25459,7 @@ $__System.registerDynamic("45", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("40", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("42", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25197,14 +25470,14 @@ $__System.registerDynamic("40", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('3d', ['3b', '40', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3f', ['3d', '42', '22'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var def = $__require('3b').setDesc,
-      has = $__require('40'),
-      TAG = $__require('20')('toStringTag');
+  var def = $__require('3d').setDesc,
+      has = $__require('42'),
+      TAG = $__require('22')('toStringTag');
   module.exports = function (it, tag, stat) {
     if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, {
       configurable: true,
@@ -25213,36 +25486,36 @@ $__System.registerDynamic('3d', ['3b', '40', '20'], true, function ($__require, 
   };
   return module.exports;
 });
-$__System.registerDynamic('42', ['49'], true, function ($__require, exports, module) {
+$__System.registerDynamic('44', ['4b'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = !$__require('49')(function () {
+  module.exports = !$__require('4b')(function () {
     return Object.defineProperty({}, 'a', { get: function () {
         return 7;
       } }).a != 7;
   });
   return module.exports;
 });
-$__System.registerDynamic('4a', ['3b', '4b', '23', '49', '3e', '44', '46', '45', '48', '3d', '42'], true, function ($__require, exports, module) {
+$__System.registerDynamic('4c', ['3d', '4d', '25', '4b', '40', '46', '48', '47', '4a', '3f', '44'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('3b'),
-      global = $__require('4b'),
-      $export = $__require('23'),
-      fails = $__require('49'),
-      hide = $__require('3e'),
-      redefineAll = $__require('44'),
-      forOf = $__require('46'),
-      strictNew = $__require('45'),
-      isObject = $__require('48'),
-      setToStringTag = $__require('3d'),
-      DESCRIPTORS = $__require('42');
+  var $ = $__require('3d'),
+      global = $__require('4d'),
+      $export = $__require('25'),
+      fails = $__require('4b'),
+      hide = $__require('40'),
+      redefineAll = $__require('46'),
+      forOf = $__require('48'),
+      strictNew = $__require('47'),
+      isObject = $__require('4a'),
+      setToStringTag = $__require('3f'),
+      DESCRIPTORS = $__require('44');
   module.exports = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
     var Base = global[NAME],
         C = Base,
@@ -25280,15 +25553,15 @@ $__System.registerDynamic('4a', ['3b', '4b', '23', '49', '3e', '44', '46', '45',
   };
   return module.exports;
 });
-$__System.registerDynamic('4c', ['43', '4a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('4e', ['45', '4c'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var strong = $__require('43');
-  $__require('4a')('Set', function (get) {
+  var strong = $__require('45');
+  $__require('4c')('Set', function (get) {
     return function Set() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
@@ -25297,12 +25570,12 @@ $__System.registerDynamic('4c', ['43', '4a'], true, function ($__require, export
     } }, strong);
   return module.exports;
 });
-$__System.registerDynamic('25', ['4d'], true, function ($__require, exports, module) {
+$__System.registerDynamic('27', ['4f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var anObject = $__require('4d');
+  var anObject = $__require('4f');
   module.exports = function (iterator, fn, value, entries) {
     try {
       return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -25314,20 +25587,20 @@ $__System.registerDynamic('25', ['4d'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('26', ['37', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('28', ['39', '22'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var Iterators = $__require('37'),
-        ITERATOR = $__require('20')('iterator'),
+    var Iterators = $__require('39'),
+        ITERATOR = $__require('22')('iterator'),
         ArrayProto = Array.prototype;
     module.exports = function (it) {
         return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
     };
     return module.exports;
 });
-$__System.registerDynamic('48', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('4a', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25337,19 +25610,19 @@ $__System.registerDynamic('48', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('4d', ['48'], true, function ($__require, exports, module) {
+$__System.registerDynamic('4f', ['4a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var isObject = $__require('48');
+  var isObject = $__require('4a');
   module.exports = function (it) {
     if (!isObject(it)) throw TypeError(it + ' is not an object!');
     return it;
   };
   return module.exports;
 });
-$__System.registerDynamic("2e", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("30", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25361,19 +25634,19 @@ $__System.registerDynamic("2e", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('27', ['2e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('29', ['30'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var toInteger = $__require('2e'),
+  var toInteger = $__require('30'),
       min = Math.min;
   module.exports = function (it) {
     return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
   };
   return module.exports;
 });
-$__System.registerDynamic("37", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25381,30 +25654,30 @@ $__System.registerDynamic("37", [], true, function ($__require, exports, module)
   module.exports = {};
   return module.exports;
 });
-$__System.registerDynamic('28', ['4e', '20', '37', '2b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2a', ['50', '22', '39', '2d'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var classof = $__require('4e'),
-        ITERATOR = $__require('20')('iterator'),
-        Iterators = $__require('37');
-    module.exports = $__require('2b').getIteratorMethod = function (it) {
+    var classof = $__require('50'),
+        ITERATOR = $__require('22')('iterator'),
+        Iterators = $__require('39');
+    module.exports = $__require('2d').getIteratorMethod = function (it) {
         if (it != undefined) return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
     };
     return module.exports;
 });
-$__System.registerDynamic('46', ['22', '25', '26', '4d', '27', '28'], true, function ($__require, exports, module) {
+$__System.registerDynamic('48', ['24', '27', '28', '4f', '29', '2a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var ctx = $__require('22'),
-      call = $__require('25'),
-      isArrayIter = $__require('26'),
-      anObject = $__require('4d'),
-      toLength = $__require('27'),
-      getIterFn = $__require('28');
+  var ctx = $__require('24'),
+      call = $__require('27'),
+      isArrayIter = $__require('28'),
+      anObject = $__require('4f'),
+      toLength = $__require('29'),
+      getIterFn = $__require('2a');
   module.exports = function (iterable, entries, fn, that) {
     var iterFn = getIterFn(iterable),
         f = ctx(fn, that, entries ? 2 : 1),
@@ -25421,7 +25694,7 @@ $__System.registerDynamic('46', ['22', '25', '26', '4d', '27', '28'], true, func
   };
   return module.exports;
 });
-$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("35", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25433,12 +25706,12 @@ $__System.registerDynamic("33", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('4f', ['4b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('51', ['4d'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var global = $__require('4b'),
+    var global = $__require('4d'),
         SHARED = '__core-js_shared__',
         store = global[SHARED] || (global[SHARED] = {});
     module.exports = function (key) {
@@ -25446,7 +25719,7 @@ $__System.registerDynamic('4f', ['4b'], true, function ($__require, exports, mod
     };
     return module.exports;
 });
-$__System.registerDynamic('47', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('49', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25458,26 +25731,26 @@ $__System.registerDynamic('47', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('20', ['4f', '47', '4b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('22', ['51', '49', '4d'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var store = $__require('4f')('wks'),
-        uid = $__require('47'),
-        Symbol = $__require('4b').Symbol;
+    var store = $__require('51')('wks'),
+        uid = $__require('49'),
+        Symbol = $__require('4d').Symbol;
     module.exports = function (name) {
         return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
     };
     return module.exports;
 });
-$__System.registerDynamic('4e', ['33', '20'], true, function ($__require, exports, module) {
+$__System.registerDynamic('50', ['35', '22'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var cof = $__require('33'),
-        TAG = $__require('20')('toStringTag'),
+    var cof = $__require('35'),
+        TAG = $__require('22')('toStringTag'),
         ARG = cof(function () {
         return arguments;
     }()) == 'Arguments';
@@ -25487,13 +25760,13 @@ $__System.registerDynamic('4e', ['33', '20'], true, function ($__require, export
     };
     return module.exports;
 });
-$__System.registerDynamic('50', ['46', '4e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('52', ['48', '50'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var forOf = $__require('46'),
-      classof = $__require('4e');
+  var forOf = $__require('48'),
+      classof = $__require('50');
   module.exports = function (NAME) {
     return function toJSON() {
       if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
@@ -25504,37 +25777,37 @@ $__System.registerDynamic('50', ['46', '4e'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic('51', ['23', '50'], true, function ($__require, exports, module) {
+$__System.registerDynamic('53', ['25', '52'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var $export = $__require('23');
-  $export($export.P, 'Set', { toJSON: $__require('50')('Set') });
+  var $export = $__require('25');
+  $export($export.P, 'Set', { toJSON: $__require('52')('Set') });
   return module.exports;
 });
-$__System.registerDynamic('52', ['2c', '2a', '38', '4c', '51', '2b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('54', ['2e', '2c', '3a', '4e', '53', '2d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
+  $__require('2e');
   $__require('2c');
-  $__require('2a');
-  $__require('38');
-  $__require('4c');
-  $__require('51');
-  module.exports = $__require('2b').Set;
+  $__require('3a');
+  $__require('4e');
+  $__require('53');
+  module.exports = $__require('2d').Set;
   return module.exports;
 });
-$__System.registerDynamic("53", ["52"], true, function ($__require, exports, module) {
+$__System.registerDynamic("55", ["54"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("52"), __esModule: true };
+  module.exports = { "default": $__require("54"), __esModule: true };
   return module.exports;
 });
-$__System.register('54', [], function (_export) {
+$__System.register('56', [], function (_export) {
   'use strict';
 
   var dataJSON;
@@ -25547,7 +25820,7 @@ $__System.register('54', [], function (_export) {
     }
   };
 });
-$__System.register("9", ["54"], function (_export) {
+$__System.register("9", ["56"], function (_export) {
   /**
    *@module model
    *@description model depends on a json file of insights data existing
@@ -25636,8 +25909,8 @@ $__System.register("9", ["54"], function (_export) {
     }
   };
 });
-$__System.register("55", ["9", "53", "1d", "a", "1e"], function (_export) {
-  var getInsightsData, _Set, _toConsumableArray, _Object$keys, _Array$from, testing;
+$__System.register("57", ["9", "20", "55", "1f", "a"], function (_export) {
+  var getInsightsData, _Array$from, _Set, _toConsumableArray, _Object$keys, testing;
 
   /**
    * Take data from the model for a specific transaction type and return
@@ -25736,16 +26009,16 @@ $__System.register("55", ["9", "53", "1d", "a", "1e"], function (_export) {
     return tableData;
   }
   return {
-    setters: [function (_2) {
-      getInsightsData = _2.getInsightsData;
+    setters: [function (_3) {
+      getInsightsData = _3.getInsightsData;
     }, function (_) {
-      _Set = _["default"];
-    }, function (_d) {
-      _toConsumableArray = _d["default"];
+      _Array$from = _["default"];
+    }, function (_2) {
+      _Set = _2["default"];
+    }, function (_f) {
+      _toConsumableArray = _f["default"];
     }, function (_a) {
       _Object$keys = _a["default"];
-    }, function (_e) {
-      _Array$from = _e["default"];
     }],
     execute: function () {
       /**
@@ -25764,7 +26037,7 @@ $__System.register("55", ["9", "53", "1d", "a", "1e"], function (_export) {
     }
   };
 });
-$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("3d", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25784,33 +26057,33 @@ $__System.registerDynamic("3b", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('56', ['3b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('58', ['3d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var $ = $__require('3b');
+  var $ = $__require('3d');
   module.exports = function defineProperty(it, key, desc) {
     return $.setDesc(it, key, desc);
   };
   return module.exports;
 });
-$__System.registerDynamic("57", ["56"], true, function ($__require, exports, module) {
+$__System.registerDynamic("59", ["58"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("56"), __esModule: true };
+  module.exports = { "default": $__require("58"), __esModule: true };
   return module.exports;
 });
-$__System.registerDynamic("58", ["57"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5a", ["59"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var _Object$defineProperty = $__require("57")["default"];
+  var _Object$defineProperty = $__require("59")["default"];
   exports["default"] = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
@@ -25830,7 +26103,7 @@ $__System.registerDynamic("58", ["57"], true, function ($__require, exports, mod
   exports.__esModule = true;
   return module.exports;
 });
-$__System.registerDynamic("59", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("5b", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -25846,7 +26119,7 @@ $__System.registerDynamic("59", [], true, function ($__require, exports, module)
   exports.__esModule = true;
   return module.exports;
 });
-$__System.registerDynamic("2f", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25857,18 +26130,18 @@ $__System.registerDynamic("2f", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('24', ['2f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('26', ['31'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var defined = $__require('2f');
+  var defined = $__require('31');
   module.exports = function (it) {
     return Object(defined(it));
   };
   return module.exports;
 });
-$__System.registerDynamic('4b', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('4d', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25878,7 +26151,7 @@ $__System.registerDynamic('4b', [], true, function ($__require, exports, module)
 
   return module.exports;
 });
-$__System.registerDynamic('5a', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('5c', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25889,12 +26162,12 @@ $__System.registerDynamic('5a', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('22', ['5a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('24', ['5c'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var aFunction = $__require('5a');
+  var aFunction = $__require('5c');
   module.exports = function (fn, that, length) {
     aFunction(fn);
     if (that === undefined) return fn;
@@ -25918,14 +26191,14 @@ $__System.registerDynamic('22', ['5a'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('23', ['4b', '2b', '22'], true, function ($__require, exports, module) {
+$__System.registerDynamic('25', ['4d', '2d', '24'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var global = $__require('4b'),
-      core = $__require('2b'),
-      ctx = $__require('22'),
+  var global = $__require('4d'),
+      core = $__require('2d'),
+      ctx = $__require('24'),
       PROTOTYPE = 'prototype';
   var $export = function (type, name, source) {
     var IS_FORCED = type & $export.F,
@@ -25963,7 +26236,7 @@ $__System.registerDynamic('23', ['4b', '2b', '22'], true, function ($__require, 
   module.exports = $export;
   return module.exports;
 });
-$__System.registerDynamic("49", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("4b", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -25977,14 +26250,14 @@ $__System.registerDynamic("49", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('5b', ['23', '2b', '49'], true, function ($__require, exports, module) {
+$__System.registerDynamic('5d', ['25', '2d', '4b'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var $export = $__require('23'),
-        core = $__require('2b'),
-        fails = $__require('49');
+    var $export = $__require('25'),
+        core = $__require('2d'),
+        fails = $__require('4b');
     module.exports = function (KEY, exec) {
         var fn = (core.Object || {})[KEY] || Object[KEY],
             exp = {};
@@ -25995,20 +26268,20 @@ $__System.registerDynamic('5b', ['23', '2b', '49'], true, function ($__require, 
     };
     return module.exports;
 });
-$__System.registerDynamic('5c', ['24', '5b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('5e', ['26', '5d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var toObject = $__require('24');
-  $__require('5b')('keys', function ($keys) {
+  var toObject = $__require('26');
+  $__require('5d')('keys', function ($keys) {
     return function keys(it) {
       return $keys(toObject(it));
     };
   });
   return module.exports;
 });
-$__System.registerDynamic('2b', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('2d', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -26018,33 +26291,33 @@ $__System.registerDynamic('2b', [], true, function ($__require, exports, module)
 
   return module.exports;
 });
-$__System.registerDynamic('5d', ['5c', '2b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('5f', ['5e', '2d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('5c');
-  module.exports = $__require('2b').Object.keys;
+  $__require('5e');
+  module.exports = $__require('2d').Object.keys;
   return module.exports;
 });
-$__System.registerDynamic("a", ["5d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("a", ["5f"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("5d"), __esModule: true };
+  module.exports = { "default": $__require("5f"), __esModule: true };
   return module.exports;
 });
-$__System.register('5e', ['58', '59', 'a'], function (_export) {
+$__System.register('60', ['5a', '5b', 'a'], function (_export) {
   var _createClass, _classCallCheck, _Object$keys, Checkboxes;
 
   return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_2) {
-      _classCallCheck = _2['default'];
-    }, function (_a) {
-      _Object$keys = _a['default'];
+    setters: [function (_a) {
+      _createClass = _a['default'];
+    }, function (_b) {
+      _classCallCheck = _b['default'];
+    }, function (_a2) {
+      _Object$keys = _a2['default'];
     }],
     execute: function () {
       /**
@@ -26139,7 +26412,7 @@ $__System.register('5e', ['58', '59', 'a'], function (_export) {
     }
   };
 });
-$__System.register('5f', ['5e'], function (_export) {
+$__System.register('61', ['60'], function (_export) {
   /**
    * @module checkboxObserver
    */
@@ -26295,75 +26568,88 @@ $__System.register('5f', ['5e'], function (_export) {
     };
   }
   return {
-    setters: [function (_e) {
-      Checkboxes = _e['default'];
+    setters: [function (_) {
+      Checkboxes = _['default'];
     }],
     execute: function () {}
   };
 });
-$__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c', '5f'], function (_export) {
-  /***** jspm packages *****/
+$__System.register('1', ['3', '5', '6', '7', '8', '9', '57', '60', '61', 'a', 'b', 'c', 'd', 'e', '1e'], function (_export) {
+  var jquery, bootstrap, groupedBarChart, d3, groupedBarController, getInsightsData, getTableData, Checkboxes, addBootstrapCheckboxObservers, _Object$keys, donutController, getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData, tableChart, donutChart, stackChart, classMap, vals, defaults, getGroupedBarData, groupedBarData, groupedWidth, groupedHeight, groupedMargin, gBarSvg, classMapFunctionBar, formatPercent, groupRangeFunction, x0, jsonGroupNames, x1, y, xAxis, yAxis, test, groupedIds, groupedVals, groupedDefaults, groupedCback, groupedObserversFunc, table, tableDataFunc, tableData, drawTable, getDonutData, donutData, constancyFunction, classMapFunction, donutWidth, donutHeight, innerRad, padAngle, interchangeDonutSvg, interchangeValueFunction, interchangeInnerNumber, drawDonut, idsInterchangeDonut, cbackInterchangeDonut, observersFuncInterchangeDonut, salesDonutSvg, salesValueFunction, salesInnerNumber, idsSalesDonut, cbackSalesDonut, observersFuncSalesDonut, transactionsDonutSvg, transactionsValueFunction, transactionsInnerNumber, idsTransactionDonut, cbackTransactionDonut, observersFuncTransactionDonut, getSpendData, spendData, svgSpendStack, stackedClassMapFunction, stackedMargin, stackedWidth, stackedHeight, drawStack, idsSpendStack, cbackSpendStack, observersFuncSpendStack, getPurchaseData, purchaseData, svgPurchaseStack, idsPurchaseStack, cbackPurchaseStack, observersFuncPurchaseStack;
 
-  /************************************************ Grouped Bar Chart ************************************************/
-
-  //get data from controller
-
-  /***** local packages *****/
-  'use strict';
-
-  var jquery, bootstrap, groupedBarChart, d3, groupedBarController, getInsightsData, getTableData, Checkboxes, donutController, tableChart, donutChart, addBootstrapCheckboxObservers, getData, groupedBarData, width, height, margin, gBarSvg, classMapFunctionBar, classMapBar, formatPercent, groupRangeFunction, x0, jsonGroupNames, x1, y, xAxis, yAxis, test, ids, vals, defaults, cback, observersFunc, table, tableDataFunc, tableData, drawTable, getDonutData, myFinancialInstitution, constancyFunction, classMapFunction, classMap, svg, valueFunction, innerNumber, testDonut, idsDonutOne, valsDonutOne, defaultsDonutOne, cbackDonutOne, observersFuncDonutOne, svgTwo, valueFunctionTwo, innerNumberTwo, testTwo, idsDonutTwo, valsDonutTwo, defaultsDonutTwo, cbackDonutTwo, observersFuncDonutTwo, svgThree, valueFunctionThree, innerNumberThree, testThree, idsDonutThree, valsDonutThree, defaultsDonutThree, cbackDonutThree, observersFuncDonutThree;
   return {
     setters: [function (_) {
       jquery = _['default'];
     }, function (_2) {
       bootstrap = _2['default'];
-    }, function (_5) {
-      groupedBarChart = _5['default'];
+    }, function (_6) {
+      groupedBarChart = _6['default'];
     }, function (_3) {
       d3 = _3;
-    }, function (_6) {
-      groupedBarController = _6['default'];
+    }, function (_7) {
+      groupedBarController = _7['default'];
     }, function (_4) {
       getInsightsData = _4.getInsightsData;
-    }, function (_7) {
-      getTableData = _7.getData;
-    }, function (_e) {
-      Checkboxes = _e['default'];
+    }, function (_8) {
+      getTableData = _8.getData;
+    }, function (_5) {
+      Checkboxes = _5['default'];
+    }, function (_9) {
+      addBootstrapCheckboxObservers = _9['default'];
+    }, function (_a) {
+      _Object$keys = _a['default'];
     }, function (_b) {
       donutController = _b['default'];
     }, function (_c) {
-      tableChart = _c['default'];
-    }, function (_c2) {
-      donutChart = _c2['default'];
-    }, function (_f) {
-      addBootstrapCheckboxObservers = _f['default'];
+      getSpendByMerchantSegmentData = _c.getSpendByMerchantSegmentData;
+      getPurchaseByMerchantSegmentData = _c.getPurchaseByMerchantSegmentData;
+    }, function (_d) {
+      tableChart = _d['default'];
+    }, function (_e) {
+      donutChart = _e['default'];
+    }, function (_e2) {
+      stackChart = _e2['default'];
     }],
     execute: function () {
-      getData = groupedBarController().txnType("pin_debit");
-      groupedBarData = getData();
+      /***** jspm packages *****/
+
+      /************************************************ ALL CHARTS ************************************************/
+
+      /***** local packages *****/
+      'use strict';
+
+      classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
+        "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+        "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
+
+      /* ALL DONUTS AND STACKED CHART CHECKBOXES */
+      vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery"];
+      defaults = [true, true, true, true, true];
+
+      /************************************************ Grouped Bar Chart ************************************************/
+
+      //get data from controller
+      getGroupedBarData = groupedBarController().txnType("sig_debit");
+      groupedBarData = getGroupedBarData();
 
       //chart parameters
-      width = 500;
-      height = 100;
-      margin = { top: 20, right: 20, bottom: 0, left: 0 };
+      groupedWidth = 500;
+      groupedHeight = 100;
+      groupedMargin = { top: 20, right: 20, bottom: 0, left: 0 };
 
-      width = width - margin.right - margin.left;
-      height = height - margin.top - margin.bottom;
+      groupedWidth = groupedWidth - groupedMargin.right - groupedMargin.left;
+      groupedHeight = groupedHeight - groupedMargin.top - groupedMargin.bottom;
 
       //create svg
-      gBarSvg = d3.select("div#chartid").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + width + " " + height)
+      gBarSvg = d3.select("div#groupedBarSigDebit").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + groupedWidth + " " + groupedHeight).style("overflow", "visible")
       //class to make it responsive
       .classed("svg-content-responsive", true);
 
       // stuff to pass to config
 
       classMapFunctionBar = function classMapFunctionBar(d) {
-        return classMapBar[d.name];
+        return classMap[d.name];
       };
-
-      classMapBar = { "Department Store": "fill-blue", "Grocery": "fill-red",
-        "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-        "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
       // Axes
       //formatting for y axis
@@ -26379,7 +26665,7 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
       };
 
       //create scales
-      x0 = d3.scaleBand().rangeRound([0, width]).domain(groupedBarData.map(function (d) {
+      x0 = d3.scaleBand().rangeRound([0, groupedWidth]).domain(groupedBarData.map(function (d) {
         return d.Issuer;
       }));
 
@@ -26388,7 +26674,7 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
 
       // scales
       x1 = d3.scaleBand().paddingOuter(1).domain(jsonGroupNames).rangeRound([0, x0.bandwidth()]);
-      y = d3.scaleLinear().range([height, 0]).domain([0, d3.max(groupedBarData, function (d) {
+      y = d3.scaleLinear().range([groupedHeight, 0]).domain([0, d3.max(groupedBarData, function (d) {
         return d3.max(d.groups, function (d) {
           return d.value;
         });
@@ -26398,21 +26684,14 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
 
       //create axes
       xAxis = d3.axisBottom().scale(x0).tickSize(0).tickPadding(10);
-      yAxis = d3.axisLeft().scale(y).tickFormat(formatPercent).ticks(5).tickSizeInner(-width).tickSizeOuter(0).tickPadding(0);
+      yAxis = d3.axisLeft().scale(y).tickFormat(formatPercent).ticks(5).tickSizeInner(-groupedWidth).tickSizeOuter(0).tickPadding(0);
 
       //draw axes
-      gBarSvg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+      gBarSvg.append("g").attr("class", "x axis").attr("transform", "translate(0," + groupedHeight + ")").call(xAxis);
       gBarSvg.append("g").attr("class", "y axis").call(yAxis);
 
       //chart config
-
-      //.append("text")
-      //.attr("transform", "rotate(-90)")
-      //.attr("y", 6)
-      //.attr("dy", ".71em")
-      //.style("text-anchor", "end")
-      //.text("percentage")
-      test = groupedBarChart().width(width).height(height).classMap(classMapBar).classMapFunction(classMapFunctionBar).x0(x0).x1(x1).y(y).groupRangeFunction(groupRangeFunction);
+      test = groupedBarChart().width(groupedWidth).height(groupedHeight).classMap(classMap).classMapFunction(classMapFunctionBar).x0(x0).x1(x1).y(y).groupRangeFunction(groupRangeFunction);
 
       //draw chart
       test(gBarSvg, groupedBarData);
@@ -26420,13 +26699,13 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
       /******* GROUPED BAR CHECKBOXES *******/
 
       // add observers
-      ids = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
-      vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Total", "Grocery"];
-      defaults = [true, true, true, true, true, true];
+      groupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
+      groupedVals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery", "Total"];
+      groupedDefaults = [true, true, true, true, true, true];
 
       // function to execute when a change happens
 
-      cback = function cback(arr) {
+      groupedCback = function groupedCback(arr) {
         //add issuer to object
         arr.push("Issuer");
 
@@ -26453,9 +26732,9 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
       };
 
       //config
-      observersFunc = addBootstrapCheckboxObservers().elementIds(ids).values(vals).defaults(defaults).callback(cback);
+      groupedObserversFunc = addBootstrapCheckboxObservers().elementIds(groupedIds).values(groupedVals).defaults(groupedDefaults).callback(groupedCback);
 
-      observersFunc();
+      groupedObserversFunc();
 
       /************************************************ TABLE ************************************************/
 
@@ -26481,8 +26760,8 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
 
       /********** USED FOR ALL DONUTS **********/
       //get data from controller
-      getDonutData = donutController().txnType("pin_debit").fi("My Financial Institution");
-      myFinancialInstitution = getDonutData();
+      getDonutData = donutController().txnType("sig_debit").fi("My Financial Institution");
+      donutData = getDonutData();
 
       //config objects
 
@@ -26494,47 +26773,46 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
         return classMap[d.data.mcc_name];
       };
 
-      classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
-        "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-        "Pharmacies": "fill-teal" };
+      donutWidth = 500;
+      donutHeight = 500;
+      innerRad = 90;
+      padAngle = 0.03;
 
       /********* Donut 1 (AVG INTERCHANGE) *********/
       //draw svg
 
-      svg = d3.select("div#donutid").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + 500 + " " + 500)
+      interchangeDonutSvg = d3.select("div#interchangeFeesDonut").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
       //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", 500).attr("height", 500).append("g").attr("id", "donutchart").attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")");
+      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
 
-      valueFunction = function valueFunction(d) {
+      interchangeValueFunction = function interchangeValueFunction(d) {
         return d.avg_fee;
       };
 
-      innerNumber = 0;
+      interchangeInnerNumber = 0;
 
-      myFinancialInstitution.forEach(function (d, j) {
-        innerNumber += d.avg_fee;
+      donutData.forEach(function (d, j) {
+        interchangeInnerNumber += d.avg_fee;
       });
-      innerNumber = innerNumber / myFinancialInstitution.length;
+      interchangeInnerNumber = interchangeInnerNumber / donutData.length;
 
       //config donut
-      testDonut = donutChart().classMap(classMap).valueFunction(valueFunction).constancyFunction(constancyFunction).classMapFunction(classMapFunction).innerRad(90).innerNumber(innerNumber).innerText("AVG INTERCHANGE").padAngle(0.03);
+      drawDonut = donutChart().classMap(classMap).valueFunction(interchangeValueFunction).constancyFunction(constancyFunction).classMapFunction(classMapFunction).innerRad(innerRad).innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE").padAngle(padAngle);
 
       //draw donut
-      testDonut(svg, myFinancialInstitution);
+      drawDonut(interchangeDonutSvg, donutData);
 
       /********* DONUT 1 CHECKBOXES *********/
 
       // add observers
-      idsDonutOne = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
-      valsDonutOne = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery"];
-      defaultsDonutOne = [true, true, true, true, true];
+      idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
 
       // function to execute when a change happens
 
-      cbackDonutOne = function cbackDonutOne(arr) {
+      cbackInterchangeDonut = function cbackInterchangeDonut(arr) {
 
         //filter data
-        var filteredDonutOne = myFinancialInstitution.filter(function (obj) {
+        var filteredInterchangeDonut = donutData.filter(function (obj) {
           if (arr.indexOf(obj.mcc_name) == -1) {
             return false;
           }
@@ -26542,60 +26820,58 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
         });
 
         //update inner number
-        innerNumber = 0;
-        filteredDonutOne.forEach(function (d, j) {
-          innerNumber += d.avg_fee;
+        interchangeInnerNumber = 0;
+        filteredInterchangeDonut.forEach(function (d, j) {
+          interchangeInnerNumber += d.avg_fee;
         });
-        innerNumber = innerNumber / filteredDonutOne.length;
-        if (!innerNumber || innerNumber == NaN) {
-          innerNumber = 0;
+        interchangeInnerNumber = interchangeInnerNumber / filteredInterchangeDonut.length;
+        if (!interchangeInnerNumber || interchangeInnerNumber == NaN) {
+          interchangeInnerNumber = 0;
         }
-        testDonut.innerNumber(innerNumber);
+        drawDonut.innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE");
 
         //redraw donut
-        testDonut(svg, filteredDonutOne);
+        drawDonut(interchangeDonutSvg, filteredInterchangeDonut);
       };
 
       //config checkboxes
-      observersFuncDonutOne = addBootstrapCheckboxObservers().elementIds(idsDonutOne).values(valsDonutOne).defaults(defaultsDonutOne).callback(cbackDonutOne);
+      observersFuncInterchangeDonut = addBootstrapCheckboxObservers().elementIds(idsInterchangeDonut).values(vals).defaults(defaults).callback(cbackInterchangeDonut);
 
-      observersFuncDonutOne();
+      observersFuncInterchangeDonut();
 
       /********* Donut 2 (TOTAL SALES) *********/
 
       //draw svg
-      svgTwo = d3.select("div#donuttwo").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + 500 + " " + 500)
+      salesDonutSvg = d3.select("div#salesDonut").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
       //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", 500).attr("height", 500).append("g").attr("id", "donutchart").attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")");
+      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
 
-      valueFunctionTwo = function valueFunctionTwo(d) {
+      salesValueFunction = function salesValueFunction(d) {
         return d.amt_sale;
       };
 
-      innerNumberTwo = 0;
+      salesInnerNumber = 0;
 
-      myFinancialInstitution.forEach(function (d, j) {
-        innerNumberTwo += d.amt_sale;
+      donutData.forEach(function (d, j) {
+        salesInnerNumber += d.amt_sale;
       });
 
       //config
-      testTwo = donutChart().classMap(classMap).valueFunction(valueFunctionTwo).constancyFunction(constancyFunction).classMapFunction(classMapFunction).innerRad(90).innerNumber(innerNumberTwo).innerText("TOTAL SALES").padAngle(0.03);
+      drawDonut.valueFunction(salesValueFunction).innerNumber(salesInnerNumber).innerText("TOTAL SALES");
 
       //draw donut
-      testTwo(svgTwo, myFinancialInstitution);
+      drawDonut(salesDonutSvg, donutData);
 
       /********* DONUT 2 CHECKBOXES *********/
 
       // add observers
-      idsDonutTwo = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
-      valsDonutTwo = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery"];
-      defaultsDonutTwo = [true, true, true, true, true];
+      idsSalesDonut = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
 
       // function to execute when a change happens
 
-      cbackDonutTwo = function cbackDonutTwo(arr) {
+      cbackSalesDonut = function cbackSalesDonut(arr) {
 
-        var filteredDonutTwo = myFinancialInstitution.filter(function (obj) {
+        var filteredSalesDonut = donutData.filter(function (obj) {
           if (arr.indexOf(obj.mcc_name) == -1) {
             return false;
           }
@@ -26603,56 +26879,54 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
         });
 
         //update inner number
-        innerNumberTwo = 0;
-        filteredDonutTwo.forEach(function (d, j) {
-          innerNumberTwo += d.amt_sale;
+        salesInnerNumber = 0;
+        filteredSalesDonut.forEach(function (d, j) {
+          salesInnerNumber += d.amt_sale;
         });
-        testTwo.innerNumber(innerNumberTwo);
+        drawDonut.innerNumber(salesInnerNumber).innerText("TOTAL SALES");
 
         //redraw donut
-        testTwo(svgTwo, filteredDonutTwo);
+        drawDonut(salesDonutSvg, filteredSalesDonut);
       };
 
       //config checkboxes
-      observersFuncDonutTwo = addBootstrapCheckboxObservers().elementIds(idsDonutTwo).values(valsDonutTwo).defaults(defaultsDonutTwo).callback(cbackDonutTwo);
+      observersFuncSalesDonut = addBootstrapCheckboxObservers().elementIds(idsSalesDonut).values(vals).defaults(defaults).callback(cbackSalesDonut);
 
-      observersFuncDonutTwo();
+      observersFuncSalesDonut();
 
       /********* Donut 3 (TOTAL TRANS) *********/
       //draw svg
-      svgThree = d3.select("div#donutthree").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + 500 + " " + 500)
+      transactionsDonutSvg = d3.select("div#donutTransactions").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
       //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", 500).attr("height", 500).append("g").attr("id", "donutchart").attr("transform", "translate(" + 500 / 2 + "," + 500 / 2 + ")");
+      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
 
-      valueFunctionThree = function valueFunctionThree(d) {
+      transactionsValueFunction = function transactionsValueFunction(d) {
         return d.n_trans;
       };
 
-      innerNumberThree = 0;
+      transactionsInnerNumber = 0;
 
-      myFinancialInstitution.forEach(function (d, j) {
-        innerNumberThree += d.n_trans;
+      donutData.forEach(function (d, j) {
+        transactionsInnerNumber += d.n_trans;
       });
 
       //config
-      testThree = donutChart().classMap(classMap).valueFunction(valueFunctionThree).constancyFunction(constancyFunction).classMapFunction(classMapFunction).innerRad(90).innerNumber(innerNumberThree).innerText("TOTAL TRANS").padAngle(0.03);
+      drawDonut.valueFunction(transactionsValueFunction).innerNumber(transactionsInnerNumber).innerText("TOTAL TRANS");
 
       //draw donut
-      testThree(svgThree, myFinancialInstitution);
+      drawDonut(transactionsDonutSvg, donutData);
 
       /********* DONUT 3 CHECKBOXES *********/
 
       // add observers
-      idsDonutThree = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
-      valsDonutThree = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery"];
-      defaultsDonutThree = [true, true, true, true, true];
+      idsTransactionDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
 
       // function to execute when a change happens
 
-      cbackDonutThree = function cbackDonutThree(arr) {
+      cbackTransactionDonut = function cbackTransactionDonut(arr) {
 
         //filter data
-        var filteredDonutThree = myFinancialInstitution.filter(function (obj) {
+        var filteredTransactionDonut = donutData.filter(function (obj) {
           if (arr.indexOf(obj.mcc_name) == -1) {
             return false;
           }
@@ -26660,20 +26934,125 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '55', '5e', 'b', 'c', '1c
         });
 
         //update inner number
-        innerNumberThree = 0;
-        filteredDonutThree.forEach(function (d, j) {
-          innerNumberThree += d.n_trans;
+        transactionsInnerNumber = 0;
+        filteredTransactionDonut.forEach(function (d, j) {
+          transactionsInnerNumber += d.n_trans;
         });
-        testThree.innerNumber(innerNumberThree);
+        drawDonut.innerNumber(transactionsInnerNumber).innerText("TOTAL TRANS");
 
         //redraw donut
-        testThree(svgThree, filteredDonutThree);
+        drawDonut(transactionsDonutSvg, filteredTransactionDonut);
       };
 
       //config checkboxes
-      observersFuncDonutThree = addBootstrapCheckboxObservers().elementIds(idsDonutThree).values(valsDonutThree).defaults(defaultsDonutThree).callback(cbackDonutThree);
+      observersFuncTransactionDonut = addBootstrapCheckboxObservers().elementIds(idsTransactionDonut).values(vals).defaults(defaults).callback(cbackTransactionDonut);
 
-      observersFuncDonutThree();
+      observersFuncTransactionDonut();
+
+      /************************************************ Stacked Charts ************************************************/
+
+      /****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
+
+      getSpendData = getSpendByMerchantSegmentData();
+      spendData = getSpendData();
+
+      //add columns attribute
+      spendData.columns = _Object$keys(spendData[0]).filter(function (obj) {
+        return obj != "total";
+      });
+
+      svgSpendStack = d3.select("#spendStack").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + 900 + " " + 300);
+
+      stackedClassMapFunction = function stackedClassMapFunction(d) {
+        return classMap[d.key];
+      };
+
+      stackedMargin = { top: 30, right: 40, bottom: 50, left: 40 };
+      stackedWidth = 900;
+      stackedHeight = 300;
+      drawStack = stackChart().margin(stackedMargin).width(stackedWidth).height(stackedHeight).classMap(classMap).classMapFunction(stackedClassMapFunction);
+
+      drawStack(svgSpendStack, spendData);
+      /********* GET SPEND BY MERCHANT DATA CHECKBOXES *********/
+
+      // add observers
+      idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
+
+      // function to execute when a change happens
+
+      cbackSpendStack = function cbackSpendStack(arr) {
+
+        var filteredSpendData = [];
+        var SpendStackObj = {};
+        filteredSpendData[0] = SpendStackObj;
+        //filter data
+        for (var i = 0; i < arr.length; i++) {
+          filteredSpendData[0][arr[i]] = spendData[0][arr[i]];
+        }
+        filteredSpendData[0].total = 1;
+
+        filteredSpendData.columns = _Object$keys(filteredSpendData[0]).filter(function (obj) {
+          return obj != "total";
+        });
+
+        //redraw stack
+        drawStack(svgSpendStack, filteredSpendData);
+      };
+
+      //config checkboxes
+      observersFuncSpendStack = addBootstrapCheckboxObservers().elementIds(idsSpendStack).values(vals).defaults(defaults).callback(cbackSpendStack);
+
+      observersFuncSpendStack();
+
+      /****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
+
+      getPurchaseData = getPurchaseByMerchantSegmentData();
+      purchaseData = getPurchaseData();
+
+      //add columns attribute
+      purchaseData.columns = _Object$keys(purchaseData[0]).filter(function (obj) {
+        return obj != "total";
+      });
+
+      //add columns attribute
+      purchaseData.columns = _Object$keys(purchaseData[0]).filter(function (obj) {
+        return obj != "total";
+      });
+
+      svgPurchaseStack = d3.select("#purchaseStack").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + 900 + " " + 300);
+
+      drawStack(svgPurchaseStack, purchaseData);
+
+      /********* GET PURCHASE BY MERCHANT SEGMENT CHECKBOXES *********/
+
+      // add observers
+      idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
+
+      // function to execute when a change happens
+
+      cbackPurchaseStack = function cbackPurchaseStack(arr) {
+
+        var filteredPurchaseStackData = [];
+        var PurchaseStackObj = {};
+        filteredPurchaseStackData[0] = PurchaseStackObj;
+        //filter data
+        for (var i = 0; i < arr.length; i++) {
+          filteredPurchaseStackData[0][arr[i]] = purchaseData[0][arr[i]];
+        }
+        filteredPurchaseStackData[0].total = 1;
+
+        filteredPurchaseStackData.columns = _Object$keys(filteredPurchaseStackData[0]).filter(function (obj) {
+          return obj != "total";
+        });
+
+        //redraw stack
+        drawStack(svgPurchaseStack, filteredPurchaseStackData);
+      };
+
+      //config checkboxes
+      observersFuncPurchaseStack = addBootstrapCheckboxObservers().elementIds(idsPurchaseStack).values(vals).defaults(defaults).callback(cbackPurchaseStack);
+
+      observersFuncPurchaseStack();
     }
   };
 });
