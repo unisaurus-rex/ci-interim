@@ -9,6 +9,7 @@ import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
 import donutController from 'donutController';
+import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
 import stackChart from 'stacked';
@@ -444,19 +445,17 @@ observersFuncDonutThree();
 
 /************************************************ Stacked Chart ************************************************/
 
+/****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
 
-var stackedData= [ { "All Others": 0.2,
-  "Department Store": 0.2,
-  "Family Clothing": 0.2,
-  "Fast Food": 0.2,
-  "Grocery": 0.1,
-  "Pharmacies": 0.1,
-  total: 1 } ];
+var getStackedData = getSpendByMerchantSegmentData();
+
+var stackedDataTest = getStackedData();
 
 //add columns attribute
-stackedData.columns = Object.keys(stackedData[0]).filter(function (obj){
+stackedDataTest.columns = Object.keys(stackedDataTest[0]).filter(function (obj){
   return obj != "total";
 })
+
   
 var svgStacked = d3.select("#stackid")  .append("div")
   .classed("svg-container", true)
@@ -487,4 +486,36 @@ var testStack = stackChart()
   .classMapFunction(stackedClassMapFunction)
 ;
 
-testStack(svgStacked, stackedData);
+testStack(svgStacked, stackedDataTest);
+
+/*window.stackedData = stackedData;
+window.stackedDataTest = stackedDataTest;
+window.testStack = testStack;
+window.svgStacked = svgStacked;*/
+
+
+
+/****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
+
+var getStackedDataTwo = getPurchaseByMerchantSegmentData();
+
+var stackedDataTwo = getStackedDataTwo();
+
+//add columns attribute
+stackedDataTwo.columns = Object.keys(stackedDataTwo[0]).filter(function (obj){
+  return obj != "total";
+})
+
+//add columns attribute
+stackedDataTwo.columns = Object.keys(stackedDataTwo[0]).filter(function (obj){
+  return obj != "total";
+})
+
+var svgStackedTwo = d3.select("#purchasestack")  .append("div")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("viewBox","0 0 " + 900 + " " + 300)
+;
+
+testStack(svgStackedTwo, stackedDataTwo);

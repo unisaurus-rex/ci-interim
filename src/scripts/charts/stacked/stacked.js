@@ -25,43 +25,60 @@ export default function stackChart(){
 
 function chart(svg, data){
 	var ogheight = height 
-	width = width - margin.left- margin.right;
-	height = height - margin.top-margin.bottom;
+	//width = width - margin.left- margin.right;
+	//height = height - margin.top-margin.bottom;
 
 	x
-	.rangeRound([0,height]);
+	.rangeRound([0,height -margin.top - margin.bottom]);
 	
 	y
-		.rangeRound([width,0])
+		.rangeRound([width - margin.left - margin.right, 0])
 		.domain([0, d3.max(data, function(d) { return d.total; })]).nice()
 	;
 	
 	y2
-		.rangeRound([0,width])
+		.rangeRound([0, width - margin.right - margin.left])
 		.domain([0, d3.max(data, function(d) { return d.total; })]).nice()
 	;
 
-	var stack = d3.stack();
+	var stack = d3.stack().keys(data.columns);
  
-  	z.domain(data.columns.slice(1));
+//  	z.domain(data.columns.slice(1));
   
-	var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	var gUpdate = svg.selectAll("g")
+	.data( [data]);
+
+	var g = gUpdate
+	.enter()
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	.merge(gUpdate)
+	;
+	
    
-	var transformY = height- (height /4);
+	var transformY = (height -margin.top - margin.bottom) /4;
+	console.log(transformY)
 
+	var rectUpdate = g.selectAll("rect")
+	.data(stack);
 
-	g.selectAll(".serie")
-	.data(stack.keys(data.columns.slice(0))(data))
-	.enter().append("g")
-	  .attr("transform", "translate(0," + transformY + ")")
-	  .attr("class", classMapFunction)
-	.selectAll("rect")
-	.data(function(d) { return d; })
+	var rect = rectUpdate
 	.enter().append("rect")
-	  .attr("y", function(d) { return -height/2; })
-	  .attr("x", function(d) {   return y2(d[0]); })
-	  .attr("width", function(d) { return y(d[0]) - y(d[1]); })
-	  .attr("height", height/2);
+	.merge(rectUpdate)
+	  .attr("y", height/8 )
+	  .attr("class", classMapFunction)
+
+	  .attr("height", height/2)
+	  
+	  .transition()
+	  .duration(1000)
+  	  .attr("x", function(d) {   return y2(d[0][0]); })	  
+	.attr("width", function(d) { return y(d[0][0]) - y(d[0][1]); })
+  	;
+
+  	rectUpdate.exit()
+  		.remove();
+
 
   	var xaxis = d3.axisRight(x)
   		.tickSize(0)
@@ -74,13 +91,31 @@ function chart(svg, data){
 	  	.call(xaxis)
   	;
 
+
+var newY = height -margin.top - margin.bottom;
 	g.append("g")
-		.attr("transform", "translate(0," + height + ")")
+		.attr("transform", "translate(0," + newY+ ")")
 		.call(
 			d3.axisBottom(y2)
 		  	.ticks(4, "%")
 		)
+
+ /* 	var rect = sel.selectAll("rect")
+  		.data(function(d) { return d; })
 	;
+
+	rect
+	.enter().append("rect")
+	  .attr("y", function(d) { console.log (d); return -height/2; })
+	  .merge( rect )
+	  .attr("x", function(d) {   return y2(d[0]); })
+	  .attr("width", function(d) { return y(d[0]) - y(d[1]); })
+	  .attr("height", height/2)
+	  ;
+
+*/
+
+
 }
 
   chart.width = function(value){
