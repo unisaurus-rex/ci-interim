@@ -160,7 +160,11 @@ var observersFunc = addBootstrapCheckboxObservers().elementIds(ids)
     .defaults(defaults)
     .callback(cback);
 
-observersFunc();
+// observersFunc();
+/* testing only */
+window.observerArr = observersFunc();
+window.o = observersFunc;
+/* end testing */
 
 /************************************************ TABLE ************************************************/
 
