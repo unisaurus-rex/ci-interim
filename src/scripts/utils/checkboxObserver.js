@@ -35,10 +35,10 @@ export default function addBootstrapCheckboxObservers() {
     // get the DOM element tied to each id
     var domEls = elementIds.map( (id) => document.getElementById(id) );
 
-    // add observers for each item
-    domEls.forEach( (el) => addCheckboxObserver(el, changeCallback) );  
+    // add observers for each item in domEls and collect the new mutation observer objects in an array so we can return it
+    var observerArr = domEls.map( (el) => { return addCheckboxObserver(el, changeCallback); });  
 
-    return boxes;
+    return observerArr;
   }
 
   // configuration functions (getters and setters)
@@ -78,8 +78,18 @@ export default function addBootstrapCheckboxObservers() {
     return observers;
   };
 
+  // take an array of mutation observers and disconnect each one
+  observers.disconnect = function(observersArr) {
+    observersArr.forEach( (obs) => {
+      obs.disconnect();
+    });
+
+    return observers;
+  }
+
   return observers;
 }
+
 
 /**
  * Expose a way to track checkbox toggling that can be used by other functions
@@ -114,6 +124,8 @@ function addCheckboxObserver(el, callback) {
 
   // apply the observer to el
   observer.observe(el, config);
+
+  return observer;
 }
 
 /**
