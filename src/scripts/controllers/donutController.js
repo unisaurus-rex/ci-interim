@@ -3,31 +3,34 @@ import * as d3 from "d3";
 
 
 export default function getData(){
-	var txnType = "sig_debdfsit";
-	var fi = "My Financial Institutionsdf";
+  var txnType = null;
+  var fi = null;
 
-	function getData(){
-		var data = getInsightsData(txnType, fi);
+  function getData(){
+    // user must set txnType and fi or call to getData will throw error
+    if(txnType === null || fi === null){
+      throw new Error("Called getData() with unset txnType or fi");
+    }
 
-		data = data.filter(function (obj){
-			return obj.mcc_name != "Total";
-		})
+    var data = getInsightsData(txnType, fi);
 
-		//console.log(data);
+    data = data.filter(function (obj){
+      return obj.mcc_name != "Total";
+    })
 
-		return data;
-	}
+    return data;
+  }
 
-	getData.txnType = function (value){
+  getData.txnType = function (value){
     if (!arguments.length) return txnType;
-    	txnType = value;
+    txnType = value;
     return getData;
-	}
-	getData.fi = function (value){
+  }
+  getData.fi = function (value){
     if (!arguments.length) return fi;
-    	fi = value;
+    fi = value;
     return getData;
-	}
+  }
 
-	return getData;
+  return getData;
 }
