@@ -8,7 +8,13 @@ import {getInsightsData} from 'model';
 import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
-import donutController from 'donutController';
+import {getData as donutController,
+        buildChartData as buildDonutData,
+        createDrawingFunc as createDonutFunc,
+        draw as drawDonutChart,
+        initObservers as initDonutObservers,
+        disconnectObservers as disconnectDonutObservers,
+        updateObservers as updateDonutObservers} from 'donutController';
 import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
@@ -18,8 +24,8 @@ import addBootstrapCheckboxObservers from 'checkboxObserver';
 
 /************************************************ ALL CHARTS ************************************************/
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
-"Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-"Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
+                 "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+                 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
 
 /* ALL DONUTS AND STACKED CHART CHECKBOXES */
 var vals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery" ];
@@ -30,7 +36,7 @@ var defaults = [true, true, true, true, true];
 
 //get data from controller
 var getGroupedBarData = groupedBarController()
-  .txnType("sig_debit")
+    .txnType("sig_debit")
 ;
 var groupedBarData = getGroupedBarData();
 
@@ -43,14 +49,14 @@ groupedHeight = groupedHeight - groupedMargin.top - groupedMargin.bottom;
 
 //create svg
 var gBarSvg = d3.select("div#groupedBarSigDebit")
-  .append("div")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")     
-  .attr("viewBox","0 0 " + groupedWidth + " " + groupedHeight)
-  .style("overflow", "visible")
-  //class to make it responsive
-  .classed("svg-content-responsive", true)
+    .append("div")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")     
+    .attr("viewBox","0 0 " + groupedWidth + " " + groupedHeight)
+    .style("overflow", "visible")
+//class to make it responsive
+    .classed("svg-content-responsive", true)
 ;
 
 // stuff to pass to config
@@ -189,11 +195,17 @@ drawTable(table, tableData);
 
 /********** USED FOR ALL DONUTS **********/
 //get data from controller
+// TODO: remove this when converted to buildDonutData
 var getDonutData = donutController()
     .txnType("sig_debit")
     .fi("My Financial Institution")
 ;
 var donutData = getDonutData();
+
+var interchangeName = 'interchange';
+
+// keep this when conversion complete
+buildDonutData(interchangeName, 'sig_debit', 'My Financial Institution');
 
 //config objects
 var constancyFunction = function(d){
@@ -201,14 +213,14 @@ var constancyFunction = function(d){
 }
 var classMapFunction = function(d){
   return classMap[d.data.mcc_name];
-}
+  }
 
-var donutWidth = 500;
-var donutHeight = 500;
-var innerRad = 90;
-var padAngle = 0.03;
+  var donutWidth = 500;
+  var donutHeight = 500;
+  var innerRad = 90;
+  var padAngle = 0.03;
 
-/********* Donut 1 (AVG INTERCHANGE) *********/
+  /********* Donut 1 (AVG INTERCHANGE) *********/
 //draw svg
 
 var interchangeDonutSvg = d3.select("div#interchangeFeesDonut")
@@ -229,25 +241,41 @@ var interchangeValueFunction = function(d){
 }
 
 var interchangeInnerNumber = 0;
-donutData.forEach(function(d,j){
+/*
+  TODO: inner number set based on data
+  donutData.forEach(function(d,j){
   interchangeInnerNumber += d.avg_fee;
-});
-interchangeInnerNumber = interchangeInnerNumber / donutData.length;
+  });
+  interchangeInnerNumber = interchangeInnerNumber / donutData.length;
+*/
+
 
 //config donut
-var drawDonut = donutChart()
-  .classMap(classMap)
-  .valueFunction(interchangeValueFunction)
-  .constancyFunction(constancyFunction)
-  .classMapFunction(classMapFunction)
-  .innerRad(innerRad)
-  .innerNumber(interchangeInnerNumber)
-  .innerText("AVG INTERCHANGE")
-  .padAngle(padAngle)
+var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
+    .classMap(classMap)
+    .valueFunction(interchangeValueFunction)
+    .constancyFunction(constancyFunction)
+    .classMapFunction(classMapFunction)
+    .innerRad(innerRad)
+    .innerNumber(interchangeInnerNumber)
+    .innerText("AVG INTERCHANGE")
+    .padAngle(padAngle)
 ;
 
 //draw donut
-drawDonut(interchangeDonutSvg, donutData);
+// TODO: remove this when conversion is complete
+var drawDonut = donutChart() 
+    .classMap(classMap)
+    .valueFunction(interchangeValueFunction)
+    .constancyFunction(constancyFunction)
+    .classMapFunction(classMapFunction)
+    .innerRad(innerRad)
+    .innerNumber(interchangeInnerNumber)
+    .innerText("AVG INTERCHANGE")
+    .padAngle(padAngle)
+;
+// drawDonut(interchangeDonutSvg, donutData);
+drawDonutChart(interchangeName);
 
 /********* DONUT 1 CHECKBOXES *********/
 
@@ -257,50 +285,66 @@ var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'grou
 
 // function to execute when a change happens
 var cbackInterchangeDonut = (arr) => {
-
+  console.log("checked boxes: " + arr);
   //filter data
-  var filteredInterchangeDonut = donutData.filter(function (obj){
+  /*
+    var filteredInterchangeDonut = donutData.filter(function (obj){
     if (arr.indexOf(obj.mcc_name) == -1) {
-      return false;
+    return false;
     }
     return true;
-  })
+    })
+  */
 
-  //update inner number
-  interchangeInnerNumber = 0;
-  filteredInterchangeDonut.forEach(function(d,j){
+  // TODO: update inner number
+  /*
+    interchangeInnerNumber = 0;
+    filteredInterchangeDonut.forEach(function(d,j){
     interchangeInnerNumber += d.avg_fee;
-  });
-  interchangeInnerNumber = interchangeInnerNumber / filteredInterchangeDonut.length;
-  if (!interchangeInnerNumber || interchangeInnerNumber == NaN){ interchangeInnerNumber = 0;}
-  drawDonut.innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE");
-
+    });
+    interchangeInnerNumber = interchangeInnerNumber / filteredInterchangeDonut.length;
+    if (!interchangeInnerNumber || interchangeInnerNumber == NaN){ interchangeInnerNumber = 0;}
+    drawDonut.innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE");
+  */
   //redraw donut
-  drawDonut (interchangeDonutSvg, filteredInterchangeDonut);
+  // drawDonutChart(interchangeName);
 };
 
 //config checkboxes
-var observersFuncInterchangeDonut = addBootstrapCheckboxObservers().elementIds(idsInterchangeDonut)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cbackInterchangeDonut);
+/* this is what we're replacing
+   var observersFuncInterchangeDonut = addBootstrapCheckboxObservers().elementIds(idsInterchangeDonut)
+   .values(vals)
+   .defaults(defaults)
+   .callback(cbackInterchangeDonut);
 
-observersFuncInterchangeDonut();
+   observersFuncInterchangeDonut();
+*/
+
+initDonutObservers(interchangeName, idsInterchangeDonut, vals, defaults, cbackInterchangeDonut);
+
+// testing only
+window.chartname = interchangeName;
+window.callback = cbackInterchangeDonut;
+window.defaults = defaults;
+window.disconnect = disconnectDonutObservers;
+window.update = updateDonutObservers;
+// end testing
+
 
 /********* Donut 2 (TOTAL SALES) *********/
 
 //draw svg
 var salesDonutSvg = d3.select("div#salesDonut")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-  //class for responsivenesss
-  .classed("svg-content-responsive-pie", true)
-  .attr("width", donutWidth)
-  .attr("height", donutHeight)
-  .append("g")
-  .attr("id", "donutchart")
-  .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
+//class for responsivenesss
+    .classed("svg-content-responsive-pie", true)
+    .attr("width", donutWidth)
+    .attr("height", donutHeight)
+    .append("g")
+    .attr("id", "donutchart")
+    .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
 ;
 
 var salesValueFunction = function(d){
