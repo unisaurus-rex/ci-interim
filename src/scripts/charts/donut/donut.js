@@ -135,61 +135,112 @@ export default function donutChart(){
 
   chart.width = function(value){
     if (!arguments.length) return width;
-    width = value;
+
+    if(value != null) {
+      width = value;
+    }
+
     return chart;
   }
 
   chart.height = function(value){
     if (!arguments.length) return height;
-    height = value;
+
+    if(value != null) {
+      height = value; 
+    }
+
     return chart; 
   }
+
   chart.innerText = function(value){
     if (!arguments.length) return innerText;
-    innerText = value;
+
+    if(value != null) {
+      innerText = value;
+    }
+    
     return chart; 
   }
+  
   chart.innerRad = function(value){
     if (!arguments.length) return innerRad;
-    innerRad = value;
+
+    if(value != null) {
+      innerRad = value;
+    }
+    
     return chart; 
   }
+
   chart.hoverRad = function(value){
     if (!arguments.length) return hoverRad;
-    hoverRad = value;
+
+    if(value != null) {
+      hoverRad = value;
+    }
+    
     return chart; 
   }
   chart.padAngle = function(value){
     if (!arguments.length) return padAngle;
-    padAngle = value;
+
+    if(value != null) {
+      padAngle = value;
+    }
+    
     return chart; 
   }
+
   chart.constancyFunction = function(value){
     if (!arguments.length) return constancyFunction;
-    constancyFunction = value; 
+
+    if(value != null) {
+      constancyFunction = value; 
+    }
+    
     return chart;
   }
+
   chart.valueFunction = function(value){
     if (!arguments.length) return valueFunction;
-    valueFunction = value;
+
+    if(value != null) {
+      valueFunction = value;
+    }
+    
     return chart; 
   }
+
   chart.classMap = function(value){
     if (!arguments.length) return classMap;
-    classMap = value;
+
+    if(value != null) {
+      classMap = value;
+    }
+    
     return chart;
   }
+
   chart.classMapFunction = function(value){
     if(!arguments.length) return classMapFunction;
-    classMapFunction = value;
+
+    if(value != null) {
+      classMapFunction = value;
+    }
+    
     return chart;
   }
 
   chart.innerNumber = function (value){
-   if(!arguments.length) return innerNumber;
-    innerNumber = value;
+    if(!arguments.length) return innerNumber;
+
+    if(value != null) {
+      innerNumber = value;
+    }
+    
     return chart; 
   }
 
-    return chart;
+  return chart;
 }

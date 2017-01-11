@@ -54,57 +54,10 @@ export function getData(){
   return getData;
 }
 
-function drawSvg(chartname){
-
-  var width = charts[chartname].svg.width;
-  var height = charts[chartname].svg.height;
-  
-  var svgSelect = chartname + " .donut";
-
-  var interchangeDonutSvg = d3.select( svgSelect )
-    .classed("svg-container", true)
-    .append("svg")
-    .attr("viewBox", "0 0 " + width + " " + height)
-//class for responsivenesss
-    .classed("svg-content-responsive-pie", true)
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("id", "donutchart")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-  ;
-}
-
-export function setSvgSize(chartname, width, height){
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.svg.width = width;
-    p.svg.height = height;
-
-    charts[chartname] = p;
-  }
-  else{
-    charts[chartname].svg.width = width;
-    charts[chartname].svg.height = height;
-  }
-}
-
-export function setMargins(chartname, margins){
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.svg.margins = margins;
-
-    charts[chartname] = p;
-  }
-  else{
-    charts[chartname].svg.margins = margins;
-  }
-}
-
 /**
  * add or update chartname.data based on txnType and fi
  */ 
-export function buildChartData(chartname, txnType, fi) {
+export function buildData(chartname, txnType, fi) {
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
@@ -129,8 +82,76 @@ export function buildChartData(chartname, txnType, fi) {
   }
 }
 
-export function createDrawingFunc(chartname, location) {
-  let func = donutChart();
+/**
+ * @function setSvgSize
+ */
+export function setSvgSize(chartname, width, height){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.width = width;
+    p.svg.height = height;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.width = width;
+    charts[chartname].svg.height = height;
+  }
+}
+
+/**
+ * @function setMargins
+ */
+export function setMargins(chartname, margins){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.margins = margins;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.margins = margins;
+  }
+}
+
+/**
+ * @function drawSvg
+ */
+function drawSvg(chartname){
+
+  var width = charts[chartname].svg.width;
+  var height = charts[chartname].svg.height;
+  
+  var svgSelect = chartname + " .donut";
+
+  var interchangeDonutSvg = d3.select( svgSelect )
+      .classed("svg-container", true)
+      .append("svg")
+      .attr("viewBox", "0 0 " + width + " " + height)
+  //class for responsivenesss
+      .classed("svg-content-responsive-pie", true)
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("id", "donutchart")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+  ;
+}
+
+/**
+ * @function createDrawingFunc
+ * @param {Object} config - donutConfig object
+ */
+export function createDrawingFunc(chartname, config) {
+  let func = donutChart() 
+      .classMap(config.classMap)
+      .valueFunction(config.interchangeValueFunction)
+      .constancyFunction(config.constancyFunction)
+      .classMapFunction(config.classMapFunction)
+      .innerRad(config.innerRad)
+      .innerNumber(config.interchangeInnerNumber)
+      .innerText(config.innerText)
+      .padAngle(config.padAngle);
 
   // create new object for chartname if it doesn't exisit
   if(!charts.hasOwnProperty(chartname)) {
@@ -141,16 +162,13 @@ export function createDrawingFunc(chartname, location) {
     // update drawing function in charts
     charts[chartname].draw = func;
   }
-
-  // return the drawing function so the user can configure it and/or use it themselves
-  return func;
 }
 
 // Call the drawing function associated with a chartname
 export function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     let data = charts[chartname].data;
-    let loc = charts[chartname].location;
+    let loc = chartname + " svg";
 
     charts[chartname].draw(loc, data);
   }  
