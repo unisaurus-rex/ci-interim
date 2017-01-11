@@ -2,8 +2,23 @@ import {getInsightsData} from 'model';
 import addBootstrapCheckboxObservers from 'checkboxObserver';
 import donutChart from 'donut';
 import * as d3 from "d3";
+import Panel from "panel";
 
 var charts = {};
+
+
+
+export var donutExport = {
+  setSvgSize: setSvgSize,
+  setMargins: setMargins,
+  buildChartData: buildChartData,
+  drawSvg: drawSvg
+}
+
+window.charts = charts;
+window.donutExport = donutExport;
+
+
 
 // TODO: after changes, this function not needed
 export function getData(){
@@ -39,17 +54,79 @@ export function getData(){
   return getData;
 }
 
+function drawSvg(chartname){
+
+  var width = charts[chartname].svg.width;
+  var height = charts[chartname].svg.height;
+  
+  var svgSelect = chartname + " .donut";
+
+  var interchangeDonutSvg = d3.select( svgSelect )
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("viewBox", "0 0 " + width + " " + height)
+//class for responsivenesss
+    .classed("svg-content-responsive-pie", true)
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("id", "donutchart")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+  ;
+}
+
+export function setSvgSize(chartname, width, height){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.width = width;
+    p.svg.height = height;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.width = width;
+    charts[chartname].svg.height = height;
+  }
+}
+
+export function setMargins(chartname, margins){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.margins = margins;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.margins = margins;
+  }
+}
+
 /**
  * add or update chartname.data based on txnType and fi
  */ 
 export function buildChartData(chartname, txnType, fi) {
+  
   // if chartname object doesn't exist, build new object and add data property
+  //chartname is the selector for the panel
   if(!charts.hasOwnProperty(chartname)) {
-    charts[chartname] = {data: getInsightsData(txnType, fi)}
-  }
+    var p = new Panel();
+    p.data = getInsightsData(txnType, fi);
+    p.data = p.data.filter(function (obj){
+      return obj.mcc_name != "Total";
+    })
 
-  // if chartname object exists, add/update data
-  charts[chartname].data = getInsightsData(txnType, fi);
+    charts[chartname] = p;
+
+    var dropDownSelect = chartname + " .dropdown-menu li";
+    p.dropdown = d3.select( dropDownSelect ).attr("value");
+  }
+  else{
+    charts[chartname].data = getInsightsData(txnType, fi);
+
+    charts[chartname].data = charts[chartname].data.filter(function (obj){
+      return obj.mcc_name != "Total";
+    }) 
+  }
 }
 
 export function createDrawingFunc(chartname, location) {
@@ -57,12 +134,12 @@ export function createDrawingFunc(chartname, location) {
 
   // create new object for chartname if it doesn't exisit
   if(!charts.hasOwnProperty(chartname)) {
-    charts[chartname] = {draw: func,
-                         location: location}
+    var p = new Panel();
+    p.draw = func;
+    charts[chartname] = p;
   } else {
     // update drawing function in charts
     charts[chartname].draw = func;
-    charts[chartname].location = location;
   }
 
   // return the drawing function so the user can configure it and/or use it themselves

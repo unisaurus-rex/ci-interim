@@ -151,9 +151,9 @@
       </div>
 
       <!-- Second row that contains 3 columns: 4, 4, and 4 -->
-      <div class="flex-row row">
+      <div class="flex-row row donutRow">
         <div class="col-lg-4 col-md-12 col-sm-12 ">
-          <div class="panel">
+          <div class="panel" id="sigDebitInterchange">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Interchange Fees</h2>
@@ -164,23 +164,15 @@
                       Dropdown <span class="caret"></span>
                     </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li value="amt_fee"><a>Total Amount of Interchange Fee</a></li>
+                    <li value="avg_fee"><a>Average Interchange Fee Amount</a></li>
+                    <li value="fee_pc"><a>Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="interchangeFeesDonut">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
               <div class="checkboxes" id="interchangeDonut">
@@ -226,7 +218,7 @@
           </div>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12">
-          <div class="panel">
+          <div class="panel" id="sigDebitSales">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Sales</h2>
@@ -237,23 +229,15 @@
                     Dropdown <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li value="amt_sale"><a>Total Amount of Sales</a></li>
+                    <li value="avg_sale"><a>Average Sales Amount</a></li>
+                    <li value="sale_pc"><a>Dollar Amount Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="salesDonut">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
               <div class="checkboxes">
@@ -299,7 +283,7 @@
           </div>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12">
-          <div class="panel">
+          <div class="panel" id="sigDebitTransactions">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Transactions</h2>
@@ -310,23 +294,15 @@
                     Dropdown <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li value="n_trans"><a>Number of Transactions</a></li>
+                    <li value="n_card"><a>Total Number of Cards Used</a></li>
+                    <li value="trans_pc"><a>Transactions Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="donutTransactions">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
               <div class="checkboxes">

@@ -14,7 +14,9 @@ import {getData as donutController,
         draw as drawDonutChart,
         initObservers as initDonutObservers,
         disconnectObservers as disconnectDonutObservers,
-        updateObservers as updateDonutObservers} from 'donutController';
+        updateObservers as updateDonutObservers,
+        donutExport
+      } from 'donutController';
 import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
@@ -205,7 +207,7 @@ var donutData = getDonutData();
 var interchangeName = 'interchange';
 
 // keep this when conversion complete
-buildDonutData(interchangeName, 'sig_debit', 'My Financial Institution');
+//buildDonutData(interchangeName, 'sig_debit', 'My Financial Institution');
 
 //config objects
 var constancyFunction = function(d){
@@ -221,6 +223,10 @@ var classMapFunction = function(d){
   var padAngle = 0.03;
 
   /********* Donut 1 (AVG INTERCHANGE) *********/
+
+
+
+
 //draw svg
 
 var interchangeDonutSvg = d3.select("div#interchangeFeesDonut")
@@ -251,7 +257,7 @@ var interchangeInnerNumber = 0;
 
 
 //config donut
-var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
+/*var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
     .classMap(classMap)
     .valueFunction(interchangeValueFunction)
     .constancyFunction(constancyFunction)
@@ -260,7 +266,7 @@ var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
     .innerNumber(interchangeInnerNumber)
     .innerText("AVG INTERCHANGE")
     .padAngle(padAngle)
-;
+;*/
 
 //draw donut
 // TODO: remove this when conversion is complete
@@ -275,7 +281,7 @@ var drawDonut = donutChart()
     .padAngle(padAngle)
 ;
 // drawDonut(interchangeDonutSvg, donutData);
-drawDonutChart(interchangeName);
+//drawDonutChart(interchangeName);
 
 /********* DONUT 1 CHECKBOXES *********/
 
@@ -320,7 +326,7 @@ var cbackInterchangeDonut = (arr) => {
    observersFuncInterchangeDonut();
 */
 
-initDonutObservers(interchangeName, idsInterchangeDonut, vals, defaults, cbackInterchangeDonut);
+//initDonutObservers(interchangeName, idsInterchangeDonut, vals, defaults, cbackInterchangeDonut);
 
 // testing only
 window.chartname = interchangeName;
@@ -334,7 +340,7 @@ window.update = updateDonutObservers;
 /********* Donut 2 (TOTAL SALES) *********/
 
 //draw svg
-var salesDonutSvg = d3.select("div#salesDonut")
+var salesDonutSvg = d3.select(".donutRow #sigDebitSales .donut")
     .classed("svg-container", true)
     .append("svg")
     .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
@@ -404,7 +410,7 @@ observersFuncSalesDonut();
 
 /********* Donut 3 (TOTAL TRANS) *********/
 //draw svg
-var transactionsDonutSvg = d3.select("div#donutTransactions")
+var transactionsDonutSvg = d3.select(".donutRow #sigDebitTransactions .donut")
   .classed("svg-container", true)
   .append("svg")
   .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
