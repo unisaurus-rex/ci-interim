@@ -307,18 +307,21 @@ function setResetCount(chartname) {
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
   return function(d) {
-    // get dropdown selection
-    let dropdownParam = d3.select(this).attr('value');
+    // get dropdown values
+    let current = d3.select(this).attr('value');
+    let old = charts[chartname].dropdown;
 
-    // set dropdown param
-    setDropdown(chartname, dropdownParam);
+    if( current != old) {
+      // set dropdown param
+      setDropdown(chartname, current);
 
-    // set reset count
-    setResetCount(chartname);
+      // set reset count
+      setResetCount(chartname);
     
-    // check all checkboxes
-    let selector = chartname + " .checkboxes label";
-    d3.selectAll(selector).classed('active', true);
+      // check all checkboxes
+      let selector = chartname + " .checkboxes label";
+      d3.selectAll(selector).classed('active', true);
+    }
   };
 }
 
