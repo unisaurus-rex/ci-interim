@@ -11,8 +11,10 @@ var charts = {};
 export var donutExport = {
   setSvgSize: setSvgSize,
   setMargins: setMargins,
-  buildChartData: buildChartData,
-  drawSvg: drawSvg
+  buildData: buildData,
+  drawSvg: drawSvg,
+  draw: draw,
+  createDrawingFunc: createDrawingFunc
 }
 
 window.charts = charts;
@@ -61,12 +63,15 @@ export function buildData(chartname, txnType, fi) {
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
+  var get = getData().txnType("sig_debit").fi("My Financial Institution");
+  var data = get();
+  
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
-    p.data = getInsightsData(txnType, fi);
-    p.data = p.data.filter(function (obj){
+    p.data = data;// getInsightsData(txnType, fi);
+    /*p.data = p.data.filter(function (obj){
       return obj.mcc_name != "Total";
-    })
+    })*/
 
     charts[chartname] = p;
 
@@ -74,11 +79,13 @@ export function buildData(chartname, txnType, fi) {
     p.dropdown = d3.select( dropDownSelect ).attr("value");
   }
   else{
-    charts[chartname].data = getInsightsData(txnType, fi);
+    charts[chartname].data = data//getInsightsData(txnType, fi);
 
-    charts[chartname].data = charts[chartname].data.filter(function (obj){
+/*    charts[chartname].data = charts[chartname].data.filter(function (obj){
       return obj.mcc_name != "Total";
-    }) 
+    }) */
+
+
   }
 }
 
@@ -133,7 +140,7 @@ function drawSvg(chartname){
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("id", "donutchart")
+//      .attr("id", "donutchart")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
   ;
 }
@@ -145,22 +152,22 @@ function drawSvg(chartname){
 export function createDrawingFunc(chartname, config) {
   let func = donutChart() 
       .classMap(config.classMap)
-      .valueFunction(config.interchangeValueFunction)
+      .valueFunction(config.valueFunction)
       .constancyFunction(config.constancyFunction)
       .classMapFunction(config.classMapFunction)
       .innerRad(config.innerRad)
-      .innerNumber(config.interchangeInnerNumber)
+      .innerNumber(config.innerNumber)
       .innerText(config.innerText)
       .padAngle(config.padAngle);
 
   // create new object for chartname if it doesn't exisit
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
-    p.draw = func;
+    p.drawFunc = func;
     charts[chartname] = p;
   } else {
     // update drawing function in charts
-    charts[chartname].draw = func;
+    charts[chartname].drawFunc = func;
   }
 }
 
@@ -168,9 +175,10 @@ export function createDrawingFunc(chartname, config) {
 export function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     let data = charts[chartname].data;
-    let loc = chartname + " svg";
+    let loc = d3.select(chartname + " svg g");
 
-    charts[chartname].draw(loc, data);
+    //console.log(data);
+    charts[chartname].drawFunc(loc, data);
   }  
 }
 

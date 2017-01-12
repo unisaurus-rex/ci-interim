@@ -9,7 +9,7 @@ import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
 import {getData as donutController,
-        buildChartData as buildDonutData,
+        buildData as buildDonutData,
         createDrawingFunc as createDonutFunc,
         draw as drawDonutChart,
         initObservers as initDonutObservers,
@@ -17,6 +17,7 @@ import {getData as donutController,
         updateObservers as updateDonutObservers,
         donutExport
       } from 'donutController';
+import donutConfig from "donutConfig";
 import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
@@ -195,6 +196,8 @@ drawTable(table, tableData);
 /************************************************ DONUTS ************************************************/
 
 
+
+
 /********** USED FOR ALL DONUTS **********/
 //get data from controller
 // TODO: remove this when converted to buildDonutData
@@ -224,7 +227,28 @@ var classMapFunction = function(d){
 
   /********* Donut 1 (AVG INTERCHANGE) *********/
 
+  var donutOneName = "#sigDebitInterchange";
+  var testMargin = {top: 20, left: 20, right: 30, bottom: 50};
+  donutExport.setSvgSize(donutOneName, 500, 500);
+  donutExport.setMargins(donutOneName ,testMargin);
+  donutExport.drawSvg(donutOneName);
+  donutExport.buildData(donutOneName, "sig_debit", "My Financial Institution");
 
+var interchangeValueFunction = function(d){
+  return d.avg_fee;
+}
+
+   var testDonutConfig = new donutConfig().setClassMap(classMap)
+    .setValueFunction(interchangeValueFunction)
+    .setConstancyFunction(constancyFunction)
+    .setClassMapFunction(classMapFunction)
+    .setInnerRad(innerRad)
+    .setInnerNumber(interchangeInnerNumber)
+    .setInnerText("AVG INTERCHANGE")
+    .setPadAngle(padAngle)
+  ;
+  donutExport.createDrawingFunc(donutOneName, testDonutConfig);
+  donutExport.draw(donutOneName);
 
 
 //draw svg
@@ -242,9 +266,6 @@ var interchangeDonutSvg = d3.select("div#interchangeFeesDonut")
     .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
 ;
 
-var interchangeValueFunction = function(d){
-  return d.avg_fee;
-}
 
 var interchangeInnerNumber = 0;
 /*
@@ -255,6 +276,11 @@ var interchangeInnerNumber = 0;
   interchangeInnerNumber = interchangeInnerNumber / donutData.length;
 */
 
+
+
+
+window.testDonutConfig = testDonutConfig;
+window.donutConfig = new donutConfig();
 
 //config donut
 /*var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
@@ -349,7 +375,7 @@ var salesDonutSvg = d3.select(".donutRow #sigDebitSales .donut")
     .attr("width", donutWidth)
     .attr("height", donutHeight)
     .append("g")
-    .attr("id", "donutchart")
+//    .attr("id", "donutchart")
     .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
 ;
 
@@ -370,6 +396,7 @@ drawDonut
 ;
 
 //draw donut
+
 drawDonut(salesDonutSvg, donutData)
 
 /********* DONUT 2 CHECKBOXES *********/
@@ -419,7 +446,7 @@ var transactionsDonutSvg = d3.select(".donutRow #sigDebitTransactions .donut")
   .attr("width", donutWidth)
   .attr("height", donutHeight)
   .append("g")
-  .attr("id", "donutchart")
+//  .attr("id", "donutchart")
   .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
 ;
 

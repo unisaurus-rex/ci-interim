@@ -1,4 +1,4 @@
-export default donutConfig() {
+export default function donutConfig() {
   this.classMap = null;
   this.valueFunction = null;
   this.constancyFunction = null;
@@ -8,7 +8,7 @@ export default donutConfig() {
   this.innerText = null;
   this.padAngle = null;
 
-  this.setClassMap = (m) => {
+  this.setClassMap = function (m) {
     if(arguments.length) {
       this.classMap = m;
     }
@@ -16,7 +16,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setValueFunction= (f) => {
+  this.setValueFunction= function (f) {
     if(arguments.length) {
       this.valueFunction = f;
     }
@@ -24,7 +24,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setConstacyFunction = (f) => {
+  this.setConstancyFunction = function (f) {
     if(arguments.length) {
       this.constancyFunction = f;
     }
@@ -32,7 +32,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setClassMapFunction = (f) => {
+  this.setClassMapFunction = function (f) {
     if(arguments.length) {
       this.classMapFunction = f;
     }
@@ -40,7 +40,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setInnerRad = (r) => {
+  this.setInnerRad = function (r) {
     if(arguments.length) {
       this.innerRad = r;
     }
@@ -48,7 +48,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setInnerNumber = (n) => {
+  this.setInnerNumber = function (n) {
     if(arguments.length) {
       this.innerNumber = n;
     }
@@ -56,7 +56,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setInnerText = (t) => {
+  this.setInnerText = function (t) {
     if(arguments.length) {
       this.innerText = t;
     }
@@ -64,7 +64,7 @@ export default donutConfig() {
     return this;
   };
 
-  this.setPadAngle = (p) => {
+  this.setPadAngle = function (p) {
     if(arguments.length) {
       this.padAngle = p;
     }

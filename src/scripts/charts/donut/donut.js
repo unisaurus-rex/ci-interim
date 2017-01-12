@@ -87,6 +87,7 @@ export default function donutChart(){
       .append("path")
       .merge(sel)
       .data(pie(dataArr))
+      //.attr("test", function(d){console.log(d)})
       .on("mouseover", function(d) {
             d3.select(this).transition()
                 .duration(1000)

@@ -28,6 +28,7 @@ System.config({
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",
     "donut": "charts:donut/donut.js",
+    "donutConfig": "charts:donut/donutConfig.js",
     "donutController": "controllers:donutController.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "groupedBar": "charts:groupedBar/groupedBar.js",
