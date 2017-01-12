@@ -18,7 +18,8 @@ export var donutExport = {
   createDrawingFunc: createDrawingFunc,
   toggleCheckbox: toggleCheckbox,
   observerCallbackBuilder: observerCallbackBuilder,
-  initObservers: initObservers
+  initObservers: initObservers,
+  addDropdownListener: addDropdownListener
 }
 
 window.charts = charts;
@@ -228,10 +229,34 @@ export function observerCallbackBuilder(chartname) {
   return function(value) {
     
     if(charts.hasOwnProperty(chartname)){
-      // toggle checkbox value in charts[chartname]
-      charts[chartname].cboxes.toggle(value);
-      // call draw 
-      draw(chartname);
+      let chart = charts[chartname];
+      let resetCount = chart.resetCount;
+
+      // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
+      // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
+      if(resetCount == 0) {
+        // dropdown paramater has not changed, only the checkbox values
+
+        // toggle checkbox value in charts[chartname]
+        chart.cboxes.toggle(value);
+        // call draw 
+        draw(chartname);
+      } else if(resetCount > 1) {
+        chart.cboxes.toggle(value);
+        chart.resetCount -= 1;
+      } else {
+        // reset == 1
+        // dropdown parameter has changed, time to do work
+
+        // update resetCount
+        chart.resetCount -= 1;
+
+        // toggle checkbox value in charts[chartname]
+        chart.cboxes.toggle(value);
+
+        // call draw 
+        draw(chartname);
+      }
     } else {
       throw new Error("Attempt to reference non-existent panel object");
     }
@@ -263,38 +288,42 @@ export function initObservers(chartname, idArr, valArr, defaultArr, callback){
   
 }
 
-
-/**
- * Disconnect observerers associated with chartname object in charts
- */
-export function disconnectObservers(chartname) {
-  console.log(charts);
-  if(charts.hasOwnProperty(chartname)) {
-    // disconnect each observer in observers array
-    charts[chartname].observers.forEach( (obs) => {
-      obs.disconnect(); 
-    });
-
-    // set observers array to empty
-    charts[chartname].observers = [];
+function setDropdown(chartname, value) {
+  if(charts.hasOwnProperty(chartname)){
+    charts[chartname].dropdown = value; 
+  } else {
+    throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
   }
 }
 
-/**
- * Create new mutation observers under the chartname object in charts
- */
-export function updateObservers(chartname, defaults, callback) {
-  // TODO: if observers array is not empty, call disconnect first
+function setResetCount(chartname) {
   if(charts.hasOwnProperty(chartname)) {
-    let obsFunc = charts[chartname].observerFunc;
-
-    // update observer func with new config values
-    obsFunc.defaults(defaults).callback(callback);
-
-    // create new observers and store them in the charts
-    charts[chartname].observers = obsFunc();
+    let cboxes = charts[chartname].cboxes;
+    let count = Object.keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+    charts[chartname].resetCount= count;
   }
 }
 
+function dropdownCallbackBuilder(chartname) {
+  // return d3 event callback
+  return function(d) {
+    // get dropdown selection
+    let dropdownParam = d3.select(this).attr('value');
 
+    // set dropdown param
+    setDropdown(chartname, dropdownParam);
 
+    // set reset count
+    setResetCount(chartname);
+    
+    // check all checkboxes
+    let selector = chartname + " .checkboxes label";
+    d3.selectAll(selector).classed('active', true);
+  };
+}
+
+export function addDropdownListener(chartname) {
+  let selector = chartname + " .dropdown-menu li";
+  let cb = dropdownCallbackBuilder(chartname);
+  d3.selectAll(selector).on('click', cb);
+}

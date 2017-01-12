@@ -254,6 +254,7 @@ donutExport.initObservers(donutOneName, idsInterchangeDonut, vals, defaults, don
 
 donutExport.createDrawingFunc(donutOneName, testDonutConfig);
 donutExport.draw(donutOneName);
+donutExport.addDropdownListener(donutOneName);
 
 //draw svg
 
