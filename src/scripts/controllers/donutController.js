@@ -63,15 +63,12 @@ export function buildData(chartname, txnType, fi) {
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
-  var get = getData().txnType("sig_debit").fi("My Financial Institution");
-  var data = get();
-  
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
-    p.data = data;// getInsightsData(txnType, fi);
-    /*p.data = p.data.filter(function (obj){
+    p.data = getInsightsData(txnType, fi);
+    p.data = p.data.filter(function (obj){
       return obj.mcc_name != "Total";
-    })*/
+    })
 
     charts[chartname] = p;
 
@@ -79,11 +76,11 @@ export function buildData(chartname, txnType, fi) {
     p.dropdown = d3.select( dropDownSelect ).attr("value");
   }
   else{
-    charts[chartname].data = data//getInsightsData(txnType, fi);
+    charts[chartname].data = getInsightsData(txnType, fi);
 
-/*    charts[chartname].data = charts[chartname].data.filter(function (obj){
+    charts[chartname].data = charts[chartname].data.filter(function (obj){
       return obj.mcc_name != "Total";
-    }) */
+    }) 
 
 
   }
