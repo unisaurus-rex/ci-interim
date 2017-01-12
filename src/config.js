@@ -22,6 +22,7 @@ System.config({
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
+    "newCheckboxObserver": "utils:newCheckboxObserver.js",
     "checkboxObserver": "utils:checkboxObserver.js",
     "checkboxes": "utils:checkboxes.js",
     "core-js": "npm:core-js@1.2.7",

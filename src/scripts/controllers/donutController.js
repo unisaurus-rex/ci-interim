@@ -1,8 +1,9 @@
 import {getInsightsData} from 'model';
-import addBootstrapCheckboxObservers from 'checkboxObserver';
+import addBootstrapCheckboxObservers from 'newCheckboxObserver';
 import donutChart from 'donut';
 import * as d3 from "d3";
 import Panel from "panel";
+import Checkboxes from 'checkboxes';
 
 var charts = {};
 
@@ -14,7 +15,10 @@ export var donutExport = {
   buildData: buildData,
   drawSvg: drawSvg,
   draw: draw,
-  createDrawingFunc: createDrawingFunc
+  createDrawingFunc: createDrawingFunc,
+  toggleCheckbox: toggleCheckbox,
+  observerCallbackBuilder: observerCallbackBuilder,
+  initObservers: initObservers
 }
 
 window.charts = charts;
@@ -137,7 +141,7 @@ function drawSvg(chartname){
       .attr("width", width)
       .attr("height", height)
       .append("g")
-//      .attr("id", "donutchart")
+  //      .attr("id", "donutchart")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
   ;
 }
@@ -171,12 +175,67 @@ export function createDrawingFunc(chartname, config) {
 // Call the drawing function associated with a chartname
 export function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
-    let data = charts[chartname].data;
+    
+    let arr = charts[chartname].cboxes.getAllChecked();
+    // used returned checked value array to filter data
+    let filteredData = charts[chartname].data.filter(function (obj){
+      if (arr.indexOf(obj.mcc_name) == -1) {
+        return false;
+      }
+      return true;
+    })
+
     let loc = d3.select(chartname + " svg g");
 
     //console.log(data);
-    charts[chartname].drawFunc(loc, data);
+    charts[chartname].drawFunc(loc, filteredData);
   }  
+}
+
+/*
+ * @function addCheckboxes
+ */
+function addCheckboxes(chartname, valArr, defaultArr) {
+  let cboxes = new Checkboxes(valArr, defaultArr);
+
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.cboxes = cboxes;
+       
+    charts[chartname] = p;
+  } else {
+    charts[chartname].cboxes = cboxes;
+  } 
+}
+
+/**
+ * @function toggleCheckbox
+ */
+export function toggleCheckbox(chartname, value) {
+  if(charts.hasOwnProperty(chartname)){
+    if(charts[chartname].cboxes != null){
+      return charts[chartname].cboxes.toggle(value);
+    }
+  } else {
+    throw new Error("Attempt to reference non-existent panel object");
+  }
+} 
+
+/**
+ * @function observerCallbackBuilder 
+ */
+export function observerCallbackBuilder(chartname) {
+  return function(value) {
+    
+    if(charts.hasOwnProperty(chartname)){
+      // toggle checkbox value in charts[chartname]
+      charts[chartname].cboxes.toggle(value);
+      // call draw 
+      draw(chartname);
+    } else {
+      throw new Error("Attempt to reference non-existent panel object");
+    }
+  };
 }
 
 /**
@@ -184,19 +243,24 @@ export function draw(chartname) {
  * @function initObservers
  */
 export function initObservers(chartname, idArr, valArr, defaultArr, callback){
-  // if charts.chartname does not exist, build it 
-  if(!charts.hasOwnProperty(chartname)) {
-    charts[chartname] = {};
-  }
+  addCheckboxes(chartname, valArr, defaultArr); 
 
-  let observersFunc = addBootstrapCheckboxObservers()
+  let observerFunc = addBootstrapCheckboxObservers()
       .elementIds(idArr)
-      .values(valArr)
-      .defaults(defaultArr)
       .callback(callback);
 
-  charts[chartname].observersFunc = observersFunc;
-  charts[chartname].observers = observersFunc();
+  let observers = observerFunc();
+
+  // if charts.chartname does not exist, build it 
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.observers = observers; 
+    p.observerFunc = observerFunc;
+  } else {
+    charts[chartname].observerFunc = observerFunc;
+    charts[chartname].observers = observers;
+  }
+  
 }
 
 

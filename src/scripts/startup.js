@@ -238,7 +238,7 @@ var interchangeValueFunction = function(d){
   return d.avg_fee;
 }
 
-   var testDonutConfig = new donutConfig().setClassMap(classMap)
+var testDonutConfig = new donutConfig().setClassMap(classMap)
     .setValueFunction(interchangeValueFunction)
     .setConstancyFunction(constancyFunction)
     .setClassMapFunction(classMapFunction)
@@ -246,10 +246,14 @@ var interchangeValueFunction = function(d){
     .setInnerNumber(interchangeInnerNumber)
     .setInnerText("AVG INTERCHANGE")
     .setPadAngle(padAngle)
-  ;
-  donutExport.createDrawingFunc(donutOneName, testDonutConfig);
-  donutExport.draw(donutOneName);
+;
 
+var donutOneCb = donutExport.observerCallbackBuilder(donutOneName);
+var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
+donutExport.initObservers(donutOneName, idsInterchangeDonut, vals, defaults, donutOneCb);
+
+donutExport.createDrawingFunc(donutOneName, testDonutConfig);
+donutExport.draw(donutOneName);
 
 //draw svg
 
@@ -284,15 +288,15 @@ window.donutConfig = new donutConfig();
 
 //config donut
 /*var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
-    .classMap(classMap)
-    .valueFunction(interchangeValueFunction)
-    .constancyFunction(constancyFunction)
-    .classMapFunction(classMapFunction)
-    .innerRad(innerRad)
-    .innerNumber(interchangeInnerNumber)
-    .innerText("AVG INTERCHANGE")
-    .padAngle(padAngle)
-;*/
+  .classMap(classMap)
+  .valueFunction(interchangeValueFunction)
+  .constancyFunction(constancyFunction)
+  .classMapFunction(classMapFunction)
+  .innerRad(innerRad)
+  .innerNumber(interchangeInnerNumber)
+  .innerText("AVG INTERCHANGE")
+  .padAngle(padAngle)
+  ;*/
 
 //draw donut
 // TODO: remove this when conversion is complete
@@ -312,7 +316,7 @@ var drawDonut = donutChart()
 /********* DONUT 1 CHECKBOXES *********/
 
 // add observers
-var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
+
 
 
 // function to execute when a change happens
