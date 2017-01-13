@@ -227,8 +227,8 @@ export function toggleCheckbox(chartname, value) {
  */
 export function observerCallbackBuilder(chartname) {
   return function(value) {
-    
     if(charts.hasOwnProperty(chartname)){
+
       let chart = charts[chartname];
       let resetCount = chart.resetCount;
 
@@ -239,7 +239,6 @@ export function observerCallbackBuilder(chartname) {
 
         // toggle checkbox value in charts[chartname]
         chart.cboxes.toggle(value);
-        // call draw 
         draw(chartname);
       } else if(resetCount > 1) {
         chart.cboxes.toggle(value);
@@ -300,13 +299,20 @@ function setResetCount(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     let cboxes = charts[chartname].cboxes;
     let count = Object.keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+
     charts[chartname].resetCount= count;
+
+    //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
+    if(count == 0){
+      draw(chartname);
+    }
   }
 }
 
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
   return function(d) {
+
     // get dropdown values
     let current = d3.select(this).attr('value');
     let old = charts[chartname].dropdown;
@@ -314,6 +320,11 @@ function dropdownCallbackBuilder(chartname) {
     if( current != old) {
       // set dropdown param
       setDropdown(chartname, current);
+
+
+      //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
+      charts[chartname].drawFunc.valueFunction( function (d) { return d [ charts[chartname].dropdown ]} )
+      charts[chartname].drawFunc.innerText(charts[chartname].dropdown);
 
       // set reset count
       setResetCount(chartname);

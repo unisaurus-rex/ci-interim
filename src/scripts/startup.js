@@ -8,15 +8,7 @@ import {getInsightsData} from 'model';
 import Checkboxes from 'checkboxes';
 import groupedBarChart from 'groupedBar';
 import groupedBarController from 'groupedBarController';
-import {getData as donutController,
-        buildData as buildDonutData,
-        createDrawingFunc as createDonutFunc,
-        draw as drawDonutChart,
-        initObservers as initDonutObservers,
-        disconnectObservers as disconnectDonutObservers,
-        updateObservers as updateDonutObservers,
-        donutExport
-      } from 'donutController';
+import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
@@ -195,84 +187,55 @@ drawTable(table, tableData);
 
 /************************************************ DONUTS ************************************************/
 
-
-
-
-/********** USED FOR ALL DONUTS **********/
-//get data from controller
-// TODO: remove this when converted to buildDonutData
-var getDonutData = donutController()
-    .txnType("sig_debit")
-    .fi("My Financial Institution")
-;
-var donutData = getDonutData();
-
-var interchangeName = 'interchange';
-
-// keep this when conversion complete
-//buildDonutData(interchangeName, 'sig_debit', 'My Financial Institution');
-
 //config objects
 var constancyFunction = function(d){
   return d.mcc_name;
 }
 var classMapFunction = function(d){
   return classMap[d.data.mcc_name];
-  }
+}
 
-  var donutWidth = 500;
-  var donutHeight = 500;
-  var innerRad = 90;
-  var padAngle = 0.03;
+var donutWidth = 500;
+var donutHeight = 500;
+var innerRad = 90;
+var padAngle = 0.03;
 
-  /********* Donut 1 (AVG INTERCHANGE) *********/
+/********* Donut 1 (AVG INTERCHANGE) *********/
 
-  var donutOneName = "#sigDebitInterchange";
-  var testMargin = {top: 20, left: 20, right: 30, bottom: 50};
-  donutExport.setSvgSize(donutOneName, 500, 500);
-  donutExport.setMargins(donutOneName ,testMargin);
-  donutExport.drawSvg(donutOneName);
-  donutExport.buildData(donutOneName, "sig_debit", "My Financial Institution");
+var donutInterchangeName = "#sigDebitInterchange";
+var donutMargin = {top: 20, left: 20, right: 30, bottom: 50};
+donutExport.setSvgSize(donutInterchangeName, 500, 500);
+donutExport.setMargins(donutInterchangeName ,donutMargin);
+donutExport.drawSvg(donutInterchangeName);
+donutExport.buildData(donutInterchangeName, "sig_debit", "My Financial Institution");
 
 var interchangeValueFunction = function(d){
+  //console.log("return d.avg_fee")
   return d.avg_fee;
 }
 
-var testDonutConfig = new donutConfig().setClassMap(classMap)
-    .setValueFunction(interchangeValueFunction)
-    .setConstancyFunction(constancyFunction)
-    .setClassMapFunction(classMapFunction)
-    .setInnerRad(innerRad)
-    .setInnerNumber(interchangeInnerNumber)
-    .setInnerText("AVG INTERCHANGE")
-    .setPadAngle(padAngle)
-;
-
-var donutOneCb = donutExport.observerCallbackBuilder(donutOneName);
-var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
-donutExport.initObservers(donutOneName, idsInterchangeDonut, vals, defaults, donutOneCb);
-
-donutExport.createDrawingFunc(donutOneName, testDonutConfig);
-donutExport.draw(donutOneName);
-donutExport.addDropdownListener(donutOneName);
-
-//draw svg
-
-var interchangeDonutSvg = d3.select("div#interchangeFeesDonut")
-    .classed("svg-container", true)
-    .append("svg")
-    .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-//class for responsivenesss
-    .classed("svg-content-responsive-pie", true)
-    .attr("width", donutWidth)
-    .attr("height", donutHeight)
-    .append("g")
-    .attr("id", "donutchart")
-    .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
-;
-
-
 var interchangeInnerNumber = 0;
+
+var interchangeDonutConfig = new donutConfig().setClassMap(classMap)
+  .setValueFunction(interchangeValueFunction)
+  .setConstancyFunction(constancyFunction)
+  .setClassMapFunction(classMapFunction)
+  .setInnerRad(innerRad)
+  .setInnerNumber(interchangeInnerNumber)
+  .setInnerText("AVG INTERCHANGE")
+  .setPadAngle(padAngle)
+;
+
+var donutOneCb = donutExport.observerCallbackBuilder(donutInterchangeName);
+var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
+donutExport.initObservers(donutInterchangeName, idsInterchangeDonut, vals, defaults, donutOneCb);
+
+donutExport.createDrawingFunc(donutInterchangeName, interchangeDonutConfig);
+donutExport.draw(donutInterchangeName);
+donutExport.addDropdownListener(donutInterchangeName);
+
+
+
 /*
   TODO: inner number set based on data
   donutData.forEach(function(d,j){
@@ -282,232 +245,66 @@ var interchangeInnerNumber = 0;
 */
 
 
-
-
-window.testDonutConfig = testDonutConfig;
-window.donutConfig = new donutConfig();
-
-//config donut
-/*var donutFunc = createDonutFunc(interchangeName, interchangeDonutSvg)
-  .classMap(classMap)
-  .valueFunction(interchangeValueFunction)
-  .constancyFunction(constancyFunction)
-  .classMapFunction(classMapFunction)
-  .innerRad(innerRad)
-  .innerNumber(interchangeInnerNumber)
-  .innerText("AVG INTERCHANGE")
-  .padAngle(padAngle)
-  ;*/
-
-//draw donut
-// TODO: remove this when conversion is complete
-var drawDonut = donutChart() 
-    .classMap(classMap)
-    .valueFunction(interchangeValueFunction)
-    .constancyFunction(constancyFunction)
-    .classMapFunction(classMapFunction)
-    .innerRad(innerRad)
-    .innerNumber(interchangeInnerNumber)
-    .innerText("AVG INTERCHANGE")
-    .padAngle(padAngle)
-;
-// drawDonut(interchangeDonutSvg, donutData);
-//drawDonutChart(interchangeName);
-
-/********* DONUT 1 CHECKBOXES *********/
-
-// add observers
-
-
-
-// function to execute when a change happens
-var cbackInterchangeDonut = (arr) => {
-  console.log("checked boxes: " + arr);
-  //filter data
-  /*
-    var filteredInterchangeDonut = donutData.filter(function (obj){
-    if (arr.indexOf(obj.mcc_name) == -1) {
-    return false;
-    }
-    return true;
-    })
-  */
-
-  // TODO: update inner number
-  /*
-    interchangeInnerNumber = 0;
-    filteredInterchangeDonut.forEach(function(d,j){
-    interchangeInnerNumber += d.avg_fee;
-    });
-    interchangeInnerNumber = interchangeInnerNumber / filteredInterchangeDonut.length;
-    if (!interchangeInnerNumber || interchangeInnerNumber == NaN){ interchangeInnerNumber = 0;}
-    drawDonut.innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE");
-  */
-  //redraw donut
-  // drawDonutChart(interchangeName);
-};
-
-//config checkboxes
-/* this is what we're replacing
-   var observersFuncInterchangeDonut = addBootstrapCheckboxObservers().elementIds(idsInterchangeDonut)
-   .values(vals)
-   .defaults(defaults)
-   .callback(cbackInterchangeDonut);
-
-   observersFuncInterchangeDonut();
-*/
-
-//initDonutObservers(interchangeName, idsInterchangeDonut, vals, defaults, cbackInterchangeDonut);
-
-// testing only
-window.chartname = interchangeName;
-window.callback = cbackInterchangeDonut;
-window.defaults = defaults;
-window.disconnect = disconnectDonutObservers;
-window.update = updateDonutObservers;
-// end testing
-
-
 /********* Donut 2 (TOTAL SALES) *********/
 
-//draw svg
-var salesDonutSvg = d3.select(".donutRow #sigDebitSales .donut")
-    .classed("svg-container", true)
-    .append("svg")
-    .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-//class for responsivenesss
-    .classed("svg-content-responsive-pie", true)
-    .attr("width", donutWidth)
-    .attr("height", donutHeight)
-    .append("g")
-//    .attr("id", "donutchart")
-    .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
-;
+var donutSalesName = "#sigDebitSales";
+donutExport.setSvgSize(donutSalesName, 500, 500);
+donutExport.setMargins(donutSalesName ,donutMargin);
+donutExport.drawSvg(donutSalesName);
+donutExport.buildData(donutSalesName, "sig_debit", "My Financial Institution");
 
 var salesValueFunction = function(d){
   return d.amt_sale;
 }
 
-var salesInnerNumber = 0;
-donutData.forEach(function(d,j){
-  salesInnerNumber += d.amt_sale;
-});
-
-//config
-drawDonut
-  .valueFunction(salesValueFunction)
-  .innerNumber(salesInnerNumber)
-  .innerText("TOTAL SALES")
+var salesDonutConfig = new donutConfig().setClassMap(classMap)
+  .setValueFunction(interchangeValueFunction)
+  .setConstancyFunction(constancyFunction)
+  .setClassMapFunction(classMapFunction)
+  .setInnerRad(innerRad)
+  .setInnerNumber(0)
+  .setInnerText("TOTAL SALES")
+  .setPadAngle(padAngle)
 ;
 
-//draw donut
-
-drawDonut(salesDonutSvg, donutData)
-
-/********* DONUT 2 CHECKBOXES *********/
-
-// add observers
+var donutTwoCb = donutExport.observerCallbackBuilder(donutSalesName);
 var idsSalesDonut = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
+donutExport.initObservers(donutSalesName, idsSalesDonut, vals, defaults, donutTwoCb);
 
-// function to execute when a change happens
-var cbackSalesDonut = (arr) => {
-
-  var filteredSalesDonut = donutData.filter(function (obj){
-    if (arr.indexOf(obj.mcc_name) == -1) {
-      return false;
-    }
-    return true;
-    })
-
-  //update inner number
-  salesInnerNumber = 0;
-  filteredSalesDonut.forEach(function(d,j){
-    salesInnerNumber += d.amt_sale;
-  });
-  drawDonut.innerNumber(salesInnerNumber).innerText("TOTAL SALES");
-
-  //redraw donut
-  drawDonut (salesDonutSvg, filteredSalesDonut);
-};
-
-//config checkboxes
-var observersFuncSalesDonut = addBootstrapCheckboxObservers().elementIds(idsSalesDonut)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cbackSalesDonut);
-
-observersFuncSalesDonut();
-
-
+donutExport.createDrawingFunc(donutSalesName, salesDonutConfig);
+donutExport.draw(donutSalesName);
+donutExport.addDropdownListener(donutSalesName);
 
 /********* Donut 3 (TOTAL TRANS) *********/
-//draw svg
-var transactionsDonutSvg = d3.select(".donutRow #sigDebitTransactions .donut")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-  //class for responsivenesss
-  .classed("svg-content-responsive-pie", true)
-  .attr("width", donutWidth)
-  .attr("height", donutHeight)
-  .append("g")
-//  .attr("id", "donutchart")
-  .attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")")
-;
+
+
+var donutTransactionsName = "#sigDebitTransactions";
+donutExport.setSvgSize(donutTransactionsName, 500, 500);
+donutExport.setMargins(donutTransactionsName ,donutMargin);
+donutExport.drawSvg(donutTransactionsName);
+donutExport.buildData(donutTransactionsName, "sig_debit", "My Financial Institution");
 
 var transactionsValueFunction = function(d){
-  return d.n_trans;
+  return d.amt_sale;
 }
 
-var transactionsInnerNumber = 0;
-donutData.forEach(function(d,j){
-  transactionsInnerNumber += d.n_trans;
-});
-
-//config
-drawDonut
-  .valueFunction(transactionsValueFunction)
-  .innerNumber(transactionsInnerNumber)
-  .innerText("TOTAL TRANS")
+var transactionsDonutConfig = new donutConfig().setClassMap(classMap)
+  .setValueFunction(transactionsValueFunction)
+  .setConstancyFunction(constancyFunction)
+  .setClassMapFunction(classMapFunction)
+  .setInnerRad(innerRad)
+  .setInnerNumber(0)
+  .setInnerText("TOTAL TRANS")
+  .setPadAngle(padAngle)
 ;
 
-//draw donut
-drawDonut(transactionsDonutSvg, donutData)
+var donutThreeCb = donutExport.observerCallbackBuilder(donutTransactionsName);
+var idsTransactionsDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
+donutExport.initObservers(donutTransactionsName, idsTransactionsDonut, vals, defaults, donutThreeCb);
 
-/********* DONUT 3 CHECKBOXES *********/
-
-// add observers
-var idsTransactionDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
-
-// function to execute when a change happens
-var cbackTransactionDonut = (arr) => {
-
-  //filter data
-  var filteredTransactionDonut = donutData.filter(function (obj){
-    if (arr.indexOf(obj.mcc_name) == -1) {
-      return false;
-    }
-    return true;
-    })
-
-  //update inner number
-  transactionsInnerNumber = 0;
-  filteredTransactionDonut.forEach(function(d,j){
-    transactionsInnerNumber += d.n_trans;
-  });
-  drawDonut.innerNumber(transactionsInnerNumber).innerText("TOTAL TRANS");
-
-  //redraw donut
-  drawDonut (transactionsDonutSvg, filteredTransactionDonut);
-};
-
-//config checkboxes
-var observersFuncTransactionDonut = addBootstrapCheckboxObservers().elementIds(idsTransactionDonut)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cbackTransactionDonut);
-
-observersFuncTransactionDonut();
+donutExport.createDrawingFunc(donutTransactionsName, transactionsDonutConfig);
+donutExport.draw(donutTransactionsName);
+donutExport.addDropdownListener(donutTransactionsName);
 
 
 /************************************************ Stacked Charts ************************************************/
