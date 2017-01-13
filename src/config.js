@@ -33,6 +33,7 @@ System.config({
     "donutController": "controllers:donutController.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "groupedBar": "charts:groupedBar/groupedBar.js",
+    "groupedBarConfig": "charts:groupedBar/groupedBarConfig.js",
     "groupedBarController": "controllers:groupedBarController.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "model:model.js",

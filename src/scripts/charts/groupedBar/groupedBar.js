@@ -2,8 +2,8 @@ import * as d3 from "d3";
 
 export default function groupedBarChart(){
 
-var width = 0;
-var height = 0;
+var width = 500;
+var height = 100;
 var classMap =  {};
 var classMapFunction = function (d){
   return classMap[ d.name ];

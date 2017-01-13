@@ -5,10 +5,395 @@ import Checkboxes from 'checkboxes';
 import addBootstrapCheckboxObservers from 'newCheckboxObserver';
 import groupedBarChart from 'groupedBar';
 
-export default function getData(){
-	var txnType = "sig_debit";
+var charts = {};
 
-	function getData(){
+var get;
+
+window.charts=charts;
+
+export var groupedExport = {
+  setSvgSize: setSvgSize,
+  setMargins: setMargins,
+  buildData: buildData,
+  drawSvg: drawSvg,
+  draw: draw,
+  createDrawingFunc: createDrawingFunc,
+  toggleCheckbox: toggleCheckbox,
+  observerCallbackBuilder: observerCallbackBuilder,
+  initObservers: initObservers,
+  addDropdownListener: addDropdownListener
+}
+
+// Call the drawing function associated with a chartname
+function draw(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    
+    let arr = charts[chartname].cboxes.getAllChecked();
+    arr.push( "Issuer" );
+    // used returned checked value array to filter data
+    let filteredData = charts[chartname].data.map( (d) => {
+    return arr.reduce( (result, key) => {result[key] = d[key];
+                                         return result;}, {});
+  });  
+
+//add group attribute
+  var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
+  filteredData.forEach(function(d) {
+    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+
+    let loc = d3.select(chartname + " svg");
+
+    //console.log(data);
+    charts[chartname].drawFunc(loc, filteredData);
+  }  
+}
+
+
+/**
+ * @function createDrawingFunc
+ * @param {Object} config - groupedBarConfig object
+ */
+function createDrawingFunc(chartname, config) {
+
+  let func = groupedBarChart() 
+  		.width( charts[chartname].svg.width)
+  		.height(charts[chartname].svg.height)
+      .classMap(config.classMap)
+      .classMapFunction(config.classMapFunction)
+      .x0(config.x0)
+      .x1(config.x1)
+      .y(config.y)
+      .groupRangeFunction(config.groupRangeFunction)
+	;
+
+  // create new object for chartname if it doesn't exisit
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.drawFunc = func;
+    charts[chartname] = p;
+  } else {
+    // update drawing function in charts
+    charts[chartname].drawFunc = func;
+  }
+}
+
+
+/**
+ * @function drawSvg
+ */
+function drawSvg(chartname){
+
+  var width = charts[chartname].svg.width;
+  var height = charts[chartname].svg.height;
+  
+  var svgSelect = chartname + " .grouped";
+
+	var gBarSvg = d3.select(svgSelect)
+	    .append("div")
+	    .classed("svg-container", true)
+	    .append("svg")
+	    .attr("preserveAspectRatio", "xMinYMin meet")     
+	    .attr("viewBox","0 0 " + width + " " + height)
+	    .style("overflow", "visible")
+	//class to make it responsive
+	    .classed("svg-content-responsive", true)
+	;
+
+	return gBarSvg;
+}
+
+/**
+ * @function toggleCheckbox
+ */
+function toggleCheckbox(chartname, value) {
+  if(charts.hasOwnProperty(chartname)){
+    if(charts[chartname].cboxes != null){
+      return charts[chartname].cboxes.toggle(value);
+    }
+  } else {
+    throw new Error("Attempt to reference non-existent panel object");
+  }
+} 
+
+/**
+ * @function setSvgSize
+ */
+function setSvgSize(chartname, width, height){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.width = width;
+    p.svg.height = height;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.width = width;
+    charts[chartname].svg.height = height;
+  }
+}
+
+/**
+ * @function setMargins
+ */
+function setMargins(chartname, margins){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.margins = margins;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.margins = margins;
+  }
+}
+/**
+ * @function observerCallbackBuilder 
+ */
+function observerCallbackBuilder(chartname) {
+  return function(value) {
+    if(charts.hasOwnProperty(chartname)){
+
+      let chart = charts[chartname];
+      let resetCount = chart.resetCount;
+
+      // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
+      // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
+      if(resetCount == 0) {
+        // dropdown paramater has not changed, only the checkbox values
+
+        // toggle checkbox value in charts[chartname]
+        chart.cboxes.toggle(value);
+        draw(chartname);
+      } else if(resetCount > 1) {
+        chart.cboxes.toggle(value);
+        chart.resetCount -= 1;
+      } else {
+        // reset == 1
+        // dropdown parameter has changed, time to do work
+
+        // update resetCount
+        chart.resetCount -= 1;
+
+        // toggle checkbox value in charts[chartname]
+        chart.cboxes.toggle(value);
+
+        // call draw 
+        draw(chartname);
+      }
+    } else {
+      throw new Error("Attempt to reference non-existent panel object");
+    }
+  };
+}
+
+/*
+ * @function addCheckboxes
+ */
+function addCheckboxes(chartname, valArr, defaultArr) {
+  let cboxes = new Checkboxes(valArr, defaultArr);
+
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.cboxes = cboxes;
+       
+    charts[chartname] = p;
+  } else {
+    charts[chartname].cboxes = cboxes;
+  } 
+}
+
+
+/**
+ * Create mutation observers and track them in the charts object
+ * @function initObservers
+ */
+function initObservers(chartname, idArr, valArr, defaultArr, callback){
+  
+  addCheckboxes(chartname, valArr, defaultArr); 
+
+  let observerFunc = addBootstrapCheckboxObservers()
+      .elementIds(idArr)
+      .callback(callback);
+
+  let observers = observerFunc();
+
+  // if charts.chartname does not exist, build it 
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.observers = observers; 
+    p.observerFunc = observerFunc;
+  } else {
+    charts[chartname].observerFunc = observerFunc;
+    charts[chartname].observers = observers;
+  }
+  
+}
+
+function setDropdown(chartname, value) {
+  if(charts.hasOwnProperty(chartname)){
+    charts[chartname].dropdown = value; 
+  } else {
+    throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
+  }
+}
+
+function setResetCount(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    let cboxes = charts[chartname].cboxes;
+    let count = Object.keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+
+    charts[chartname].resetCount= count;
+
+    //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
+    if(count == 0){
+      draw(chartname);
+    }
+  }
+}
+
+function dropdownCallbackBuilder(chartname) {
+  // return d3 event callback
+  return function(d) {
+
+  	// get dropdown values
+    let current = d3.select(this).attr('value');
+    let old = charts[chartname].dropdown;
+
+  	var tickFormatFunc;
+		if ( current == "n_trans" || current == "amt_sale" || current == "amt_fee" || current == "n_card"){
+			tickFormatFunc = function(d){
+	    	var t = d/1000000;
+	    	return t+"m" }
+		}		
+		else{
+			tickFormatFunc = d3.format(',.2f');
+		}
+
+		var svgSelect = chartname + " .grouped svg";
+		var svg = d3.select(svgSelect);
+		svg.selectAll(".y.axis").transition().duration(1000).style("opacity", 0).remove()
+
+
+
+
+    if( current != old) {
+      // set dropdown param
+      setDropdown(chartname, current);
+
+      //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
+      get.column( current )
+      charts[chartname].data = get(); 
+      //charts[chartname].drawFunc.innerText(charts[chartname].dropdown);
+
+  var width = charts[chartname].svg.width;
+  var height = charts[chartname].svg.height;
+
+ var newy = d3.scaleLinear()
+  		.range([height, 0])
+  		.domain([0, d3.max(charts[chartname].data, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
+		;
+		var newYAxis = d3.axisLeft()
+	    .scale(newy)
+	    .tickFormat( tickFormatFunc)
+	    .ticks(5)
+	    .tickSizeInner(-width)
+	    //.tickSizeOuter(0)
+	    //.tickPadding(0)
+		;
+		svg.append("g")
+		  .attr("class", "y axis")
+		  .style("opacity", 0)
+		  .transition()
+		  .duration(2000)
+		  .style("opacity", 1)
+		 //.attr("transform", "translate(0, 0)" )
+		  .call(newYAxis)
+		;
+
+		d3.selectAll(".y.axis").moveToBack();
+
+		//update scale of draw function
+		charts[chartname].drawFunc.y(newy);
+
+      // set reset count
+      setResetCount(chartname);
+    
+      // check all checkboxes
+      let selector = chartname + " .checkboxes label";
+      d3.selectAll(selector).classed('active', true);
+    }
+  };
+}
+d3.selection.prototype.moveToBack = function() {  
+    return this.each(function() { 
+        var firstChild = this.parentNode.firstChild; 
+        if (firstChild) { 
+            this.parentNode.insertBefore(this, firstChild); 
+        } 
+    });
+};
+
+function addDropdownListener(chartname) {
+  let selector = chartname + " .dropdown-menu li";
+  let cb = dropdownCallbackBuilder(chartname);
+  d3.selectAll(selector).on('click', cb);
+}
+
+
+/**
+ * add or update chartname.data based on txnType and fi
+ */ 
+function buildData(chartname, txnType) {
+	get = groupedFilter().txnType(txnType);
+  
+  // if chartname object doesn't exist, build new object and add data property
+  //chartname is the selector for the panel
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    var dropDownSelect = chartname + " .dropdown-menu li";
+    p.dropdown = d3.select( dropDownSelect ).attr("value");
+
+    get.column(p.dropdown);
+
+    p.data = get();
+    charts[chartname] = p;
+
+  }
+  else{
+    var dropDownSelect = chartname + " .dropdown-menu li";
+    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value");
+    get.column(charts[chartname].dropdown);
+    charts[chartname].data = get();
+
+  }
+
+  return charts[chartname].data;
+}
+
+
+export default function groupedFilter(){
+	
+	var txnType = null;
+	var column = null;
+
+	function updateData(){
+
+		if (txnType == null){
+			throw "txnType cannot be null";
+		}
+
+		if (column == null){
+			throw "column cannot be null";
+		}
+
+		var data = getData(txnType, column);
+		return data;
+	}
+
+	function getData(txnType, column){
+
 		var insightsData = getInsightsData(txnType);	
 		var issuers = Object.keys(insightsData) ;
 		var groupedBarData = [];
@@ -21,7 +406,7 @@ export default function getData(){
 
 		  //map every mcc_name to fee_pc for every fi
 		  for ( var j=0; j< insightsData[ [issuers[i] ] ].length; j++){
-		    groupedBarData[i] [insightsData [issuers[i] ] [j].mcc_name] = insightsData [issuers[i] ] [j].fee_pc;
+		    groupedBarData[i] [insightsData [issuers[i] ] [j].mcc_name] = insightsData [issuers[i] ] [j] [column];
 		  }
 		}
 		var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function(key) { return key !== "Issuer"; });
@@ -35,13 +420,28 @@ export default function getData(){
 		return groupedBarData;	
 	}
 
-	getData.txnType = function (value){
+	updateData.txnType = function (value){
     if (!arguments.length) return txnType;
     	txnType = value;
-    return getData;
+
+    if( value == null || value == undefined){
+    	throw "txnType cannot be null or undefined";
+    }
+    return updateData;
 	}
 
-	return getData;
+	updateData.column = function (value){
+    if (!arguments.length) return column;
+    	column = value;
+
+    if( value == null || value == undefined){
+    	throw "column cannot be null or undefined";
+    }
+    return updateData;
+	}
+
+	return updateData;
+
 }
 
 
