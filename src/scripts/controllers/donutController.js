@@ -7,8 +7,6 @@ import Checkboxes from 'checkboxes';
 
 var charts = {};
 
-
-
 export var donutExport = {
   setSvgSize: setSvgSize,
   setMargins: setMargins,
@@ -22,49 +20,10 @@ export var donutExport = {
   addDropdownListener: addDropdownListener
 }
 
-window.charts = charts;
-window.donutExport = donutExport;
-
-
-
-// TODO: after changes, this function not needed
-export function getData(){
-  var txnType = null;
-  var fi = null;
-
-  function getData(){
-    // user must set txnType and fi or call to getData will throw error
-    if(txnType === null || fi === null){
-      throw new Error("Called getData() with unset txnType or fi");
-    }
-
-    var data = getInsightsData(txnType, fi);
-
-    data = data.filter(function (obj){
-      return obj.mcc_name != "Total";
-    })
-
-    return data;
-  }
-
-  getData.txnType = function (value){
-    if (!arguments.length) return txnType;
-    txnType = value;
-    return getData;
-  }
-  getData.fi = function (value){
-    if (!arguments.length) return fi;
-    fi = value;
-    return getData;
-  }
-
-  return getData;
-}
-
 /**
  * add or update chartname.data based on txnType and fi
  */ 
-export function buildData(chartname, txnType, fi) {
+function buildData(chartname, txnType, fi) {
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
@@ -94,7 +53,7 @@ export function buildData(chartname, txnType, fi) {
 /**
  * @function setSvgSize
  */
-export function setSvgSize(chartname, width, height){
+function setSvgSize(chartname, width, height){
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
     p.svg.width = width;
@@ -111,7 +70,7 @@ export function setSvgSize(chartname, width, height){
 /**
  * @function setMargins
  */
-export function setMargins(chartname, margins){
+function setMargins(chartname, margins){
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
     p.svg.margins = margins;
@@ -151,7 +110,7 @@ function drawSvg(chartname){
  * @function createDrawingFunc
  * @param {Object} config - donutConfig object
  */
-export function createDrawingFunc(chartname, config) {
+function createDrawingFunc(chartname, config) {
   let func = donutChart() 
       .classMap(config.classMap)
       .valueFunction(config.valueFunction)
@@ -174,7 +133,7 @@ export function createDrawingFunc(chartname, config) {
 }
 
 // Call the drawing function associated with a chartname
-export function draw(chartname) {
+function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     
     let arr = charts[chartname].cboxes.getAllChecked();
@@ -212,7 +171,7 @@ function addCheckboxes(chartname, valArr, defaultArr) {
 /**
  * @function toggleCheckbox
  */
-export function toggleCheckbox(chartname, value) {
+function toggleCheckbox(chartname, value) {
   if(charts.hasOwnProperty(chartname)){
     if(charts[chartname].cboxes != null){
       return charts[chartname].cboxes.toggle(value);
@@ -225,7 +184,7 @@ export function toggleCheckbox(chartname, value) {
 /**
  * @function observerCallbackBuilder 
  */
-export function observerCallbackBuilder(chartname) {
+function observerCallbackBuilder(chartname) {
   return function(value) {
     if(charts.hasOwnProperty(chartname)){
 
@@ -266,7 +225,7 @@ export function observerCallbackBuilder(chartname) {
  * Create mutation observers and track them in the charts object
  * @function initObservers
  */
-export function initObservers(chartname, idArr, valArr, defaultArr, callback){
+function initObservers(chartname, idArr, valArr, defaultArr, callback){
   addCheckboxes(chartname, valArr, defaultArr); 
 
   let observerFunc = addBootstrapCheckboxObservers()
@@ -321,7 +280,6 @@ function dropdownCallbackBuilder(chartname) {
       // set dropdown param
       setDropdown(chartname, current);
 
-
       //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
       charts[chartname].drawFunc.valueFunction( function (d) { return d [ charts[chartname].dropdown ]} )
       charts[chartname].drawFunc.innerText(charts[chartname].dropdown);
@@ -336,7 +294,7 @@ function dropdownCallbackBuilder(chartname) {
   };
 }
 
-export function addDropdownListener(chartname) {
+function addDropdownListener(chartname) {
   let selector = chartname + " .dropdown-menu li";
   let cb = dropdownCallbackBuilder(chartname);
   d3.selectAll(selector).on('click', cb);

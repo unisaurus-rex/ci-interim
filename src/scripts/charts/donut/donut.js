@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 
 export default function donutChart(){
-
   var width = 500,
   height = 500,
   innerText = "TOTAL TRANS";
@@ -19,13 +18,9 @@ export default function donutChart(){
   var classMapFunction= function(d) {
     return classMap[d.data.transactionType];
   }
-
   var innerNumber = 0;
 
-
-  
   function chart(container, dataArr){
-
     //remove current number
     container.select( "text.data" )
       .transition()

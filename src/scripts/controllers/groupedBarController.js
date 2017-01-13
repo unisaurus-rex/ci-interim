@@ -1,6 +1,9 @@
 import {getInsightsData} from 'model';
 import * as d3 from "d3";
-
+import Panel from "panel";
+import Checkboxes from 'checkboxes';
+import addBootstrapCheckboxObservers from 'newCheckboxObserver';
+import groupedBarChart from 'groupedBar';
 
 export default function getData(){
 	var txnType = "sig_debit";
