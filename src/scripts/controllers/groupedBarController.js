@@ -42,10 +42,13 @@ function draw(chartname) {
     d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
   });
 
+  filteredData.columns = jsonGroupNames;
+
 
     let loc = d3.select(chartname + " svg");
 
     //console.log(data);
+    charts[chartname].drawFunc.column(charts[chartname].dropdown);
     charts[chartname].drawFunc(loc, filteredData);
   }  
 }
@@ -62,9 +65,6 @@ function createDrawingFunc(chartname, config) {
   		.height(charts[chartname].svg.height)
       .classMap(config.classMap)
       .classMapFunction(config.classMapFunction)
-      .x0(config.x0)
-      .x1(config.x1)
-      .y(config.y)
       .groupRangeFunction(config.groupRangeFunction)
 	;
 
@@ -261,22 +261,11 @@ function dropdownCallbackBuilder(chartname) {
     let current = d3.select(this).attr('value');
     let old = charts[chartname].dropdown;
 
-  	var tickFormatFunc;
-		if ( current == "n_trans" || current == "amt_sale" || current == "amt_fee" || current == "n_card"){
-			tickFormatFunc = function(d){
-	    	var t = d/1000000;
-	    	return t+"m" }
-		}		
-		else{
-			tickFormatFunc = d3.format(',.2f');
-		}
-
-		var svgSelect = chartname + " .grouped svg";
-		var svg = d3.select(svgSelect);
-		svg.selectAll(".y.axis").transition().duration(1000).style("opacity", 0).remove()
 
 
-
+		//var svgSelect = chartname + " .grouped svg";
+		//var svg = d3.select(svgSelect);
+		
 
     if( current != old) {
       // set dropdown param
@@ -285,37 +274,7 @@ function dropdownCallbackBuilder(chartname) {
       //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
       get.column( current )
       charts[chartname].data = get(); 
-      //charts[chartname].drawFunc.innerText(charts[chartname].dropdown);
 
-  var width = charts[chartname].svg.width;
-  var height = charts[chartname].svg.height;
-
- var newy = d3.scaleLinear()
-  		.range([height, 0])
-  		.domain([0, d3.max(charts[chartname].data, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
-		;
-		var newYAxis = d3.axisLeft()
-	    .scale(newy)
-	    .tickFormat( tickFormatFunc)
-	    .ticks(5)
-	    .tickSizeInner(-width)
-	    //.tickSizeOuter(0)
-	    //.tickPadding(0)
-		;
-		svg.append("g")
-		  .attr("class", "y axis")
-		  .style("opacity", 0)
-		  .transition()
-		  .duration(2000)
-		  .style("opacity", 1)
-		 //.attr("transform", "translate(0, 0)" )
-		  .call(newYAxis)
-		;
-
-		d3.selectAll(".y.axis").moveToBack();
-
-		//update scale of draw function
-		charts[chartname].drawFunc.y(newy);
 
       // set reset count
       setResetCount(chartname);
@@ -326,14 +285,7 @@ function dropdownCallbackBuilder(chartname) {
     }
   };
 }
-d3.selection.prototype.moveToBack = function() {  
-    return this.each(function() { 
-        var firstChild = this.parentNode.firstChild; 
-        if (firstChild) { 
-            this.parentNode.insertBefore(this, firstChild); 
-        } 
-    });
-};
+
 
 function addDropdownListener(chartname) {
   let selector = chartname + " .dropdown-menu li";

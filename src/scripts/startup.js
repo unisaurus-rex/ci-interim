@@ -32,13 +32,17 @@ var defaults = [true, true, true, true, true];
 
 var groupedWidth = 500;
 var groupedHeight = 100;
-
 var groupedName =  "#sigDebitGrouped";
-var groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
 groupedExport.setSvgSize(groupedName, groupedWidth, groupedHeight);
+var gBarSvg= groupedExport.drawSvg(groupedName);
+
+
+
+var groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
+
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 groupedExport.setMargins(groupedName, groupedMargin);
-var gBarSvg= groupedExport.drawSvg(groupedName);
+
 
 
 //console.log(groupedBarData);
@@ -101,9 +105,6 @@ gBarSvg.append("g")
 var groupedConfig = new groupedBarConfig()
     .setClassMap(classMap)
     .setClassMapFunction(classMapFunctionBar)
-    .setX0( x0 )
-    .setX1( x1 )
-    .setY( y )
     .setGroupRangeFunction(groupRangeFunction)
 ;
 
