@@ -32,7 +32,7 @@ export default function donutChart(){
     var innerNumber = innerNumberFunc(dataArr, column);
     var formatNum = d3.format(',.2f');
     innerNumber = formatNum(innerNumber);
-    
+
     //update number
     container.append("text")
       .attr("dy", ".95em")
@@ -88,16 +88,22 @@ export default function donutChart(){
       .data(pie(dataArr))
       //.attr("test", function(d){console.log(d)})
       .on("mouseover", function(d) {
-            d3.select(this).transition()
+            d3.select(this)
+              .transition()
                 .duration(1000)
-                .attr("d", hoverArc);
+                .attr("d", hoverArc)    
+            ;
           })
         .on("mouseout", function(d) {
-            d3.select(this).transition()
+            d3.select(this)
+              .transition()
                 .duration(1000)
-                .attr("d", arc);
+                .attr("d", arc)
+              ;
+                
         })
         .attr("class", classMapFunction)
+        .attr("pointer-events", "none")
         .transition()
         .duration(700)
         .attrTween('d', function(d) {
@@ -105,6 +111,7 @@ export default function donutChart(){
         return function(t) {
             return arc(interpolate(t));
         }})
+        .on("end", function(){ d3.select(this).attr("pointer-events", null) })
         ;
 
         sel.exit()
