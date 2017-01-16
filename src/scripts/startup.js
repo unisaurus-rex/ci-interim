@@ -60,42 +60,42 @@ var groupRangeFunction = function(d) { return "translate(" + x0(d.Issuer) + ",0)
 // used for scales
 var jsonGroupNames = groupedBarData.columns;
 
-// scales
-var x1 = d3.scaleBand()
-  .paddingOuter(1)
-  .domain(jsonGroupNames)
-  .rangeRound([0, x0.bandwidth()])
-; 
-var y = d3.scaleLinear()
-  .range([groupedHeight, 0])
-  .domain([0, d3.max(groupedBarData, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
-;
-
-//create axes
-var xAxis = d3.axisBottom()
-    .scale(x0)
-    .tickSize(0)
-    .tickPadding(10)
-;
-var yAxis = d3.axisLeft()
-    .scale(y)
-    .tickFormat(formatPercent)
-    .ticks(5)
-    .tickSizeInner(-groupedWidth)
-    .tickSizeOuter(0)
-    .tickPadding(0)
-;
-
-//draw axes
-gBarSvg.append("g")
-  .attr("class", "x axis")
-  .attr("transform", "translate(0," + groupedHeight + ")")
-  .call(xAxis)
-;
-gBarSvg.append("g")
-  .attr("class", "y axis")
-  .call(yAxis)
-;
+//// scales
+//var x1 = d3.scaleBand()
+//  .paddingOuter(1)
+//  .domain(jsonGroupNames)
+//  .rangeRound([0, x0.bandwidth()])
+//; 
+//var y = d3.scaleLinear()
+//  .range([groupedHeight, 0])
+//  .domain([0, d3.max(groupedBarData, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
+//;
+//
+////create axes
+//var xAxis = d3.axisBottom()
+//    .scale(x0)
+//    .tickSize(0)
+//    .tickPadding(10)
+//;
+//var yAxis = d3.axisLeft()
+//    .scale(y)
+//    .tickFormat(formatPercent)
+//    .ticks(5)
+//    .tickSizeInner(-groupedWidth)
+//    .tickSizeOuter(0)
+//    .tickPadding(0)
+//;
+//
+////draw axes
+//gBarSvg.append("g")
+//  .attr("class", "x axis")
+//  .attr("transform", "translate(0," + groupedHeight + ")")
+//  .call(xAxis)
+//;
+//gBarSvg.append("g")
+//  .attr("class", "y axis")
+//  .call(yAxis)
+//;
 var groupedConfig = new groupedBarConfig()
     .setClassMap(classMap)
     .setClassMapFunction(classMapFunctionBar)

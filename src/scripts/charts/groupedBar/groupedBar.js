@@ -65,7 +65,7 @@ function chart(svg, data){
       .tickSizeInner(-width)
   ;
 
-  if (svg.selectAll(".x.axis")._groups.length < 1){
+  if (svg.selectAll(".x.axis")._groups[0].length < 1){
     svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -73,10 +73,20 @@ function chart(svg, data){
     ;  
   }
 
+  if (svg.selectAll(".y.axis")._groups[0].length < 1){
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    ;  
+  }
+  else{
+    //update y axis
+    var t =  svg.transition().duration(1000);
+    t.selectAll(".y.axis").call(yAxis);
 
-  //update y axis
-  var t =  svg.transition().duration(1000);
-  t.select(".y.axis").call(yAxis);
+  }
+
+
 
 
   // group of bars
