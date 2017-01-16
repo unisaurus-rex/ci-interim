@@ -1,5 +1,127 @@
 import {getInsightsData} from 'model';
 import * as d3 from "d3";
+import Panel from "panel";
+import stackChart from 'stacked';
+
+var charts = {};
+
+window.charts = charts;
+
+export var stackExport = {
+  setSvgSize: setSvgSize,
+  setMargins: setMargins,
+  buildData: buildData,
+  drawSvg: drawSvg,
+//  draw: draw,
+  createDrawingFunc: createDrawingFunc
+//  toggleCheckbox: toggleCheckbox,
+//  observerCallbackBuilder: observerCallbackBuilder,
+//  initObservers: initObservers,
+//  addDropdownListener: addDropdownListener
+}
+
+/**
+ * @function createDrawingFunc
+ * @param {Object} config - stackConfig object
+ */
+function createDrawingFunc(chartname, config) {
+
+  let func = stackChart() 
+      .width( charts[chartname].svg.width)
+      .height(charts[chartname].svg.height)
+      .margin( charts[chartname].svg.margins )
+      .classMap(config.classMap)
+      .classMapFunction(config.classMapFunction)
+  ;
+
+  // create new object for chartname if it doesn't exisit
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.drawFunc = func;
+    charts[chartname] = p;
+  } else {
+    // update drawing function in charts
+    charts[chartname].drawFunc = func;
+  }
+}
+
+/**
+ * @function setSvgSize
+ */
+function setSvgSize(chartname, width, height){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.svg.width = width;
+    p.svg.height = height;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.width = width;
+    charts[chartname].svg.height = height;
+  }
+}
+
+function setMargins(chartname, margins){
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel(); 
+    p.svg.margins = margins;
+
+    charts[chartname] = p;
+  }
+  else{
+    charts[chartname].svg.margins = margins;
+  }
+}
+
+function drawSvg(chartname){
+
+  var width = charts[chartname].svg.width;
+  var height = charts[chartname].svg.height;
+  
+  var svgSelect = chartname + " .stack";
+
+  var svgSpendStack = d3.select(svgSelect)  .append("div")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")     
+    .attr("viewBox","0 0 " + width + " " + height)
+  ;
+}
+
+/**
+ * add or update chartname.data based on txnType and fi
+ */
+function buildData(chartname, fi, column) {
+
+  var getData = getPurchaseByMerchantSegmentData().fi(fi).column(column);
+  
+  // if chartname object doesn't exist, build new object and add data property
+  //chartname is the selector for the panel
+  if(!charts.hasOwnProperty(chartname)) {
+    var p = new Panel();
+    p.data = getData();
+    p.data.columns = Object.keys(p.data[0]).filter(function (obj){
+      return obj != "total";
+    })
+
+
+    charts[chartname] = p;
+
+    var dropDownSelect = chartname + " .dropdown-menu li";
+    p.dropdown = d3.select( dropDownSelect ).attr("value");
+  }
+  else{
+    charts[chartname].data = getData();
+
+    charts[chartname].data.columns = Object.keys(charts[chartname].data[0]).filter(function (obj){
+      return obj != "total";
+    })
+
+   var dropDownSelect = chartname + " .dropdown-menu li";
+    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value"); 
+  }
+}
 
 
 export function getSpendByMerchantSegmentData(){
@@ -48,14 +170,11 @@ export function getSpendByMerchantSegmentData(){
       amtSaleTotal = amtSaleTotal + data[i].amt_sale;
     }
 
-    //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
-
     var percentageDepartmentStore = amtSaleDepartmentStore / amtSaleTotal;
     var percentageGrocery =  amtSaleGrocery / amtSaleTotal;
     var percentagePharmacies =  amtSalePharmacies / amtSaleTotal;
     var percentageFamilyClothing =  amtSaleFamilyClothing / amtSaleTotal;
     var percentageFastFood =amtSaleFastFood / amtSaleTotal;
-    //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);    
     
     var finalData = [];
 
@@ -88,6 +207,7 @@ export function getSpendByMerchantSegmentData(){
 export function getPurchaseByMerchantSegmentData(){
 
   var fi = "My Financial Institution";
+  var column = "sale_pc";
 
   function getData(){
     var bin1Data = getInsightsData("bin 1", fi);
@@ -114,21 +234,21 @@ export function getPurchaseByMerchantSegmentData(){
     for (var i =0; i < data.length; i++)
     {
       if( data[i].mcc_name == "Department Store" ){
-        salePcDepartmentStore = data[i].sale_pc + salePcDepartmentStore;
+        salePcDepartmentStore = data[i] [column] + salePcDepartmentStore;
       } 
       if( data[i].mcc_name == "Grocery" ){
-        salePcGrocery = data[i].sale_pc + salePcGrocery;
+        salePcGrocery = data[i] [column] + salePcGrocery;
       } 
       if( data[i].mcc_name == "Pharmacies" ){
-        salePcPharmacies = data[i].sale_pc + salePcPharmacies;
+        salePcPharmacies = data[i] [column] + salePcPharmacies;
       } 
       if( data[i].mcc_name == "Family Clothing" ){
-        salePcFamilyClothing = data[i].sale_pc + salePcFamilyClothing;
+        salePcFamilyClothing = data[i] [column] + salePcFamilyClothing;
       } 
       if( data[i].mcc_name == "Fast Food" ){
-        salePcFastFood = data[i].sale_pc + salePcFastFood;
+        salePcFastFood = data[i] [column] + salePcFastFood;
       } 
-      salePcTotal = salePcTotal + data[i].sale_pc;
+      salePcTotal = salePcTotal + data[i] [column];
     }
 
     //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
@@ -160,6 +280,11 @@ export function getPurchaseByMerchantSegmentData(){
   getData.fi = function (value){
     if (!arguments.length) return fi;
       fi = value;
+    return getData;
+  }
+  getData.column = function (value){
+    if (!arguments.length) return column;
+      column = value;
     return getData;
   }
 

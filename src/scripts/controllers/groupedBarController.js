@@ -58,8 +58,8 @@ function draw(chartname) {
 function createDrawingFunc(chartname, config) {
 
   let func = groupedBarChart() 
-  		.width( charts[chartname].svg.width)
-  		.height(charts[chartname].svg.height)
+  		.width( charts[chartname].svg.width - charts[chartname].svg.margins.left- charts[chartname].svg.margins.right)
+  		.height(charts[chartname].svg.height - charts[chartname].svg.margins.top- charts[chartname].svg.margins.bottom)
       .classMap(config.classMap)
       .classMapFunction(config.classMapFunction)
       .groupRangeFunction(config.groupRangeFunction)
@@ -92,9 +92,7 @@ function drawSvg(chartname){
 	    .classed("svg-container", true)
 	    .append("svg")
 	    .attr("preserveAspectRatio", "xMinYMin meet")     
-	    .attr("viewBox","0 0 " + width + " " + height)
-	    .style("overflow", "visible")
-	//class to make it responsive
+	    .attr("viewBox", "-" + charts[chartname].svg.margins.left + " -"+ charts[chartname].svg.margins.top + " "+ width + " " + height)
 	    .classed("svg-content-responsive", true)
 	;
 

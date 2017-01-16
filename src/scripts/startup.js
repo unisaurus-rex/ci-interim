@@ -11,7 +11,8 @@ import {groupedExport} from 'groupedBarController';
 import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import groupedBarConfig from "groupedBarConfig";
-import {getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
+import stackConfig from "stackConfig";
+import {stackExport, getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
 import tableChart from 'table';
 import donutChart from 'donut';
 import stackChart from 'stacked';
@@ -34,13 +35,13 @@ var groupedWidth = 500;
 var groupedHeight = 100;
 var groupedName =  "#sigDebitGrouped";
 groupedExport.setSvgSize(groupedName, groupedWidth, groupedHeight);
-
+var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
+groupedExport.setMargins(groupedName, groupedMargin);
 var gBarSvg= groupedExport.drawSvg(groupedName);
 
 var groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
 
-var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
-groupedExport.setMargins(groupedName, groupedMargin);
+
 
 // stuff to pass to config
 var classMapFunctionBar = function (d){
@@ -143,17 +144,6 @@ donutExport.createDrawingFunc(donutInterchangeName, interchangeDonutConfig);
 donutExport.draw(donutInterchangeName);
 donutExport.addDropdownListener(donutInterchangeName);
 
-
-
-/*
-  TODO: inner number set based on data
-  donutData.forEach(function(d,j){
-  interchangeInnerNumber += d.avg_fee;
-  });
-  interchangeInnerNumber = interchangeInnerNumber / donutData.length;
-*/
-
-
 /********* Donut 2 (TOTAL SALES) *********/
 
 var donutSalesName = "#sigDebitSales";
@@ -185,8 +175,6 @@ donutExport.draw(donutSalesName);
 donutExport.addDropdownListener(donutSalesName);
 
 /********* Donut 3 (TOTAL TRANS) *********/
-
-
 var donutTransactionsName = "#sigDebitTransactions";
 donutExport.setSvgSize(donutTransactionsName, 500, 500);
 donutExport.setMargins(donutTransactionsName ,donutMargin);
@@ -220,129 +208,156 @@ donutExport.addDropdownListener(donutTransactionsName);
 
 /****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
 
-var getSpendData = getSpendByMerchantSegmentData();
+var spendStackName = "#spendStack";
 
-var spendData = getSpendData();
+stackExport.setSvgSize(spendStackName, 900, 300);
+var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
 
-//add columns attribute
-spendData.columns = Object.keys(spendData[0]).filter(function (obj){
-  return obj != "total";
-})
+stackExport.setMargins(spendStackName, stackedMargin);
 
-  
-var svgSpendStack = d3.select("#spendStack")  .append("div")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")     
-  .attr("viewBox","0 0 " + 900 + " " + 300)
-;
+stackExport.drawSvg(spendStackName);
+
+stackExport.buildData(spendStackName, "My Financial Institution", "amt_sale");
 
 var stackedClassMapFunction = function (d){
-    return classMap[ d.key ];
-  }
+  return classMap[ d.key ];
+}
 
-
-
-var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
-var stackedWidth =900;
-var stackedHeight =300;
-
-var drawStack = stackChart()
-  .margin(stackedMargin)
-  .width(stackedWidth)
-  .height(stackedHeight)
-  .classMap(classMap)
-  .classMapFunction(stackedClassMapFunction)
+var spendStackConfig = new stackConfig()
+  .setClassMap(classMap)
+  .setClassMapFunction(stackedClassMapFunction)
 ;
 
-drawStack(svgSpendStack, spendData);
-/********* GET SPEND BY MERCHANT DATA CHECKBOXES *********/
+stackExport.createDrawingFunc(spendStackName, spendStackConfig);
 
-// add observers
-var idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
 
-// function to execute when a change happens
-var cbackSpendStack = (arr) => {
 
-  var filteredSpendData = [];
-  var SpendStackObj = {};
-  filteredSpendData[0] = SpendStackObj;
-  //filter data
-  for (var i =0; i< arr.length; i++){
-    filteredSpendData[0] [ arr[i] ] = spendData[0] [ arr[i] ];
-  }
-  filteredSpendData[0].total = 1;
+//
+//var getSpendData = getSpendByMerchantSegmentData();
+//
+//var spendData = getSpendData();
+//
+////add columns attribute
+//spendData.columns = Object.keys(spendData[0]).filter(function (obj){
+//  return obj != "total";
+//})
 
-  filteredSpendData.columns = Object.keys(filteredSpendData[0]).filter(function (obj){
-    return obj != "total";
-  })
-
-  //redraw stack
-  drawStack (svgSpendStack, filteredSpendData);
-};
-
-//config checkboxes
-var observersFuncSpendStack = addBootstrapCheckboxObservers().elementIds(idsSpendStack)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cbackSpendStack);
-
-observersFuncSpendStack();
-
-/****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
-
-var getPurchaseData = getPurchaseByMerchantSegmentData();
-
-var purchaseData = getPurchaseData();
-
-//add columns attribute
-purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
-  return obj != "total";
-})
-
-//add columns attribute
-purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
-  return obj != "total";
-})
-
-var svgPurchaseStack = d3.select("#purchaseStack")  .append("div")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")     
-  .attr("viewBox","0 0 " + 900 + " " + 300)
-;
-
-drawStack(svgPurchaseStack, purchaseData);
-
-/********* GET PURCHASE BY MERCHANT SEGMENT CHECKBOXES *********/
-
-// add observers
-var idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
-
-// function to execute when a change happens
-var cbackPurchaseStack = (arr) => {
-
-  var filteredPurchaseStackData = [];
-  var PurchaseStackObj = {};
-  filteredPurchaseStackData[0] = PurchaseStackObj;
-  //filter data
-  for (var i =0; i< arr.length; i++){
-    filteredPurchaseStackData[0] [ arr[i] ] = purchaseData[0] [ arr[i] ];
-  }
-  filteredPurchaseStackData[0].total = 1;
-
-  filteredPurchaseStackData.columns = Object.keys(filteredPurchaseStackData[0]).filter(function (obj){
-    return obj != "total";
-  })
-
-  //redraw stack
-  drawStack (svgPurchaseStack, filteredPurchaseStackData);
-};
-
-//config checkboxes
-var observersFuncPurchaseStack = addBootstrapCheckboxObservers().elementIds(idsPurchaseStack)
-    .values(vals)
-    .defaults(defaults)
-    .callback(cbackPurchaseStack);
-
-observersFuncPurchaseStack();
+//console.log(spendData)
+//
+  //
+//var svgSpendStack = d3.select("#spendStack")  .append("div")
+//  .classed("svg-container", true)
+//  .append("svg")
+//  .attr("preserveAspectRatio", "xMinYMin meet")     
+//  .attr("viewBox","0 0 " + 900 + " " + 300)
+//;
+//
+//var stackedClassMapFunction = function (d){
+//    return classMap[ d.key ];
+//  }
+//
+//
+//
+//var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
+//var stackedWidth =900;
+//var stackedHeight =300;
+//
+//var drawStack = stackChart()
+//  .margin(stackedMargin)
+//  .width(stackedWidth)
+//  .height(stackedHeight)
+//  .classMap(classMap)
+//  .classMapFunction(stackedClassMapFunction)
+//;
+//
+//drawStack(svgSpendStack, spendData);
+///********* GET SPEND BY MERCHANT DATA CHECKBOXES *********/
+//
+//// add observers
+//var idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
+//
+//// function to execute when a change happens
+//var cbackSpendStack = (arr) => {
+//
+//  var filteredSpendData = [];
+//  var SpendStackObj = {};
+//  filteredSpendData[0] = SpendStackObj;
+//  //filter data
+//  for (var i =0; i< arr.length; i++){
+//    filteredSpendData[0] [ arr[i] ] = spendData[0] [ arr[i] ];
+//  }
+//  filteredSpendData[0].total = 1;
+//
+//  filteredSpendData.columns = Object.keys(filteredSpendData[0]).filter(function (obj){
+//    return obj != "total";
+//  })
+//
+//  //redraw stack
+//  drawStack (svgSpendStack, filteredSpendData);
+//};
+//
+////config checkboxes
+//var observersFuncSpendStack = addBootstrapCheckboxObservers().elementIds(idsSpendStack)
+//    .values(vals)
+//    .defaults(defaults)
+//    .callback(cbackSpendStack);
+//
+//observersFuncSpendStack();
+//
+///****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
+//
+//var getPurchaseData = getPurchaseByMerchantSegmentData();
+//
+//var purchaseData = getPurchaseData();
+//
+////add columns attribute
+//purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
+//  return obj != "total";
+//})
+//
+////add columns attribute
+//purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
+//  return obj != "total";
+//})
+//
+//var svgPurchaseStack = d3.select("#purchaseStack")  .append("div")
+//  .classed("svg-container", true)
+//  .append("svg")
+//  .attr("preserveAspectRatio", "xMinYMin meet")     
+//  .attr("viewBox","0 0 " + 900 + " " + 300)
+//;
+//
+//drawStack(svgPurchaseStack, purchaseData);
+//
+///********* GET PURCHASE BY MERCHANT SEGMENT CHECKBOXES *********/
+//
+//// add observers
+//var idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
+//
+//// function to execute when a change happens
+//var cbackPurchaseStack = (arr) => {
+//
+//  var filteredPurchaseStackData = [];
+//  var PurchaseStackObj = {};
+//  filteredPurchaseStackData[0] = PurchaseStackObj;
+//  //filter data
+//  for (var i =0; i< arr.length; i++){
+//    filteredPurchaseStackData[0] [ arr[i] ] = purchaseData[0] [ arr[i] ];
+//  }
+//  filteredPurchaseStackData[0].total = 1;
+//
+//  filteredPurchaseStackData.columns = Object.keys(filteredPurchaseStackData[0]).filter(function (obj){
+//    return obj != "total";
+//  })
+//
+//  //redraw stack
+//  drawStack (svgPurchaseStack, filteredPurchaseStackData);
+//};
+//
+////config checkboxes
+//var observersFuncPurchaseStack = addBootstrapCheckboxObservers().elementIds(idsPurchaseStack)
+//    .values(vals)
+//    .defaults(defaults)
+//    .callback(cbackPurchaseStack);
+//
+//observersFuncPurchaseStack();

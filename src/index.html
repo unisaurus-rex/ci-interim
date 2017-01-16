@@ -345,7 +345,7 @@
     <!-- Third row that contains 2 columns: 6 and 6 -->
     <div class="flex-row row">
       <div class="col-lg-6 col-md-6 col-sm-12 ">
-        <div class="panel">
+        <div class="panel" id="spendStack">
           <div class="panel-heading">
             <div class="col-sm-12">
               <h2>Spend by Merchant Segment</h2>
@@ -356,16 +356,16 @@
                   Dropdown <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li value="n_trans">Number of Transactions</li>
-                  <li value="amt_sale">Total Amount of Sales</li>
-                  <li value="amt_fee">Total Amount of Interchange Fee</li>
+                  <li value="n_trans"> <a href="#" onclick="return false">Number of Transactions</a></li>
+                  <li value="amt_sale"> <a href="#" onclick="return false">Total Amount of Sales</a></li>
+                  <li value="amt_fee"> <a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
                 </ul>
               </div>
               <div class="text-right"><i class="fa fa-question-circle"></i></div>
             </div>
           </div>
-          <div class="panel-body">
-            <div id="spendStack"> </div>
+          <div class="panel-body stack">
+
           </div>
           <div class="panel-footer">
             <div class="checkboxes">
@@ -411,7 +411,7 @@
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sm-12">
-        <div class="panel">
+        <div class="panel" id="purchaseStack">
           <div class="panel-heading">
             <div class="col-sm-12">
               <h2>Purchase by Merchant Segment</h2>
@@ -422,16 +422,16 @@
                   Dropdown <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li value="n_trans">Number of Transactions</li>
-                  <li value="amt_sale">Total Amount of Sales</li>
-                  <li value="amt_fee">Total Amount of Interchange Fee</li>
+                  <li value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
+                  <li value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
+                  <li value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
                 </ul>
               </div>
               <div class="text-right"><i class="fa fa-question-circle"></i></div>
             </div>
           </div>
-          <div class="panel-body">
-            <div id="purchaseStack"> </div>
+          <div class="panel-body stack">
+            
           </div>
           <div class="panel-footer">
             <div class="checkboxes">
