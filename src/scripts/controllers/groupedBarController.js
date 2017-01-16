@@ -45,7 +45,6 @@ function draw(chartname) {
 
     let loc = d3.select(chartname + " svg");
 
-    //console.log(data);
     charts[chartname].drawFunc.column(charts[chartname].dropdown);
     charts[chartname].drawFunc(loc, filteredData);
   }  
