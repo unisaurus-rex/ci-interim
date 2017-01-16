@@ -6,10 +6,8 @@ import addBootstrapCheckboxObservers from 'newCheckboxObserver';
 import groupedBarChart from 'groupedBar';
 
 var charts = {};
-
+//used to create a global 
 var get;
-
-window.charts=charts;
 
 export var groupedExport = {
   setSvgSize: setSvgSize,

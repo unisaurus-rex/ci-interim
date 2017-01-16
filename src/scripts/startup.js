@@ -34,18 +34,13 @@ var groupedWidth = 500;
 var groupedHeight = 100;
 var groupedName =  "#sigDebitGrouped";
 groupedExport.setSvgSize(groupedName, groupedWidth, groupedHeight);
+
 var gBarSvg= groupedExport.drawSvg(groupedName);
-
-
 
 var groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
 
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 groupedExport.setMargins(groupedName, groupedMargin);
-
-
-
-//console.log(groupedBarData);
 
 // stuff to pass to config
 var classMapFunctionBar = function (d){
@@ -54,7 +49,6 @@ var classMapFunctionBar = function (d){
 
 var formatPercent = function(d){ return d + "%"};
 //define function to define range for a group
-
 
 //create scales
 var x0 = d3.scaleBand()
@@ -91,7 +85,7 @@ var yAxis = d3.axisLeft()
     .tickSizeOuter(0)
     .tickPadding(0)
 ;
-//
+
 //draw axes
 gBarSvg.append("g")
   .attr("class", "x axis")
@@ -118,142 +112,6 @@ groupedExport.initObservers(groupedName, groupedIds, groupedVals, groupedDefault
 groupedExport.createDrawingFunc(groupedName, groupedConfig);
 groupedExport.draw(groupedName);
 groupedExport.addDropdownListener(groupedName);
-
-
-
-//
-////get data from controller
-//var getGroupedBarData = groupedBarController()
-//    .txnType("sig_debit")
-//;
-//var groupedBarData = getGroupedBarData();
-//
-////chart parameters
-//var groupedWidth = 500;
-//var groupedHeight = 100;
-//var groupedMargin = {top: 20, right: 20, bottom: 0, left: 0};
-//groupedWidth = groupedWidth - groupedMargin.right - groupedMargin.left;
-//groupedHeight = groupedHeight - groupedMargin.top - groupedMargin.bottom;
-//
-////create svg
-//var gBarSvg = d3.select("div#groupedBarSigDebit")
-//    .append("div")
-//    .classed("svg-container", true)
-//    .append("svg")
-//    .attr("preserveAspectRatio", "xMinYMin meet")     
-//    .attr("viewBox","0 0 " + groupedWidth + " " + groupedHeight)
-//    .style("overflow", "visible")
-////class to make it responsive
-//    .classed("svg-content-responsive", true)
-//;
-//
-
-//
-//// Axes
-////formatting for y axis
-//var formatPercent = function(d){ return d + "%"};
-////define function to define range for a group
-//var groupRangeFunction = function(d) {return "translate(" + x0(d.Issuer) + ",0)"; };
-//
-//
-////create scales
-//var x0 = d3.scaleBand()
-//  .rangeRound([0, groupedWidth])
-//  .domain(groupedBarData.map(function(d) { return d.Issuer; }))
-//;
-//
-//// used for scales
-//var jsonGroupNames = groupedBarData.columns;
-//
-//// scales
-//var x1 = d3.scaleBand()
-//  .paddingOuter(1)
-//  .domain(jsonGroupNames)
-//  .rangeRound([0, x0.bandwidth()])
-//; 
-//var y = d3.scaleLinear()
-//  .range([groupedHeight, 0])
-//  .domain([0, d3.max(groupedBarData, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
-//;
-//
-////create axes
-//var xAxis = d3.axisBottom()
-//    .scale(x0)
-//    .tickSize(0)
-//    .tickPadding(10)
-//;
-//var yAxis = d3.axisLeft()
-//    .scale(y)
-//    .tickFormat(formatPercent)
-//    .ticks(5)
-//    .tickSizeInner(-groupedWidth)
-//    .tickSizeOuter(0)
-//    .tickPadding(0)
-//;
-  //
-////draw axes
-//gBarSvg.append("g")
-//  .attr("class", "x axis")
-//  .attr("transform", "translate(0," + groupedHeight + ")")
-//  .call(xAxis)
-//;
-//gBarSvg.append("g")
-//  .attr("class", "y axis")
-//  .call(yAxis)
-//;
-//
-////chart config
-//var test = groupedBarChart()
-//    .width(groupedWidth)
-//    .height(groupedHeight)
-//    .classMap(classMap)
-//    .classMapFunction(classMapFunctionBar)
-//    .x0( x0 )
-//    .x1( x1 )
-//    .y( y )
-//    .groupRangeFunction(groupRangeFunction)
-//;
-//
-////draw chart
-//test(gBarSvg, groupedBarData);
-//
-//
-///******* GROUPED BAR CHECKBOXES *******/
-//
-//// add observers
-//var groupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
-//
-//var groupedVals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery", "Total" ];
-//var groupedDefaults = [true, true, true, true, true, true];
-//
-//// function to execute when a change happens
-//var groupedCback = (arr) => {
-//  //add issuer to object
-//  arr.push( "Issuer" );
-//
-//  //filter data
-//  var filteredData = groupedBarData.map( (d) => {
-//    return arr.reduce( (result, key) => {result[key] = d[key];
-//                                         return result;}, {});
-//  });  
-//
-//  //add group attribute
-//  var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
-//  filteredData.forEach(function(d) {
-//    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-//  });
-//
-//  //redraw chart
-//  test (gBarSvg, filteredData);
-//};
-//
-////config
-//var groupedObserversFunc = addBootstrapCheckboxObservers().elementIds(groupedIds)
-//    .values(groupedVals)
-//    .defaults(groupedDefaults)
-//    .callback(groupedCback);
-//
-//groupedObserversFunc();
 
 /************************************************ TABLE ************************************************/
 
@@ -287,7 +145,7 @@ var classMapFunction = function(d){
 
 var donutWidth = 500;
 var donutHeight = 500;
-var innerRad = 90;
+var innerRad = 75;
 var padAngle = 0.03;
 
 /********* Donut 1 (AVG INTERCHANGE) *********/

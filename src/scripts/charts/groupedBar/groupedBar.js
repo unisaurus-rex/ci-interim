@@ -11,93 +11,77 @@ var y = null;
 var classMapFunction = function (d){
   return classMap[ d.name ];
 }
+//used for formatting y axis
 var column;
   
-  
-
 var groupRangeFunction;
 
 function chart(svg, data){
 
-  console.log(data);
-
   //create scales
-if( x0 == null){
-    console.log( "x0 is null");
-  x0 = d3.scaleBand()
-    .rangeRound([0, width])
-    .domain(data.map(function(d) { return d.Issuer; }))
-  ;  
-}
-svg.selectAll(".y.axis").transition().duration(1000).style("opacity", 0).remove()
+  if( x0 == null){
+    x0 = d3.scaleBand()
+      .rangeRound([0, width])
+      .domain(data.map(function(d) { return d.Issuer; }))
+    ;  
+  }
 
+  var groupRangeFunction = function(d) { return "translate(" + x0(d.Issuer) + ",0)"; };
 
-var groupRangeFunction = function(d) { return "translate(" + x0(d.Issuer) + ",0)"; };
-
-if (x1 == null){
-  console.log( "x1 is null");
-   x1 = d3.scaleBand()
-    .paddingOuter(1)
-    .domain(data.columns)
-    .rangeRound([0, x0.bandwidth()])
-  ;   
-} 
-
+  if (x1 == null){
+     x1 = d3.scaleBand()
+      .paddingOuter(1)
+      .domain(data.columns)
+      .rangeRound([0, x0.bandwidth()])
+    ;   
+  } 
 
   y = d3.scaleLinear()
       .range([height, 0])
-  .domain([0, d3.max(data, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
-    ;
-
-
-var tickFormatFunc;
-if ( column == "n_trans" || column == "amt_sale" || column == "amt_fee" || column== "n_card"){
-  tickFormatFunc = function(d){
-    var t = d/1000000;
-    return t+"m" }
-}   
-else{
-  tickFormatFunc = d3.format(',.2f');
-}
-
-//create axes
-var xAxis = d3.axisBottom()
-    .scale(x0)
-    .tickSize(0)
-    .tickPadding(10)
-;
-var yAxis = d3.axisLeft()
-    .scale(y)
-    .tickFormat(tickFormatFunc)
-    .ticks(5)
-    .tickSizeInner(-width)
-;
-
-//draw axes
-svg.append("g")
-  .attr("class", "x axis")
-  .attr("transform", "translate(0," + height + ")")
-  .call(xAxis)
-;
-  svg.append("g")
-    .attr("class", "y axis")
-    .style("opacity", 0)
-    .transition()
-    .duration(2000)
-    .style("opacity", 1)
-   //.attr("transform", "translate(0, 0)" )
-    .call(yAxis)
+      .domain([0, d3.max(data, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
   ;
 
-d3.selectAll(".y.axis").moveToBack();
-  window.d3 = d3;
 
+  var tickFormatFunc;
+  if ( column == "n_trans" || column == "amt_sale" || column == "amt_fee" || column== "n_card"){
+    tickFormatFunc = function(d){
+      var t = d/1000000;
+      return t+"m" }
+  }   
+  else{
+    tickFormatFunc = d3.format(',.2f');
+  }
+
+  //create axes
+  var xAxis = d3.axisBottom()
+      .scale(x0)
+      .tickSize(0)
+      .tickPadding(10)
+  ;
+  var yAxis = d3.axisLeft()
+      .scale(y)
+      .tickFormat(tickFormatFunc)
+      .ticks(5)
+      .tickSizeInner(-width)
+  ;
+
+  if (svg.selectAll(".x.axis")._groups.length < 1){
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    ;  
+  }
+
+
+  //update y axis
+  var t =  svg.transition().duration(750);
+  t.select(".y.axis").call(yAxis);
 
 
   // group of bars
   var issuer = svg.selectAll(".issuer")
     .data(data);
-
 
   var enterAndUpdate = 
     issuer.enter().append("g")
@@ -110,8 +94,7 @@ d3.selectAll(".y.axis").moveToBack();
   var sel = enterAndUpdate.selectAll("rect")
   .data(function(d) { return d.groups; }, (d)=> d.name);
     
-    
-    sel
+  sel
     .enter().append("rect")
     .attr("y", height)
     .merge(sel)
@@ -121,12 +104,8 @@ d3.selectAll(".y.axis").moveToBack();
     .attr("class", classMapFunction)
     .transition()
     .duration(1000)
-
-    .attr("y", function(d) { console.log(d.value); return y(d.value); })
-  .attr("height", function(d) { return height - y( d.value); })
-    
-    //.on('mouseover', tip.show)
-    //.on('mouseout', tip.hide)
+    .attr("y", function(d) { return y(d.value); })
+    .attr("height", function(d) { return height - y( d.value); })
   ;
 
   sel.exit()
@@ -134,7 +113,6 @@ d3.selectAll(".y.axis").moveToBack();
     .duration(1000)
     .attr("height", 0)
     .attr("y", function(d) {return height})
-
     .remove();
 }
 

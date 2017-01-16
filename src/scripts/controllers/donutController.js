@@ -7,6 +7,18 @@ import Checkboxes from 'checkboxes';
 
 var charts = {};
 
+var columnConfig ={
+  "amt_fee": {"innerText": "TOTAL INTERCHANGE", "innerNumber":"" },
+  "avg_fee": {"innerText": "AVG INTERCHANGE", "innerNumber": ""},
+  "fee_pc": {"innerText": "INTERCHANGE BY CARD", "innerNumber": ""},
+  "amt_sale": {"innerText": "TOTAL SALES", "innerNumber": "" },
+  "avg_sale": {"innerText": "AVG SALE", "innerNumber": "" },
+  "sale_pc": {"innerText": "AMOUNT PER CARD", "innerNumber": "" },
+  "n_trans": {"innerText": "TOTAL TRANS", "innerNumber": "" },
+  "n_card": {"innerText": "TOTAL CARDS USED", "innerNumber": "" },
+  "trans_pc": {"innerText": "TRANS BY CARD", "innerNumber": "" } 
+}
+
 export var donutExport = {
   setSvgSize: setSvgSize,
   setMargins: setMargins,
@@ -45,6 +57,9 @@ function buildData(chartname, txnType, fi) {
     charts[chartname].data = charts[chartname].data.filter(function (obj){
       return obj.mcc_name != "Total";
     }) 
+
+   var dropDownSelect = chartname + " .dropdown-menu li";
+    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value"); 
 
 
   }
@@ -118,7 +133,7 @@ function createDrawingFunc(chartname, config) {
       .classMapFunction(config.classMapFunction)
       .innerRad(config.innerRad)
       .innerNumber(config.innerNumber)
-      .innerText(config.innerText)
+      .innerText( columnConfig [charts[chartname].dropdown].innerText )
       .padAngle(config.padAngle);
 
   // create new object for chartname if it doesn't exisit
@@ -280,9 +295,9 @@ function dropdownCallbackBuilder(chartname) {
       // set dropdown param
       setDropdown(chartname, current);
 
-      //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
+      //UPDATE VALUE FUNCTION, INNERTEXT, INNERNUMBER?
       charts[chartname].drawFunc.valueFunction( function (d) { return d [ charts[chartname].dropdown ]} )
-      charts[chartname].drawFunc.innerText(charts[chartname].dropdown);
+      charts[chartname].drawFunc.innerText( columnConfig [charts[chartname].dropdown].innerText);
 
       // set reset count
       setResetCount(chartname);
