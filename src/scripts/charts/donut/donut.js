@@ -8,9 +8,8 @@ export default function donutChart(){
   var innerRad = radius / 4;
   var hoverRad = 15;
   var padAngle = 0;
-  var valueFunction = function(d){
-    return d.number;
-  }
+  var column;
+ 
   var constancyFunction = function(d){
     return d.transactionType;
   }
@@ -18,7 +17,8 @@ export default function donutChart(){
   var classMapFunction= function(d) {
     return classMap[d.data.transactionType];
   }
-  var innerNumber = 0;
+
+  var innerNumberFunc;
 
   function chart(container, dataArr){
     //remove current number
@@ -28,6 +28,10 @@ export default function donutChart(){
       .style("opacity", 0)
       .remove()
     ;
+
+    var innerNumber = innerNumberFunc(dataArr, column);
+    var formatNum = d3.format(',.2f');
+    innerNumber = formatNum(innerNumber);
     
     //update number
     container.append("text")
@@ -68,7 +72,7 @@ export default function donutChart(){
 
     var pie = d3.pie()
       .sort(null)
-      .value ( valueFunction )
+      .value ( function (d) { return d [column] })
       .padAngle(padAngle)
     ;
 
@@ -198,16 +202,6 @@ export default function donutChart(){
     return chart;
   }
 
-  chart.valueFunction = function(value){
-    if (!arguments.length) return valueFunction;
-
-    if(value != null) {
-      valueFunction = value;
-    }
-    
-    return chart; 
-  }
-
   chart.classMap = function(value){
     if (!arguments.length) return classMap;
 
@@ -228,11 +222,22 @@ export default function donutChart(){
     return chart;
   }
 
-  chart.innerNumber = function (value){
-    if(!arguments.length) return innerNumber;
+
+
+  chart.innerNumberFunc = function (value){
+    if(!arguments.length) return innerNumberFunc;
 
     if(value != null) {
-      innerNumber = value;
+      innerNumberFunc = value;
+    }
+    
+    return chart; 
+  }
+  chart.column = function (value){
+    if(!arguments.length) return column;
+
+    if(value != null) {
+      column = value;
     }
     
     return chart; 

@@ -7,16 +7,36 @@ import Checkboxes from 'checkboxes';
 
 var charts = {};
 
+var sumFunc = function sum(data, column){
+  var number = 0;
+  data.forEach( function(d, j){
+    number += d[column];
+  })
+  return number;
+}
+
+var avgFunc = function average(data, column){
+  var number = 0;
+  if (data.length ==0){
+    return 0;
+  }
+  data.forEach( function(d, j){
+    number += d[column];
+  })
+  number = number / data.length;
+  return number;
+}
+
 var columnConfig ={
-  "amt_fee": {"innerText": "TOTAL INTERCHANGE", "innerNumber":"" },
-  "avg_fee": {"innerText": "AVG INTERCHANGE", "innerNumber": ""},
-  "fee_pc": {"innerText": "INTERCHANGE BY CARD", "innerNumber": ""},
-  "amt_sale": {"innerText": "TOTAL SALES", "innerNumber": "" },
-  "avg_sale": {"innerText": "AVG SALE", "innerNumber": "" },
-  "sale_pc": {"innerText": "AMOUNT PER CARD", "innerNumber": "" },
-  "n_trans": {"innerText": "TOTAL TRANS", "innerNumber": "" },
-  "n_card": {"innerText": "TOTAL CARDS USED", "innerNumber": "" },
-  "trans_pc": {"innerText": "TRANS BY CARD", "innerNumber": "" } 
+  "amt_fee": {"innerText": "TOTAL INTERCHANGE", "innerNumber": sumFunc },
+  "avg_fee": {"innerText": "AVG INTERCHANGE", "innerNumber": avgFunc},
+  "fee_pc": {"innerText": "INTERCHANGE BY CARD", "innerNumber": avgFunc},
+  "amt_sale": {"innerText": "TOTAL SALES", "innerNumber":  sumFunc},
+  "avg_sale": {"innerText": "AVG SALE", "innerNumber":  avgFunc},
+  "sale_pc": {"innerText": "AMOUNT PER CARD", "innerNumber":  avgFunc},
+  "n_trans": {"innerText": "TOTAL TRANS", "innerNumber":  sumFunc},
+  "n_card": {"innerText": "TOTAL CARDS USED", "innerNumber":  sumFunc},
+  "trans_pc": {"innerText": "TRANS BY CARD", "innerNumber":  avgFunc} 
 }
 
 export var donutExport = {
@@ -128,13 +148,14 @@ function drawSvg(chartname){
 function createDrawingFunc(chartname, config) {
   let func = donutChart() 
       .classMap(config.classMap)
-      .valueFunction(config.valueFunction)
       .constancyFunction(config.constancyFunction)
       .classMapFunction(config.classMapFunction)
       .innerRad(config.innerRad)
-      .innerNumber(config.innerNumber)
       .innerText( columnConfig [charts[chartname].dropdown].innerText )
-      .padAngle(config.padAngle);
+      .padAngle(config.padAngle)
+      .column( charts [chartname].dropdown )
+      .innerNumberFunc ( columnConfig [charts[chartname].dropdown].innerNumber)
+      ;
 
   // create new object for chartname if it doesn't exisit
   if(!charts.hasOwnProperty(chartname)) {
@@ -296,8 +317,9 @@ function dropdownCallbackBuilder(chartname) {
       setDropdown(chartname, current);
 
       //UPDATE VALUE FUNCTION, INNERTEXT, INNERNUMBER?
-      charts[chartname].drawFunc.valueFunction( function (d) { return d [ charts[chartname].dropdown ]} )
       charts[chartname].drawFunc.innerText( columnConfig [charts[chartname].dropdown].innerText);
+      charts[chartname].drawFunc.innerNumberFunc ( columnConfig[ charts[chartname].dropdown].innerNumber);
+      charts[chartname].drawFunc.column( charts [chartname].dropdown );
 
       // set reset count
       setResetCount(chartname);
