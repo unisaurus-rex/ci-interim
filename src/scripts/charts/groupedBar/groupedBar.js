@@ -75,7 +75,7 @@ function chart(svg, data){
 
 
   //update y axis
-  var t =  svg.transition().duration(750);
+  var t =  svg.transition().duration(1000);
   t.select(".y.axis").call(yAxis);
 
 

@@ -34,7 +34,7 @@ function draw(chartname) {
                                          return result;}, {});
   });  
 
-//add group attribute
+  //add group attribute
   var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
   filteredData.forEach(function(d) {
     d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
@@ -258,12 +258,6 @@ function dropdownCallbackBuilder(chartname) {
   	// get dropdown values
     let current = d3.select(this).attr('value');
     let old = charts[chartname].dropdown;
-
-
-
-		//var svgSelect = chartname + " .grouped svg";
-		//var svg = d3.select(svgSelect);
-		
 
     if( current != old) {
       // set dropdown param
