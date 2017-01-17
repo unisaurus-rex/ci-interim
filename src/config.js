@@ -11,18 +11,16 @@ System.config({
   paths: {
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*",
-    "charts:*": "scripts/charts/*",
-    "model:*": "scripts/model/*",
-    "utils:*": "scripts/utils/*",
-    "controllers:*": "scripts/controllers/*"
+    "charts/*": "scripts/charts/*",
+    "model/*": "scripts/model/*",
+    "utils/*": "scripts/utils/*",
+    "controllers/*": "scripts/controllers/*"
   },
 
   map: {
-    "panel": "utils:panelObject.js",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
-    "newCheckboxObserver": "utils:newCheckboxObserver.js",
     "checkboxObserver": "utils:checkboxObserver.js",
     "checkboxes": "utils:checkboxes.js",
     "core-js": "npm:core-js@1.2.7",
@@ -30,7 +28,6 @@ System.config({
     "data": "scripts/data.js",
     "donut": "charts:donut/donut.js",
     "donutConfig": "charts:donut/donutConfig.js",
-    "stackConfig": "charts:stacked/stackConfig.js",
     "donutController": "controllers:donutController.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "groupedBar": "charts:groupedBar/groupedBar.js",
@@ -38,6 +35,9 @@ System.config({
     "groupedBarController": "controllers:groupedBarController.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "model:model.js",
+    "newCheckboxObserver": "utils:newCheckboxObserver.js",
+    "panel": "utils:panelObject.js",
+    "stackConfig": "charts:stacked/stackConfig.js",
     "stacked": "charts:stacked/stacked.js",
     "stackedController": "controllers:stackedController.js",
     "startup": "scripts/startup.js",
