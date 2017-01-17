@@ -31,6 +31,7 @@ var defaults = [true, true, true, true, true];
 
 /************************************************ Grouped Bar Chart ************************************************/
 
+//set up SVG and margins
 var groupedWidth = 500;
 var groupedHeight = 100;
 var groupedName =  "#sigDebitGrouped";
@@ -39,40 +40,35 @@ var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 groupedExport.setMargins(groupedName, groupedMargin);
 var gBarSvg= groupedExport.drawSvg(groupedName);
 
+//Get data
 var groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
-
-
 
 // stuff to pass to config
 var classMapFunctionBar = function (d){
   return classMap[ d.name ];
 }
 
-//create scales
-var x0 = d3.scaleBand()
-  .rangeRound([0, groupedWidth])
-  .domain(groupedBarData.map(function(d) { return d.Issuer; }))
-;
 var groupRangeFunction = function(d) { return "translate(" + x0(d.Issuer) + ",0)"; };
 
-// used for scales
-var jsonGroupNames = groupedBarData.columns;
-
+//Create config for drawing function
 var groupedConfig = new groupedBarConfig()
     .setClassMap(classMap)
     .setClassMapFunction(classMapFunctionBar)
     .setGroupRangeFunction(groupRangeFunction)
 ;
 
+//Setup checkboxes
 var groupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
 var groupedVals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery", "Total" ];
 var groupedDefaults = [true, true, true, true, true, true];
-
 var groupedCb = groupedExport.observerCallbackBuilder(groupedName);
 groupedExport.initObservers(groupedName, groupedIds, groupedVals, groupedDefaults, groupedCb);
 
+//Draw chart
 groupedExport.createDrawingFunc(groupedName, groupedConfig);
 groupedExport.draw(groupedName);
+
+//Add dropdown event listeners
 groupedExport.addDropdownListener(groupedName);
 
 /************************************************ TABLE ************************************************/
@@ -97,7 +93,7 @@ drawTable(table, tableData);
 
 /************************************************ DONUTS ************************************************/
 
-//config objects
+//ALL DONUTS
 var constancyFunction = function(d){
   return d.mcc_name;
 }
@@ -112,252 +108,168 @@ var padAngle = 0.03;
 
 /********* Donut 1 (AVG INTERCHANGE) *********/
 
+//Get div id
 var donutInterchangeName = "#sigDebitInterchange";
+
+//Setup SVG
 var donutMargin = {top: 20, left: 20, right: 30, bottom: 50};
 donutExport.setSvgSize(donutInterchangeName, 500, 500);
 donutExport.setMargins(donutInterchangeName ,donutMargin);
 donutExport.drawSvg(donutInterchangeName);
+
+//Get Data
 donutExport.buildData(donutInterchangeName, "sig_debit", "My Financial Institution");
 
+//Setup Config
 var interchangeValueFunction = function(d){
-  //console.log("return d.avg_fee")
   return d.avg_fee;
 }
-
-var interchangeInnerNumber = 0;
-
-var interchangeDonutConfig = new donutConfig().setClassMap(classMap)
+var donutConfiguration = new donutConfig().setClassMap(classMap)
   .setValueFunction(interchangeValueFunction)
   .setConstancyFunction(constancyFunction)
   .setClassMapFunction(classMapFunction)
   .setInnerRad(innerRad)
-  .setInnerNumber(interchangeInnerNumber)
-  .setInnerText("AVG INTERCHANGE")
   .setPadAngle(padAngle)
 ;
 
+//Add Checkboxes
 var donutOneCb = donutExport.observerCallbackBuilder(donutInterchangeName);
 var idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
 donutExport.initObservers(donutInterchangeName, idsInterchangeDonut, vals, defaults, donutOneCb);
 
-donutExport.createDrawingFunc(donutInterchangeName, interchangeDonutConfig);
+//Config Draw Function and Chart
+donutExport.createDrawingFunc(donutInterchangeName, donutConfiguration);
 donutExport.draw(donutInterchangeName);
+
+//Add dropdown event handler
 donutExport.addDropdownListener(donutInterchangeName);
 
 /********* Donut 2 (TOTAL SALES) *********/
 
+//Get div id
 var donutSalesName = "#sigDebitSales";
+
+//Setup SVG
 donutExport.setSvgSize(donutSalesName, 500, 500);
 donutExport.setMargins(donutSalesName ,donutMargin);
 donutExport.drawSvg(donutSalesName);
+
+//Get Data
 donutExport.buildData(donutSalesName, "sig_debit", "My Financial Institution");
 
+//Setup Config
 var salesValueFunction = function(d){
   return d.amt_sale;
 }
 
-var salesDonutConfig = new donutConfig().setClassMap(classMap)
-  .setValueFunction(interchangeValueFunction)
-  .setConstancyFunction(constancyFunction)
-  .setClassMapFunction(classMapFunction)
-  .setInnerRad(innerRad)
-  .setInnerNumber(0)
-  .setInnerText("TOTAL SALES")
-  .setPadAngle(padAngle)
+donutConfiguration.setClassMap(classMap)
+  .setValueFunction(salesValueFunction)
 ;
 
+//Add Checkboxes
 var donutTwoCb = donutExport.observerCallbackBuilder(donutSalesName);
 var idsSalesDonut = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
 donutExport.initObservers(donutSalesName, idsSalesDonut, vals, defaults, donutTwoCb);
 
-donutExport.createDrawingFunc(donutSalesName, salesDonutConfig);
+//Config Draw Function and Chart
+donutExport.createDrawingFunc(donutSalesName, donutConfiguration);
 donutExport.draw(donutSalesName);
+
+//Add dropdown event handler
 donutExport.addDropdownListener(donutSalesName);
 
 /********* Donut 3 (TOTAL TRANS) *********/
+
+//Get div id
 var donutTransactionsName = "#sigDebitTransactions";
+
+//Setup SVG
 donutExport.setSvgSize(donutTransactionsName, 500, 500);
 donutExport.setMargins(donutTransactionsName ,donutMargin);
 donutExport.drawSvg(donutTransactionsName);
 donutExport.buildData(donutTransactionsName, "sig_debit", "My Financial Institution");
 
+//Setup Config
 var transactionsValueFunction = function(d){
   return d.amt_sale;
 }
-
-var transactionsDonutConfig = new donutConfig().setClassMap(classMap)
+donutConfiguration
   .setValueFunction(transactionsValueFunction)
-  .setConstancyFunction(constancyFunction)
-  .setClassMapFunction(classMapFunction)
-  .setInnerRad(innerRad)
-  .setInnerNumber(0)
-  .setInnerText("TOTAL TRANS")
-  .setPadAngle(padAngle)
 ;
 
+//Add checkboxes
 var donutThreeCb = donutExport.observerCallbackBuilder(donutTransactionsName);
 var idsTransactionsDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
 donutExport.initObservers(donutTransactionsName, idsTransactionsDonut, vals, defaults, donutThreeCb);
 
-donutExport.createDrawingFunc(donutTransactionsName, transactionsDonutConfig);
+//Config Draw Function and Chart
+donutExport.createDrawingFunc(donutTransactionsName, donutConfiguration);
 donutExport.draw(donutTransactionsName);
-donutExport.addDropdownListener(donutTransactionsName);
 
+//Add dropdown event handler
+donutExport.addDropdownListener(donutTransactionsName);
 
 /************************************************ Stacked Charts ************************************************/
 
-/****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
-
-var spendStackName = "#spendStack";
-
-stackExport.setSvgSize(spendStackName, 900, 300);
-var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
-
-stackExport.setMargins(spendStackName, stackedMargin);
-
-stackExport.drawSvg(spendStackName);
-
-stackExport.buildData(spendStackName, "My Financial Institution", "amt_sale");
-
+//ALL STACKS
 var stackedClassMapFunction = function (d){
   return classMap[ d.key ];
 }
 
-var spendStackConfig = new stackConfig()
+var stackConfiguration = new stackConfig()
   .setClassMap(classMap)
   .setClassMapFunction(stackedClassMapFunction)
 ;
 
-stackExport.createDrawingFunc(spendStackName, spendStackConfig);
+/****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
+
+//div name
+var spendStackName = "#spendStack";
+
+//setup margins and svg
+stackExport.setSvgSize(spendStackName, 900, 300);
+var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
+stackExport.setMargins(spendStackName, stackedMargin);
+stackExport.drawSvg(spendStackName);
+
+//get data
+stackExport.buildData(spendStackName, "My Financial Institution", "amt_sale");
+
+//set up checkboxes
+var spendStackCb = stackExport.observerCallbackBuilder(spendStackName);
+var idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
+stackExport.initObservers(spendStackName, idsSpendStack, vals, defaults, spendStackCb);
+
+//Config Draw Function and Chart
+stackExport.createDrawingFunc(spendStackName, stackConfiguration);
+stackExport.draw(spendStackName);
+
+//add dropdown event listener
+stackExport.addDropdownListener(spendStackName);
 
 
+/****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
 
-//
-//var getSpendData = getSpendByMerchantSegmentData();
-//
-//var spendData = getSpendData();
-//
-////add columns attribute
-//spendData.columns = Object.keys(spendData[0]).filter(function (obj){
-//  return obj != "total";
-//})
+//div name
+var purchaseStackName = "#purchaseStack";
 
-//console.log(spendData)
-//
-  //
-//var svgSpendStack = d3.select("#spendStack")  .append("div")
-//  .classed("svg-container", true)
-//  .append("svg")
-//  .attr("preserveAspectRatio", "xMinYMin meet")     
-//  .attr("viewBox","0 0 " + 900 + " " + 300)
-//;
-//
-//var stackedClassMapFunction = function (d){
-//    return classMap[ d.key ];
-//  }
-//
-//
-//
-//var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
-//var stackedWidth =900;
-//var stackedHeight =300;
-//
-//var drawStack = stackChart()
-//  .margin(stackedMargin)
-//  .width(stackedWidth)
-//  .height(stackedHeight)
-//  .classMap(classMap)
-//  .classMapFunction(stackedClassMapFunction)
-//;
-//
-//drawStack(svgSpendStack, spendData);
-///********* GET SPEND BY MERCHANT DATA CHECKBOXES *********/
-//
-//// add observers
-//var idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
-//
-//// function to execute when a change happens
-//var cbackSpendStack = (arr) => {
-//
-//  var filteredSpendData = [];
-//  var SpendStackObj = {};
-//  filteredSpendData[0] = SpendStackObj;
-//  //filter data
-//  for (var i =0; i< arr.length; i++){
-//    filteredSpendData[0] [ arr[i] ] = spendData[0] [ arr[i] ];
-//  }
-//  filteredSpendData[0].total = 1;
-//
-//  filteredSpendData.columns = Object.keys(filteredSpendData[0]).filter(function (obj){
-//    return obj != "total";
-//  })
-//
-//  //redraw stack
-//  drawStack (svgSpendStack, filteredSpendData);
-//};
-//
-////config checkboxes
-//var observersFuncSpendStack = addBootstrapCheckboxObservers().elementIds(idsSpendStack)
-//    .values(vals)
-//    .defaults(defaults)
-//    .callback(cbackSpendStack);
-//
-//observersFuncSpendStack();
-//
-///****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
-//
-//var getPurchaseData = getPurchaseByMerchantSegmentData();
-//
-//var purchaseData = getPurchaseData();
-//
-////add columns attribute
-//purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
-//  return obj != "total";
-//})
-//
-////add columns attribute
-//purchaseData.columns = Object.keys(purchaseData[0]).filter(function (obj){
-//  return obj != "total";
-//})
-//
-//var svgPurchaseStack = d3.select("#purchaseStack")  .append("div")
-//  .classed("svg-container", true)
-//  .append("svg")
-//  .attr("preserveAspectRatio", "xMinYMin meet")     
-//  .attr("viewBox","0 0 " + 900 + " " + 300)
-//;
-//
-//drawStack(svgPurchaseStack, purchaseData);
-//
-///********* GET PURCHASE BY MERCHANT SEGMENT CHECKBOXES *********/
-//
-//// add observers
-//var idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
-//
-//// function to execute when a change happens
-//var cbackPurchaseStack = (arr) => {
-//
-//  var filteredPurchaseStackData = [];
-//  var PurchaseStackObj = {};
-//  filteredPurchaseStackData[0] = PurchaseStackObj;
-//  //filter data
-//  for (var i =0; i< arr.length; i++){
-//    filteredPurchaseStackData[0] [ arr[i] ] = purchaseData[0] [ arr[i] ];
-//  }
-//  filteredPurchaseStackData[0].total = 1;
-//
-//  filteredPurchaseStackData.columns = Object.keys(filteredPurchaseStackData[0]).filter(function (obj){
-//    return obj != "total";
-//  })
-//
-//  //redraw stack
-//  drawStack (svgPurchaseStack, filteredPurchaseStackData);
-//};
-//
-////config checkboxes
-//var observersFuncPurchaseStack = addBootstrapCheckboxObservers().elementIds(idsPurchaseStack)
-//    .values(vals)
-//    .defaults(defaults)
-//    .callback(cbackPurchaseStack);
-//
-//observersFuncPurchaseStack();
+//setup margins and svg
+stackExport.setSvgSize(purchaseStackName, 900, 300);
+var stackedMargin = {top: 30, right: 40, bottom: 50, left: 40};
+stackExport.setMargins(purchaseStackName, stackedMargin);
+stackExport.drawSvg(purchaseStackName);
+
+//get data
+stackExport.buildData(purchaseStackName, "My Financial Institution", "n_trans");
+
+//set up checkboxes
+var purchaseStackCb = stackExport.observerCallbackBuilder(purchaseStackName);
+var idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
+stackExport.initObservers(purchaseStackName, idsPurchaseStack, vals, defaults, purchaseStackCb);
+
+//Config Draw Function and Chart
+stackExport.createDrawingFunc(purchaseStackName, stackConfiguration);
+stackExport.draw(purchaseStackName);
+
+//add dropdown event listener
+stackExport.addDropdownListener(purchaseStackName);
