@@ -10,9 +10,7 @@ import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
-//import tableChart from 'table';
 import {tableExport} from 'tableController';
-//import addBootstrapCheckboxObservers from 'checkboxObserver';
 
 /************************************************ ALL CHARTS ************************************************/
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
