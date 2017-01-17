@@ -4,19 +4,14 @@ import bootstrap from 'bootstrap-sass';
 import * as d3 from "d3";
 
 /***** local packages *****/
-//import {getInsightsData} from 'model';
-//import Checkboxes from 'checkboxes';
-//import groupedBarChart from 'groupedBar';
 import {groupedExport} from 'groupedBarController';
+import groupedBarConfig from "groupedBarConfig";
 import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
-import groupedBarConfig from "groupedBarConfig";
 import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
-import tableChart from 'table';
-//import donutChart from 'donut';
-//import stackChart from 'stacked';
-import {getData as getTableData} from 'tableController';
+//import tableChart from 'table';
+import {tableExport} from 'tableController';
 //import addBootstrapCheckboxObservers from 'checkboxObserver';
 
 /************************************************ ALL CHARTS ************************************************/
@@ -73,23 +68,19 @@ groupedExport.addDropdownListener(groupedName);
 
 /************************************************ TABLE ************************************************/
 
-// add table to page
-var table = d3.select("#drawtable")
-    .append("table")
-    .attr("class", "table");
 
-// table should have a head and body
-table.append("thead");
-table.append("tbody");
+var sigDebitTableName = "#sigDebitGrouped"; 
+
+// add table to page
+tableExport.addTable(sigDebitTableName);
 
 // get data for drawing the table
-var tableDataFunc = getTableData();
-tableDataFunc.txnType("sig_debit");
-var tableData = tableDataFunc('n_trans');
+tableExport.setData(sigDebitTableName, "sig_debit");
 
 // draw the table
-var drawTable = tableChart();
-drawTable(table, tableData);
+tableExport.createDrawingFunc(sigDebitTableName);
+tableExport.draw(sigDebitTableName);
+tableExport.addDropdownListener(sigDebitTableName);
 
 /************************************************ DONUTS ************************************************/
 
