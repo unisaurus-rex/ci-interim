@@ -4,20 +4,20 @@ import bootstrap from 'bootstrap-sass';
 import * as d3 from "d3";
 
 /***** local packages *****/
-import {getInsightsData} from 'model';
-import Checkboxes from 'checkboxes';
-import groupedBarChart from 'groupedBar';
+//import {getInsightsData} from 'model';
+//import Checkboxes from 'checkboxes';
+//import groupedBarChart from 'groupedBar';
 import {groupedExport} from 'groupedBarController';
 import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import groupedBarConfig from "groupedBarConfig";
 import stackConfig from "stackConfig";
-import {stackExport, getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData} from 'stackedController';
+import {stackExport} from 'stackedController';
 import tableChart from 'table';
-import donutChart from 'donut';
-import stackChart from 'stacked';
+//import donutChart from 'donut';
+//import stackChart from 'stacked';
 import {getData as getTableData} from 'tableController';
-import addBootstrapCheckboxObservers from 'checkboxObserver';
+//import addBootstrapCheckboxObservers from 'checkboxObserver';
 
 /************************************************ ALL CHARTS ************************************************/
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",

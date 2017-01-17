@@ -71,7 +71,6 @@ function draw(chartname) {
 
     let loc = d3.select(chartname + " svg");
 
-    console.log("data", charts[chartname].data);
     charts[chartname].drawFunc(loc, filteredData);
   }  
 }
@@ -125,7 +124,7 @@ function drawSvg(chartname){
  */
 function buildData(chartname, fi, column) {
 
-  getData = getPurchaseByMerchantSegmentData().fi(fi).column(column);
+  getData = getSegmentData().fi(fi).column(column);
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
@@ -304,89 +303,7 @@ function addDropdownListener(chartname) {
   d3.selectAll(selector).on('click', cb);
 }
 
-
-
-export function getSpendByMerchantSegmentData(){
-
-  var fi = "My Financial Institution";
-
-  function getData(){
-    var bin1Data = getInsightsData("bin 1", fi);
-
-    bin1Data = bin1Data.filter(function (obj){
-      return obj.mcc_name != "Total"
-    })
-
-    var bin2Data = getInsightsData("bin 2", fi);
-
-    bin2Data = bin1Data.filter(function (obj){
-      return obj.mcc_name != "Total"
-    })
-
-    var data = bin1Data.concat(bin2Data);
-
-    var amtSaleDepartmentStore = 0;
-    var amtSaleGrocery = 0;
-    var amtSalePharmacies = 0;
-    var amtSaleFamilyClothing = 0;
-    var amtSaleFastFood =0;
-    var amtSaleTotal = 0; 
-
-    for (var i =0; i < data.length; i++)
-    {
-      if( data[i].mcc_name == "Department Store" ){
-        amtSaleDepartmentStore = data[i].amt_sale + amtSaleDepartmentStore;
-      } 
-      if( data[i].mcc_name == "Grocery" ){
-        amtSaleGrocery = data[i].amt_sale + amtSaleGrocery;
-      } 
-      if( data[i].mcc_name == "Pharmacies" ){
-        amtSalePharmacies = data[i].amt_sale + amtSalePharmacies;
-      } 
-      if( data[i].mcc_name == "Family Clothing" ){
-        amtSaleFamilyClothing = data[i].amt_sale + amtSaleFamilyClothing;
-      } 
-      if( data[i].mcc_name == "Fast Food" ){
-        amtSaleFastFood = data[i].amt_sale + amtSaleFastFood;
-      } 
-      amtSaleTotal = amtSaleTotal + data[i].amt_sale;
-    }
-
-    var percentageDepartmentStore = amtSaleDepartmentStore / amtSaleTotal;
-    var percentageGrocery =  amtSaleGrocery / amtSaleTotal;
-    var percentagePharmacies =  amtSalePharmacies / amtSaleTotal;
-    var percentageFamilyClothing =  amtSaleFamilyClothing / amtSaleTotal;
-    var percentageFastFood =amtSaleFastFood / amtSaleTotal;
-    
-    var finalData = [];
-
-    var obj = {
-      "Department Store" : percentageDepartmentStore,
-      "Grocery" : percentageGrocery,
-      "Pharmacies" : percentagePharmacies,
-      "Fast Food" : percentageFastFood,
-      "Family Clothing" : percentageFamilyClothing,
-      total: 1
-    }
-
-
-    finalData[0] = obj;
-
-    return finalData;
-  }
-
-  getData.fi = function (value){
-    if (!arguments.length) return fi;
-      fi = value;
-    return getData;
-  }
-
-  return getData;
-}
-
-
-
-export function getPurchaseByMerchantSegmentData(){
+export function getSegmentData(){
 
   var fi = "My Financial Institution";
   var column = "sale_pc";
@@ -433,14 +350,11 @@ export function getPurchaseByMerchantSegmentData(){
       salePcTotal = salePcTotal + data[i] [column];
     }
 
-    //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
-
     var percentageDepartmentStore = salePcDepartmentStore / salePcTotal;
     var percentageGrocery =  salePcGrocery / salePcTotal;
     var percentagePharmacies =  salePcPharmacies / salePcTotal;
     var percentageFamilyClothing =  salePcFamilyClothing / salePcTotal;
     var percentageFastFood =salePcFastFood / salePcTotal;
-    //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);    
     
     var finalData = [];
 
