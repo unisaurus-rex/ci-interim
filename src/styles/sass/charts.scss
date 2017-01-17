@@ -66,9 +66,10 @@ $donut-width: 50%;
 svg.svg-content-responsive-pie{
   display: block;
   margin: auto;
-  width: $donut-width;
-  height: $donut-width;
-  padding: 2%;
+  width: 50%;
+  height: auto;
+  padding-right: 5%;
+  padding-left: 5%;
   overflow: visible;
 }
 text.data, text.inside{

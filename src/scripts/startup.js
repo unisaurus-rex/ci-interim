@@ -66,6 +66,7 @@ groupedExport.addDropdownListener(groupedName);
 
 /************************************************ TABLE ************************************************/
 
+//console.log(tableExport);
 
 var sigDebitTableName = "#sigDebitGrouped"; 
 
@@ -102,7 +103,7 @@ var donutInterchangeName = "#sigDebitInterchange";
 
 //Setup SVG
 var donutMargin = {top: 20, left: 20, right: 30, bottom: 50};
-donutExport.setSvgSize(donutInterchangeName, 500, 500);
+donutExport.setSvgSize(donutInterchangeName, donutWidth, donutHeight);
 donutExport.setMargins(donutInterchangeName ,donutMargin);
 donutExport.drawSvg(donutInterchangeName);
 
@@ -114,7 +115,7 @@ var interchangeValueFunction = function(d){
   return d.avg_fee;
 }
 var donutConfiguration = new donutConfig().setClassMap(classMap)
-  .setValueFunction(interchangeValueFunction)
+//  .setValueFunction(interchangeValueFunction)
   .setConstancyFunction(constancyFunction)
   .setClassMapFunction(classMapFunction)
   .setInnerRad(innerRad)
@@ -139,7 +140,7 @@ donutExport.addDropdownListener(donutInterchangeName);
 var donutSalesName = "#sigDebitSales";
 
 //Setup SVG
-donutExport.setSvgSize(donutSalesName, 500, 500);
+donutExport.setSvgSize(donutSalesName, donutWidth, donutHeight);
 donutExport.setMargins(donutSalesName ,donutMargin);
 donutExport.drawSvg(donutSalesName);
 
@@ -151,9 +152,9 @@ var salesValueFunction = function(d){
   return d.amt_sale;
 }
 
-donutConfiguration.setClassMap(classMap)
-  .setValueFunction(salesValueFunction)
-;
+//donutConfiguration.setClassMap(classMap)
+//  .setValueFunction(salesValueFunction)
+//;
 
 //Add Checkboxes
 var donutTwoCb = donutExport.observerCallbackBuilder(donutSalesName);
@@ -173,18 +174,18 @@ donutExport.addDropdownListener(donutSalesName);
 var donutTransactionsName = "#sigDebitTransactions";
 
 //Setup SVG
-donutExport.setSvgSize(donutTransactionsName, 500, 500);
+donutExport.setSvgSize(donutTransactionsName, donutWidth, donutHeight);
 donutExport.setMargins(donutTransactionsName ,donutMargin);
 donutExport.drawSvg(donutTransactionsName);
 donutExport.buildData(donutTransactionsName, "sig_debit", "My Financial Institution");
 
 //Setup Config
-var transactionsValueFunction = function(d){
-  return d.amt_sale;
-}
-donutConfiguration
-  .setValueFunction(transactionsValueFunction)
-;
+//var transactionsValueFunction = function(d){
+//  return d.amt_sale;
+//}
+//donutConfiguration
+//  .setValueFunction(transactionsValueFunction)
+//;
 
 //Add checkboxes
 var donutThreeCb = donutExport.observerCallbackBuilder(donutTransactionsName);

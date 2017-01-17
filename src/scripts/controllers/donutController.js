@@ -133,8 +133,8 @@ function drawSvg(chartname){
       .attr("viewBox", "0 0 " + width + " " + height)
   //class for responsivenesss
       .classed("svg-content-responsive-pie", true)
-      .attr("width", width)
-      .attr("height", height)
+      //.attr("width", width)
+      //.attr("height", height)
       .append("g")
   //      .attr("id", "donutchart")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
