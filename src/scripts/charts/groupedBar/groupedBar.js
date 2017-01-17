@@ -106,6 +106,7 @@ export default function groupedBarChart(){
       .attr("y", height)
       .merge(sel)
           .data(function(d) { return d.groups; })
+      .attr("title", function(d){return d.name + ": " + d.value;})
       .attr("width", x1.bandwidth())
       .attr("x", function(d) {  return x1(d.name); })    
       .attr("class", classMapFunction)

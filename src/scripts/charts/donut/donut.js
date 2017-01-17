@@ -86,7 +86,7 @@ export default function donutChart(){
       .append("path")
       .merge(sel)
       .data(pie(dataArr))
-      //.attr("test", function(d){console.log(d)})
+      .attr("title", function(d){ return d.data.mcc_name + " " + d.value;})
       .on("mouseover", function(d) {
             d3.select(this)
               .transition()

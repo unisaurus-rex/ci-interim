@@ -4,6 +4,7 @@ import Panel from "panel";
 import Checkboxes from 'checkboxes';
 import addBootstrapCheckboxObservers from 'newCheckboxObserver';
 import groupedBarChart from 'groupedBar';
+import {toolTips} from 'tooltips';
 
 var charts = {};
 //used to create a global 
@@ -47,6 +48,7 @@ function draw(chartname) {
 
     charts[chartname].drawFunc.column(charts[chartname].dropdown);
     charts[chartname].drawFunc(loc, filteredData);
+    toolTips();
   }  
 }
 

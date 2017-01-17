@@ -12,6 +12,12 @@ import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
 import {tableExport} from 'tableController';
 
+import {toolTips} from 'tooltips';
+
+//Tooltips
+toolTips();
+window.toolTips = toolTips;
+
 /************************************************ ALL CHARTS ************************************************/
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
                  "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",

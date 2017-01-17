@@ -1,4 +1,4 @@
-import groupedBarController from 'groupedBarController';
+import groupedFilter from 'groupedBarController';
 
 describe("The grouped bar contoller should", function(){
 
@@ -6,7 +6,7 @@ describe("The grouped bar contoller should", function(){
 	var getData;
 
 	beforeEach (function(){
-		getData = groupedBarController().txnType("pin_debit");
+		getData = groupedFilter().txnType("pin_debit").column("n_trans");
     data = getData();
 
 	});

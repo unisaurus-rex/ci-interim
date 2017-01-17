@@ -4,6 +4,7 @@ import Panel from "panel";
 import stackChart from 'stacked';
 import Checkboxes from 'checkboxes';
 import addBootstrapCheckboxObservers from 'newCheckboxObserver';
+import {toolTips} from 'tooltips';
 
 var charts = {};
 
@@ -72,6 +73,9 @@ function draw(chartname) {
     let loc = d3.select(chartname + " svg");
 
     charts[chartname].drawFunc(loc, filteredData);
+
+    //Tooltips
+    toolTips();
   }  
 }
 

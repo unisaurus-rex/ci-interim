@@ -30,6 +30,7 @@ System.config({
     "data": "scripts/data.js",
     "donut": "scripts/charts/donut/donut.js",
     "donutConfig": "scripts/charts/donut/donutConfig.js",
+    "tooltips": "scripts/utils/tooltips.js",
     "donutController": "scripts/controllers/donutController.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "groupedBar": "scripts/charts/groupedBar/groupedBar.js",

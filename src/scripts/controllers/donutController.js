@@ -4,6 +4,7 @@ import donutChart from 'donut';
 import * as d3 from "d3";
 import Panel from "panel";
 import Checkboxes from 'checkboxes';
+import {toolTips} from 'tooltips';
 
 var charts = {};
 
@@ -171,6 +172,8 @@ function createDrawingFunc(chartname, config) {
 // Call the drawing function associated with a chartname
 function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
+
+
     
     let arr = charts[chartname].cboxes.getAllChecked();
     // used returned checked value array to filter data
@@ -185,6 +188,8 @@ function draw(chartname) {
 
     //console.log(data);
     charts[chartname].drawFunc(loc, filteredData);
+    //Tooltips
+    toolTips();
   }  
 }
 

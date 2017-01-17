@@ -51,6 +51,7 @@ function chart(svg, data){
   var rect = rectUpdate
 	.enter().append("rect")
 	.merge(rectUpdate)
+  .attr("title", function(d){ return d.key + ' ' +  d[0].data[ d.key ]})
 	  .attr("y", height/8 )
 	  .attr("height", height/2)
 	  .transition()
