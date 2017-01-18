@@ -255,7 +255,7 @@ function dropdownCallbackBuilder(chartname) {
   return function(d) {
 
   	// get dropdown values
-    let current = d3.select(this).attr('value');
+    let current = d3.select(this).attr('data-value');
     let old = charts[chartname].dropdown;
 
     if( current != old) {
@@ -296,7 +296,7 @@ function buildData(chartname, txnType) {
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
     var dropDownSelect = chartname + " .dropdown-menu li";
-    p.dropdown = d3.select( dropDownSelect ).attr("value");
+    p.dropdown = d3.select( dropDownSelect ).attr("data-value");
 
     get.column(p.dropdown);
 
@@ -306,7 +306,7 @@ function buildData(chartname, txnType) {
   }
   else{
     var dropDownSelect = chartname + " .dropdown-menu li";
-    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value");
+    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("data-value");
     get.column(charts[chartname].dropdown);
     charts[chartname].data = get();
 

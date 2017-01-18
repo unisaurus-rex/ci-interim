@@ -227,7 +227,7 @@ function setDropdown(chartname, val) {
   // if user did not pass in val, default to first dropdown list element
   if(val === undefined) {
     let selector = chartname + ' .dropdown-menu li';
-    val = d3.select(selector).attr('value');
+    val = d3.select(selector).attr('data-value');
   }
 
   tables[chartname].dropdown = val;
@@ -240,7 +240,7 @@ function setDropdown(chartname, val) {
 function dropdownCallbackBuilder(chartname) {
   return function(d) {
     // get selected dropdown value
-    let val = d3.select(this).attr('value');
+    let val = d3.select(this).attr('data-value');
 
     // set dropdown value
     setDropdown(chartname, val);

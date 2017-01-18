@@ -70,7 +70,7 @@ export function buildData(chartname, txnType, fi) {
     charts[chartname] = p;
 
     var dropDownSelect = chartname + " .dropdown-menu li";
-    p.dropdown = d3.select( dropDownSelect ).attr("value");
+    p.dropdown = d3.select( dropDownSelect ).attr("data-value");
   }
   else{
     charts[chartname].data = getInsightsData(txnType, fi);
@@ -80,7 +80,7 @@ export function buildData(chartname, txnType, fi) {
     }) 
 
     var dropDownSelect = chartname + " .dropdown-menu li";
-    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value"); 
+    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("data-value"); 
 
 
   }
@@ -315,7 +315,7 @@ function dropdownCallbackBuilder(chartname) {
   return function(d) {
 
     // get dropdown values
-    let current = d3.select(this).attr('value');
+    let current = d3.select(this).attr('data-value');
     let old = charts[chartname].dropdown;
 
     if( current != old) {
