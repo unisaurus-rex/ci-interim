@@ -211,3 +211,8 @@ svg, svg:not(:root) {
   text-align: left;
   color:$brand-primary
 }
+
+//** Tooltips **//
+#svg-tooltip {
+  position: absolute;
+}

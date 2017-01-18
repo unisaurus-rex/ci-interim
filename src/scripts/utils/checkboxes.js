@@ -73,7 +73,9 @@ export default class Checkboxes {
    * @returns {array}
    */
   toggle(name) {
-    this.checkboxes[name] = !this.checkboxes[name];
+    if(this.checkboxes.hasOwnProperty(name)){
+      this.checkboxes[name] = !this.checkboxes[name];
+    }
     return this.getAllChecked();
   }
 

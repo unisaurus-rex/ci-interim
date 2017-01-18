@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 
 export default function donutChart(){
-
   var width = 500,
   height = 500,
   innerText = "TOTAL TRANS";
@@ -9,9 +8,8 @@ export default function donutChart(){
   var innerRad = radius / 4;
   var hoverRad = 15;
   var padAngle = 0;
-  var valueFunction = function(d){
-    return d.number;
-  }
+  var column;
+ 
   var constancyFunction = function(d){
     return d.transactionType;
   }
@@ -20,12 +18,9 @@ export default function donutChart(){
     return classMap[d.data.transactionType];
   }
 
-  var innerNumber = 0;
+  var innerNumberFunc;
 
-
-  
   function chart(container, dataArr){
-
     //remove current number
     container.select( "text.data" )
       .transition()
@@ -33,7 +28,11 @@ export default function donutChart(){
       .style("opacity", 0)
       .remove()
     ;
-    
+
+    var innerNumber = innerNumberFunc(dataArr, column);
+    var formatNum = d3.format(',.2f');
+    innerNumber = formatNum(innerNumber);
+
     //update number
     container.append("text")
       .attr("dy", ".95em")
@@ -73,7 +72,7 @@ export default function donutChart(){
 
     var pie = d3.pie()
       .sort(null)
-      .value ( valueFunction )
+      .value ( function (d) { return d [column] })
       .padAngle(padAngle)
     ;
 
@@ -87,17 +86,24 @@ export default function donutChart(){
       .append("path")
       .merge(sel)
       .data(pie(dataArr))
+      .attr("title", function(d){ return d.data.mcc_name + " " + d.value;})
       .on("mouseover", function(d) {
-            d3.select(this).transition()
+            d3.select(this)
+              .transition()
                 .duration(1000)
-                .attr("d", hoverArc);
+                .attr("d", hoverArc)    
+            ;
           })
         .on("mouseout", function(d) {
-            d3.select(this).transition()
+            d3.select(this)
+              .transition()
                 .duration(1000)
-                .attr("d", arc);
+                .attr("d", arc)
+              ;
+                
         })
         .attr("class", classMapFunction)
+        .attr("pointer-events", "none")
         .transition()
         .duration(700)
         .attrTween('d', function(d) {
@@ -105,9 +111,11 @@ export default function donutChart(){
         return function(t) {
             return arc(interpolate(t));
         }})
+        .on("end", function(){ d3.select(this).attr("pointer-events", null) })
         ;
 
         sel.exit()
+          .attr("pointer-events", "none")
           .transition()
           .duration(700)
           .attrTween('d', function(d) {
@@ -135,61 +143,113 @@ export default function donutChart(){
 
   chart.width = function(value){
     if (!arguments.length) return width;
-    width = value;
+
+    if(value != null) {
+      width = value;
+    }
+
     return chart;
   }
 
   chart.height = function(value){
     if (!arguments.length) return height;
-    height = value;
+
+    if(value != null) {
+      height = value; 
+    }
+
     return chart; 
   }
+
   chart.innerText = function(value){
     if (!arguments.length) return innerText;
-    innerText = value;
+
+    if(value != null) {
+      innerText = value;
+    }
+    
     return chart; 
   }
+  
   chart.innerRad = function(value){
     if (!arguments.length) return innerRad;
-    innerRad = value;
+
+    if(value != null) {
+      innerRad = value;
+    }
+    
     return chart; 
   }
+
   chart.hoverRad = function(value){
     if (!arguments.length) return hoverRad;
-    hoverRad = value;
+
+    if(value != null) {
+      hoverRad = value;
+    }
+    
     return chart; 
   }
   chart.padAngle = function(value){
     if (!arguments.length) return padAngle;
-    padAngle = value;
+
+    if(value != null) {
+      padAngle = value;
+    }
+    
     return chart; 
   }
+
   chart.constancyFunction = function(value){
     if (!arguments.length) return constancyFunction;
-    constancyFunction = value; 
+
+    if(value != null) {
+      constancyFunction = value; 
+    }
+    
     return chart;
   }
-  chart.valueFunction = function(value){
-    if (!arguments.length) return valueFunction;
-    valueFunction = value;
-    return chart; 
-  }
+
   chart.classMap = function(value){
     if (!arguments.length) return classMap;
-    classMap = value;
-    return chart;
-  }
-  chart.classMapFunction = function(value){
-    if(!arguments.length) return classMapFunction;
-    classMapFunction = value;
+
+    if(value != null) {
+      classMap = value;
+    }
+    
     return chart;
   }
 
-  chart.innerNumber = function (value){
-   if(!arguments.length) return innerNumber;
-    innerNumber = value;
+  chart.classMapFunction = function(value){
+    if(!arguments.length) return classMapFunction;
+
+    if(value != null) {
+      classMapFunction = value;
+    }
+    
+    return chart;
+  }
+
+
+
+  chart.innerNumberFunc = function (value){
+    if(!arguments.length) return innerNumberFunc;
+
+    if(value != null) {
+      innerNumberFunc = value;
+    }
+    
+    return chart; 
+  }
+  chart.column = function (value){
+    if(!arguments.length) return column;
+
+    if(value != null) {
+      column = value;
+    }
+    
     return chart; 
   }
 
-    return chart;
+  return chart;
 }

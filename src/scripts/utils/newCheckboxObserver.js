@@ -5,7 +5,7 @@ import Checkboxes from 'checkboxes';
 
 /**
  * @callback changeCallback
- * @param {string[]} string values associated with the value attribute of input checkboxes
+ * @param {string} value associated with the value attribute of input checkboxes
  */
 
 
@@ -17,8 +17,6 @@ import Checkboxes from 'checkboxes';
 export default function addBootstrapCheckboxObservers() {
 
   var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style) 
-      values, // array of strings, each string is the value attribute of an input checkbox
-      defaults, // array of bools, the starting state of each checkbox in values, true = checked 
       callback; // changeCallback
 
   /**
@@ -27,16 +25,11 @@ export default function addBootstrapCheckboxObservers() {
    * @returns {Object} Checkboxes class
    */
   function observers() {
-    var boxes = new Checkboxes(values, defaults);
-    
-    // build the callback that is passed to addCheckboxObserver 
-    var changeCallback = checkboxChangeBuilder(boxes, callback);
-
     // get the DOM element tied to each id
     var domEls = elementIds.map( (id) => document.getElementById(id) );
 
     // add observers for each item in domEls and collect the new mutation observer objects in an array so we can return it
-    var observerArr = domEls.map( (el) => { return addCheckboxObserver(el, changeCallback); });  
+    var observerArr = domEls.map( (el) => { return addCheckboxObserver(el, callback); });  
 
     return observerArr;
   }
@@ -48,24 +41,6 @@ export default function addBootstrapCheckboxObservers() {
     }
 
     elementIds = arr;
-    return observers;
-  };
-
-  observers.values = function(arr) {
-    if(!arguments.length) {
-      return values;
-    }
-
-    values = arr;
-    return observers;
-  };
-
-  observers.defaults = function(arr) {
-    if(!arguments.length) {
-      return defaults;
-    }
-
-    defaults = arr;
     return observers;
   };
 
@@ -88,21 +63,6 @@ export default function addBootstrapCheckboxObservers() {
   }
 
   return observers;
-}
-
-
-/**
- * Expose a way to track checkbox toggling that can be used by other functions
- * to drive their behavior
- * @function checkboxChangeBuilder 
- * @param {Object} boxes - Checkboxes class
- * @param {changeCallback} callback  
- * @returns {function} a function that accepts a single value, this function can be passed to mutationFuncBuilder  
- */
-function checkboxChangeBuilder(boxes, callback) {
-  return function(value){
-    callback( boxes.toggle(value) ); 
-  };
 }
 
 /*
