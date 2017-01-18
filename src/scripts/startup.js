@@ -10,13 +10,11 @@ import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
-import {tableExport} from 'tableController';
-
+import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
 
 //Tooltips
 toolTips();
-window.toolTips = toolTips;
 
 /************************************************ ALL CHARTS ************************************************/
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",

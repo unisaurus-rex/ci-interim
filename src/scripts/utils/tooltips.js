@@ -4,7 +4,6 @@ export function toolTips() {
 
     $(document).ready(function () {
 
-        console.log("ready");
         //Part 0  Due to cross browser inconsistency you need to normalize the scrollTop/pageYOffset pixels
         function getScrollTop() {
             if (typeof pageYOffset != 'undefined') {

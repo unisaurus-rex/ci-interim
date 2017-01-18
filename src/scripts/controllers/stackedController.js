@@ -135,9 +135,7 @@ function buildData(chartname, fi, column) {
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
     p.data = getData();
-    p.data.columns = Object.keys(p.data[0]).filter(function (obj){
-      return obj != "total";
-    })
+
 
 
     charts[chartname] = p;
@@ -148,9 +146,6 @@ function buildData(chartname, fi, column) {
   else{
     charts[chartname].data = getData();
 
-    charts[chartname].data.columns = Object.keys(charts[chartname].data[0]).filter(function (obj){
-      return obj != "total";
-    })
 
    var dropDownSelect = chartname + " .dropdown-menu li";
     charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value"); 
@@ -373,6 +368,10 @@ export function getSegmentData(){
 
 
     finalData[0] = obj;
+
+      finalData.columns = Object.keys(finalData[0]).filter(function (obj){
+      return obj != "total";
+    })
 
     return finalData;
   }

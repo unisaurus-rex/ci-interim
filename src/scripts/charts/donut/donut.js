@@ -115,6 +115,7 @@ export default function donutChart(){
         ;
 
         sel.exit()
+          .attr("pointer-events", "none")
           .transition()
           .duration(700)
           .attrTween('d', function(d) {

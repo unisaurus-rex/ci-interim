@@ -56,7 +56,7 @@ export var donutExport = {
 /**
  * add or update chartname.data based on txnType and fi
  */ 
-function buildData(chartname, txnType, fi) {
+export function buildData(chartname, txnType, fi) {
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
@@ -79,11 +79,12 @@ function buildData(chartname, txnType, fi) {
       return obj.mcc_name != "Total";
     }) 
 
-   var dropDownSelect = chartname + " .dropdown-menu li";
+    var dropDownSelect = chartname + " .dropdown-menu li";
     charts[chartname].dropdown = d3.select( dropDownSelect ).attr("value"); 
 
 
   }
+  return charts[chartname].data;
 }
 
 /**
