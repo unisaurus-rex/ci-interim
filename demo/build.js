@@ -8444,19 +8444,69 @@ $__System.register("6", ["7"], function (_export) {
 
   function groupedBarChart() {
 
-    var width = 0;
-    var height = 0;
+    var width = 500;
+    var height = 100;
     var classMap = {};
+    var x0 = null;
+    var x1 = null;
+    var y = null;
     var classMapFunction = function classMapFunction(d) {
       return classMap[d.name];
     };
-    var x0;
-    var x1;
-    var y;
+    //used for formatting y axis
+    var column;
+
     var groupRangeFunction;
 
     function chart(svg, data) {
-      window.d3 = d3;
+
+      //create scales
+      if (x0 == null) {
+        x0 = d3.scaleBand().rangeRound([0, width]).domain(data.map(function (d) {
+          return d.Issuer;
+        }));
+      }
+
+      var groupRangeFunction = function groupRangeFunction(d) {
+        return "translate(" + x0(d.Issuer) + ",0)";
+      };
+
+      if (x1 == null) {
+        x1 = d3.scaleBand().paddingOuter(1).domain(data.columns).rangeRound([0, x0.bandwidth()]);
+      }
+
+      y = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, function (d) {
+        return d3.max(d.groups, function (d) {
+          return d.value;
+        });
+      })]);
+      ;
+
+      var tickFormatFunc;
+      if (column == "n_trans" || column == "amt_sale" || column == "amt_fee" || column == "n_card") {
+        tickFormatFunc = function (d) {
+          var t = d / 1000000;
+          return t + "m";
+        };
+      } else {
+        tickFormatFunc = d3.format(',.2f');
+      }
+
+      //create axes
+      var xAxis = d3.axisBottom().scale(x0).tickSize(0).tickPadding(10);
+      var yAxis = d3.axisLeft().scale(y).tickFormat(tickFormatFunc).ticks(5).tickSizeInner(-width);
+
+      if (svg.selectAll(".x.axis")._groups[0].length < 1) {
+        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+      }
+
+      if (svg.selectAll(".y.axis")._groups[0].length < 1) {
+        svg.append("g").attr("class", "y axis").call(yAxis);
+      } else {
+        //update y axis
+        var t = svg.transition().duration(1000);
+        t.selectAll(".y.axis").call(yAxis);
+      }
 
       // group of bars
       var issuer = svg.selectAll(".issuer").data(data);
@@ -8472,6 +8522,8 @@ $__System.register("6", ["7"], function (_export) {
 
       sel.enter().append("rect").attr("y", height).merge(sel).data(function (d) {
         return d.groups;
+      }).attr("title", function (d) {
+        return d.name + ": " + d.value;
       }).attr("width", x1.bandwidth()).attr("x", function (d) {
         return x1(d.name);
       }).attr("class", classMapFunction).transition().duration(1000).attr("y", function (d) {
@@ -8480,8 +8532,6 @@ $__System.register("6", ["7"], function (_export) {
         return height - y(d.value);
       });
 
-      //.on('mouseover', tip.show)
-      //.on('mouseout', tip.hide)
       sel.exit().transition().duration(1000).attr("height", 0).attr("y", function (d) {
         return height;
       }).remove();
@@ -8524,6 +8574,12 @@ $__System.register("6", ["7"], function (_export) {
       return chart;
     };
 
+    chart.column = function (value) {
+      if (!arguments.length) return column;
+      column = value;
+      return chart;
+    };
+
     chart.groupRangeFunction = function (value) {
       if (!arguments.length) return groupRangeFunction;
       groupRangeFunction = value;
@@ -8537,207 +8593,1857 @@ $__System.register("6", ["7"], function (_export) {
     setters: [function (_) {
       d3 = _;
     }],
+    execute: function () {
+
+      d3.selection.prototype.moveToBack = function () {
+        return this.each(function () {
+          var firstChild = this.parentNode.firstChild;
+          if (firstChild) {
+            this.parentNode.insertBefore(this, firstChild);
+          }
+        });
+      };
+    }
+  };
+});
+$__System.register("8", ["6", "7", "9", "e", "a", "b", "c", "d"], function (_export) {
+  var groupedBarChart, d3, getInsightsData, _Object$keys, Panel, Checkboxes, addBootstrapCheckboxObservers, toolTips, charts, get, groupedExport;
+
+  // Call the drawing function associated with a chartname
+  function draw(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      var jsonGroupNames;
+
+      (function () {
+
+        var arr = charts[chartname].cboxes.getAllChecked();
+        arr.push("Issuer");
+        // used returned checked value array to filter data
+        var filteredData = charts[chartname].data.map(function (d) {
+          return arr.reduce(function (result, key) {
+            result[key] = d[key];
+            return result;
+          }, {});
+        });
+
+        //add group attribute
+        jsonGroupNames = d3.keys(filteredData[0]).filter(function (key) {
+          return key !== "Issuer";
+        });
+
+        filteredData.forEach(function (d) {
+          d.groups = jsonGroupNames.map(function (name) {
+            return { name: name, value: +d[name] };
+          });
+        });
+
+        filteredData.columns = jsonGroupNames;
+
+        var loc = d3.select(chartname + " svg");
+
+        charts[chartname].drawFunc.column(charts[chartname].dropdown);
+        charts[chartname].drawFunc(loc, filteredData);
+        toolTips();
+      })();
+    }
+  }
+
+  /**
+   * @function createDrawingFunc
+   * @param {Object} config - groupedBarConfig object
+   */
+  function createDrawingFunc(chartname, config) {
+
+    var func = groupedBarChart().width(charts[chartname].svg.width - charts[chartname].svg.margins.left - charts[chartname].svg.margins.right).height(charts[chartname].svg.height - charts[chartname].svg.margins.top - charts[chartname].svg.margins.bottom).classMap(config.classMap).classMapFunction(config.classMapFunction).groupRangeFunction(config.groupRangeFunction);
+
+    // create new object for chartname if it doesn't exisit
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.drawFunc = func;
+      charts[chartname] = p;
+    } else {
+      // update drawing function in charts
+      charts[chartname].drawFunc = func;
+    }
+  }
+
+  /**
+   * @function drawSvg
+   */
+  function drawSvg(chartname) {
+
+    var width = charts[chartname].svg.width;
+    var height = charts[chartname].svg.height;
+
+    var svgSelect = chartname + " .grouped";
+
+    var gBarSvg = d3.select(svgSelect).append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "-" + charts[chartname].svg.margins.left + " -" + charts[chartname].svg.margins.top + " " + width + " " + height).classed("svg-content-responsive", true);
+
+    return gBarSvg;
+  }
+
+  /**
+   * @function toggleCheckbox
+   */
+  function toggleCheckbox(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      if (charts[chartname].cboxes != null) {
+        return charts[chartname].cboxes.toggle(value);
+      }
+    } else {
+      throw new Error("Attempt to reference non-existent panel object");
+    }
+  }
+
+  /**
+   * @function setSvgSize
+   */
+  function setSvgSize(chartname, width, height) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.width = width;
+      p.svg.height = height;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.width = width;
+      charts[chartname].svg.height = height;
+    }
+  }
+
+  /**
+   * @function setMargins
+   */
+  function setMargins(chartname, margins) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.margins = margins;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.margins = margins;
+    }
+  }
+  /**
+   * @function observerCallbackBuilder 
+   */
+  function observerCallbackBuilder(chartname) {
+    return function (value) {
+      if (charts.hasOwnProperty(chartname)) {
+
+        var chart = charts[chartname];
+        var resetCount = chart.resetCount;
+
+        // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
+        // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
+        if (resetCount == 0) {
+          // dropdown paramater has not changed, only the checkbox values
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+          draw(chartname);
+        } else if (resetCount > 1) {
+          chart.cboxes.toggle(value);
+          chart.resetCount -= 1;
+        } else {
+          // reset == 1
+          // dropdown parameter has changed, time to do work
+
+          // update resetCount
+          chart.resetCount -= 1;
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+
+          // call draw
+          draw(chartname);
+        }
+      } else {
+        throw new Error("Attempt to reference non-existent panel object");
+      }
+    };
+  }
+
+  /*
+   * @function addCheckboxes
+   */
+  function addCheckboxes(chartname, valArr, defaultArr) {
+    var cboxes = new Checkboxes(valArr, defaultArr);
+
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.cboxes = cboxes;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].cboxes = cboxes;
+    }
+  }
+
+  /**
+   * Create mutation observers and track them in the charts object
+   * @function initObservers
+   */
+  function initObservers(chartname, idArr, valArr, defaultArr, callback) {
+
+    addCheckboxes(chartname, valArr, defaultArr);
+
+    var observerFunc = addBootstrapCheckboxObservers().elementIds(idArr).callback(callback);
+
+    var observers = observerFunc();
+
+    // if charts.chartname does not exist, build it
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.observers = observers;
+      p.observerFunc = observerFunc;
+    } else {
+      charts[chartname].observerFunc = observerFunc;
+      charts[chartname].observers = observers;
+    }
+  }
+
+  function setDropdown(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdown = value;
+    } else {
+      throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
+    }
+  }
+
+  function setResetCount(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      var cboxes = charts[chartname].cboxes;
+      var count = _Object$keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+
+      charts[chartname].resetCount = count;
+
+      //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
+      if (count == 0) {
+        draw(chartname);
+      }
+    }
+  }
+
+  function dropdownCallbackBuilder(chartname) {
+    // return d3 event callback
+    return function (d) {
+
+      // get dropdown values
+      var current = d3.select(this).attr('data-value');
+      var old = charts[chartname].dropdown;
+
+      if (current != old) {
+        // set dropdown param
+        setDropdown(chartname, current);
+
+        //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
+        get.column(current);
+        charts[chartname].data = get();
+
+        // set reset count
+        setResetCount(chartname);
+
+        // check all checkboxes
+        var selector = chartname + " .checkboxes label";
+        d3.selectAll(selector).classed('active', true);
+      }
+    };
+  }
+
+  function addDropdownListener(chartname) {
+    var selector = chartname + " .dropdown-menu li";
+    var cb = dropdownCallbackBuilder(chartname);
+    d3.selectAll(selector).on('click', cb);
+  }
+
+  /**
+   * add or update chartname.data based on txnType and fi
+   */
+  function buildData(chartname, txnType) {
+    get = groupedFilter().txnType(txnType);
+
+    // if chartname object doesn't exist, build new object and add data property
+    //chartname is the selector for the panel
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      p.dropdown = d3.select(dropDownSelect).attr("data-value");
+
+      get.column(p.dropdown);
+
+      p.data = get();
+      charts[chartname] = p;
+    } else {
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      charts[chartname].dropdown = d3.select(dropDownSelect).attr("data-value");
+      get.column(charts[chartname].dropdown);
+      charts[chartname].data = get();
+    }
+
+    return charts[chartname].data;
+  }
+
+  function groupedFilter() {
+
+    var txnType = null;
+    var column = null;
+
+    function updateData() {
+
+      if (txnType == null) {
+        throw "txnType cannot be null";
+      }
+
+      if (column == null) {
+        throw "column cannot be null";
+      }
+
+      var data = getData(txnType, column);
+      return data;
+    }
+
+    function getData(txnType, column) {
+
+      var insightsData = getInsightsData(txnType);
+      var issuers = _Object$keys(insightsData);
+      var groupedBarData = [];
+
+      for (var i = 0; i < issuers.length; i++) {
+        //map Issuer to issuer to fi for every fi
+        groupedBarData[i] = {
+          Issuer: issuers[i]
+        };
+
+        //map every mcc_name to fee_pc for every fi
+        for (var j = 0; j < insightsData[[issuers[i]]].length; j++) {
+          groupedBarData[i][insightsData[issuers[i]][j].mcc_name] = insightsData[issuers[i]][j][column];
+        }
+      }
+      var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function (key) {
+        return key !== "Issuer";
+      });
+
+      groupedBarData.forEach(function (d) {
+        d.groups = jsonGroupNames.map(function (name) {
+          return { name: name, value: +d[name] };
+        });
+      });
+
+      groupedBarData.columns = jsonGroupNames;
+
+      return groupedBarData;
+    }
+
+    updateData.txnType = function (value) {
+      if (!arguments.length) return txnType;
+      txnType = value;
+
+      if (value == null || value == undefined) {
+        throw "txnType cannot be null or undefined";
+      }
+      return updateData;
+    };
+
+    updateData.column = function (value) {
+      if (!arguments.length) return column;
+      column = value;
+
+      if (value == null || value == undefined) {
+        throw "column cannot be null or undefined";
+      }
+      return updateData;
+    };
+
+    return updateData;
+  }
+
+  return {
+    setters: [function (_3) {
+      groupedBarChart = _3["default"];
+    }, function (_2) {
+      d3 = _2;
+    }, function (_) {
+      getInsightsData = _.getInsightsData;
+    }, function (_e) {
+      _Object$keys = _e["default"];
+    }, function (_a) {
+      Panel = _a["default"];
+    }, function (_b) {
+      Checkboxes = _b["default"];
+    }, function (_c) {
+      addBootstrapCheckboxObservers = _c["default"];
+    }, function (_d) {
+      toolTips = _d.toolTips;
+    }],
+    execute: function () {
+      "use strict";
+
+      _export("default", groupedFilter);
+
+      charts = {};
+
+      //used to create a global
+      groupedExport = {
+        setSvgSize: setSvgSize,
+        setMargins: setMargins,
+        buildData: buildData,
+        drawSvg: drawSvg,
+        draw: draw,
+        createDrawingFunc: createDrawingFunc,
+        toggleCheckbox: toggleCheckbox,
+        observerCallbackBuilder: observerCallbackBuilder,
+        initObservers: initObservers,
+        addDropdownListener: addDropdownListener
+      };
+
+      _export("groupedExport", groupedExport);
+    }
+  };
+});
+$__System.register("f", [], function (_export) {
+  "use strict";
+
+  _export("default", groupedBarConfig);
+
+  function groupedBarConfig() {
+    this.classMap = null;
+    this.classMapFunction = null;
+    this.x0 = null;
+    this.x1 = null;
+    this.y = null;
+    this.groupRangeFunction = null;
+
+    this.setClassMap = function (m) {
+      if (arguments.length) {
+        this.classMap = m;
+      }
+
+      return this;
+    };
+
+    this.setClassMapFunction = function (f) {
+      if (arguments.length) {
+        this.classMapFunction = f;
+      }
+
+      return this;
+    };
+
+    this.setX0 = function (r) {
+      if (arguments.length) {
+        this.x0 = r;
+      }
+
+      return this;
+    };
+
+    this.setX1 = function (n) {
+      if (arguments.length) {
+        this.x1 = n;
+      }
+
+      return this;
+    };
+
+    this.setY = function (t) {
+      if (arguments.length) {
+        this.y = t;
+      }
+
+      return this;
+    };
+
+    this.setGroupRangeFunction = function (p) {
+      if (arguments.length) {
+        this.groupRangeFunction = p;
+      }
+
+      return this;
+    };
+  }
+
+  return {
+    setters: [],
     execute: function () {}
   };
 });
-$__System.register("8", ["7", "9", "a"], function (_export) {
-	var d3, getInsightsData, _Object$keys;
-
-	function getData() {
-		var txnType = "sig_debit";
-
-		function getData() {
-			var insightsData = getInsightsData(txnType);
-			var issuers = _Object$keys(insightsData);
-			var groupedBarData = [];
-
-			for (var i = 0; i < issuers.length; i++) {
-				//map Issuer to issuer to fi for every fi
-				groupedBarData[i] = {
-					Issuer: issuers[i]
-				};
-
-				//map every mcc_name to fee_pc for every fi
-				for (var j = 0; j < insightsData[[issuers[i]]].length; j++) {
-					groupedBarData[i][insightsData[issuers[i]][j].mcc_name] = insightsData[issuers[i]][j].fee_pc;
-				}
-			}
-			var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function (key) {
-				return key !== "Issuer";
-			});
-
-			groupedBarData.forEach(function (d) {
-				d.groups = jsonGroupNames.map(function (name) {
-					return { name: name, value: +d[name] };
-				});
-			});
-
-			groupedBarData.columns = jsonGroupNames;
-
-			return groupedBarData;
-		}
-
-		getData.txnType = function (value) {
-			if (!arguments.length) return txnType;
-			txnType = value;
-			return getData;
-		};
-
-		return getData;
-	}
-
-	return {
-		setters: [function (_2) {
-			d3 = _2;
-		}, function (_) {
-			getInsightsData = _.getInsightsData;
-		}, function (_a) {
-			_Object$keys = _a["default"];
-		}],
-		execute: function () {
-			"use strict";
-
-			_export("default", getData);
-		}
-	};
-});
-$__System.register("b", ["7", "9"], function (_export) {
-	"use strict";
-
-	var d3, getInsightsData;
-
-	_export("default", getData);
-
-	function getData() {
-		var txnType = "sig_debdfsit";
-		var fi = "My Financial Institutionsdf";
-
-		function getData() {
-			var data = getInsightsData(txnType, fi);
-
-			data = data.filter(function (obj) {
-				return obj.mcc_name != "Total";
-			});
-
-			//console.log(data);
-
-			return data;
-		}
-
-		getData.txnType = function (value) {
-			if (!arguments.length) return txnType;
-			txnType = value;
-			return getData;
-		};
-		getData.fi = function (value) {
-			if (!arguments.length) return fi;
-			fi = value;
-			return getData;
-		};
-
-		return getData;
-	}
-
-	return {
-		setters: [function (_2) {
-			d3 = _2;
-		}, function (_) {
-			getInsightsData = _.getInsightsData;
-		}],
-		execute: function () {}
-	};
-});
-$__System.register("c", ["7", "9"], function (_export) {
+$__System.register("10", ["7"], function (_export) {
   "use strict";
 
-  var d3, getInsightsData;
+  var d3;
 
-  _export("getSpendByMerchantSegmentData", getSpendByMerchantSegmentData);
+  _export("default", donutChart);
 
-  _export("getPurchaseByMerchantSegmentData", getPurchaseByMerchantSegmentData);
+  function donutChart() {
+    var width = 500,
+        height = 500,
+        innerText = "TOTAL TRANS";
+    var radius = Math.min(width, height) / 2;
+    var innerRad = radius / 4;
+    var hoverRad = 15;
+    var padAngle = 0;
+    var column;
 
-  function getSpendByMerchantSegmentData() {
-
-    var fi = "My Financial Institution";
-
-    function getData() {
-      var bin1Data = getInsightsData("bin 1", fi);
-
-      bin1Data = bin1Data.filter(function (obj) {
-        return obj.mcc_name != "Total";
-      });
-
-      var bin2Data = getInsightsData("bin 2", fi);
-
-      bin2Data = bin1Data.filter(function (obj) {
-        return obj.mcc_name != "Total";
-      });
-
-      var data = bin1Data.concat(bin2Data);
-
-      var amtSaleDepartmentStore = 0;
-      var amtSaleGrocery = 0;
-      var amtSalePharmacies = 0;
-      var amtSaleFamilyClothing = 0;
-      var amtSaleFastFood = 0;
-      var amtSaleTotal = 0;
-
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].mcc_name == "Department Store") {
-          amtSaleDepartmentStore = data[i].amt_sale + amtSaleDepartmentStore;
-        }
-        if (data[i].mcc_name == "Grocery") {
-          amtSaleGrocery = data[i].amt_sale + amtSaleGrocery;
-        }
-        if (data[i].mcc_name == "Pharmacies") {
-          amtSalePharmacies = data[i].amt_sale + amtSalePharmacies;
-        }
-        if (data[i].mcc_name == "Family Clothing") {
-          amtSaleFamilyClothing = data[i].amt_sale + amtSaleFamilyClothing;
-        }
-        if (data[i].mcc_name == "Fast Food") {
-          amtSaleFastFood = data[i].amt_sale + amtSaleFastFood;
-        }
-        amtSaleTotal = amtSaleTotal + data[i].amt_sale;
-      }
-
-      //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
-
-      var percentageDepartmentStore = amtSaleDepartmentStore / amtSaleTotal;
-      var percentageGrocery = amtSaleGrocery / amtSaleTotal;
-      var percentagePharmacies = amtSalePharmacies / amtSaleTotal;
-      var percentageFamilyClothing = amtSaleFamilyClothing / amtSaleTotal;
-      var percentageFastFood = amtSaleFastFood / amtSaleTotal;
-      //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);   
-
-      var finalData = [];
-
-      var obj = {
-        "Department Store": percentageDepartmentStore,
-        "Grocery": percentageGrocery,
-        "Pharmacies": percentagePharmacies,
-        "Fast Food": percentageFastFood,
-        "Family Clothing": percentageFamilyClothing,
-        total: 1
-      };
-
-      finalData[0] = obj;
-
-      return finalData;
-    }
-
-    getData.fi = function (value) {
-      if (!arguments.length) return fi;
-      fi = value;
-      return getData;
+    var constancyFunction = function constancyFunction(d) {
+      return d.transactionType;
+    };
+    var classMap = { "declines": "fill-danger", "authorizations": "fill-success", "chargebacks": "fill-warning" };
+    var classMapFunction = function classMapFunction(d) {
+      return classMap[d.data.transactionType];
     };
 
-    return getData;
+    var innerNumberFunc;
+
+    function chart(container, dataArr) {
+      //remove current number
+      container.select("text.data").transition().duration(100).style("opacity", 0).remove();
+
+      var innerNumber = innerNumberFunc(dataArr, column);
+      var formatNum = d3.format(',.2f');
+      innerNumber = formatNum(innerNumber);
+
+      //update number
+      container.append("text").attr("dy", ".95em").style("text-anchor", "middle").style("opacity", 0).attr("class", "data").text(function (d) {
+        return innerNumber;
+      }).transition().duration(1000).style("opacity", 1);
+
+      //remove and add inner text
+      container.selectAll("text.inside").remove();
+      container.append("text").attr("dy", "-0.5em").style("text-anchor", "middle").attr("class", "inside").text(function () {
+        return innerText;
+      });
+
+      var arc = d3.arc().outerRadius(radius).innerRadius(radius - innerRad);
+
+      var hoverArc = d3.arc().outerRadius(radius - innerRad).innerRadius(radius + hoverRad);
+
+      var pie = d3.pie().sort(null).value(function (d) {
+        return d[column];
+      }).padAngle(padAngle);
+
+      var sel = container.selectAll("path").data(pie(dataArr), constancyFunction);
+
+      sel.data(pie(dataArr)).enter().append("path").merge(sel).data(pie(dataArr)).attr("title", function (d) {
+        return d.data.mcc_name + " " + d.value;
+      }).on("mouseover", function (d) {
+        d3.select(this).transition().duration(1000).attr("d", hoverArc);
+      }).on("mouseout", function (d) {
+        d3.select(this).transition().duration(1000).attr("d", arc);
+      }).attr("class", classMapFunction).attr("pointer-events", "none").transition().duration(700).attrTween('d', function (d) {
+        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+        return function (t) {
+          return arc(interpolate(t));
+        };
+      }).on("end", function () {
+        d3.select(this).attr("pointer-events", null);
+      });
+
+      sel.exit().attr("pointer-events", "none").transition().duration(700).attrTween('d', function (d) {
+        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+        return function (t) {
+          return arc(interpolate(t));
+        };
+      }).style("opacity", 0).remove();
+
+      function arcTween(a) {
+        var startAngle = a.startAngle; //<-- keep reference to start angle
+        var i = d3.interpolate(a.startAngle, a.endAngle, a); //<-- interpolate start to end
+        return function (t) {
+          return arc({ //<-- return arc at each iteration from start to interpolate end
+            startAngle: startAngle,
+            endAngle: i(t)
+          });
+        };
+      }
+    }
+
+    chart.width = function (value) {
+      if (!arguments.length) return width;
+
+      if (value != null) {
+        width = value;
+      }
+
+      return chart;
+    };
+
+    chart.height = function (value) {
+      if (!arguments.length) return height;
+
+      if (value != null) {
+        height = value;
+      }
+
+      return chart;
+    };
+
+    chart.innerText = function (value) {
+      if (!arguments.length) return innerText;
+
+      if (value != null) {
+        innerText = value;
+      }
+
+      return chart;
+    };
+
+    chart.innerRad = function (value) {
+      if (!arguments.length) return innerRad;
+
+      if (value != null) {
+        innerRad = value;
+      }
+
+      return chart;
+    };
+
+    chart.hoverRad = function (value) {
+      if (!arguments.length) return hoverRad;
+
+      if (value != null) {
+        hoverRad = value;
+      }
+
+      return chart;
+    };
+    chart.padAngle = function (value) {
+      if (!arguments.length) return padAngle;
+
+      if (value != null) {
+        padAngle = value;
+      }
+
+      return chart;
+    };
+
+    chart.constancyFunction = function (value) {
+      if (!arguments.length) return constancyFunction;
+
+      if (value != null) {
+        constancyFunction = value;
+      }
+
+      return chart;
+    };
+
+    chart.classMap = function (value) {
+      if (!arguments.length) return classMap;
+
+      if (value != null) {
+        classMap = value;
+      }
+
+      return chart;
+    };
+
+    chart.classMapFunction = function (value) {
+      if (!arguments.length) return classMapFunction;
+
+      if (value != null) {
+        classMapFunction = value;
+      }
+
+      return chart;
+    };
+
+    chart.innerNumberFunc = function (value) {
+      if (!arguments.length) return innerNumberFunc;
+
+      if (value != null) {
+        innerNumberFunc = value;
+      }
+
+      return chart;
+    };
+    chart.column = function (value) {
+      if (!arguments.length) return column;
+
+      if (value != null) {
+        column = value;
+      }
+
+      return chart;
+    };
+
+    return chart;
   }
 
-  function getPurchaseByMerchantSegmentData() {
+  return {
+    setters: [function (_) {
+      d3 = _;
+    }],
+    execute: function () {}
+  };
+});
+$__System.register('11', ['7', '9', '10', 'e', 'c', 'a', 'b', 'd'], function (_export) {
+  var d3, getInsightsData, donutChart, _Object$keys, addBootstrapCheckboxObservers, Panel, Checkboxes, toolTips, charts, sumFunc, avgFunc, columnConfig, donutExport;
+
+  /**
+   * add or update chartname.data based on txnType and fi
+   */
+
+  function buildData(chartname, txnType, fi) {
+
+    // if chartname object doesn't exist, build new object and add data property
+    //chartname is the selector for the panel
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.data = getInsightsData(txnType, fi);
+      p.data = p.data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      charts[chartname] = p;
+
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      p.dropdown = d3.select(dropDownSelect).attr("data-value");
+    } else {
+      charts[chartname].data = getInsightsData(txnType, fi);
+
+      charts[chartname].data = charts[chartname].data.filter(function (obj) {
+        return obj.mcc_name != "Total";
+      });
+
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      charts[chartname].dropdown = d3.select(dropDownSelect).attr("data-value");
+    }
+    return charts[chartname].data;
+  }
+
+  /**
+   * @function setSvgSize
+   */
+  function setSvgSize(chartname, width, height) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.width = width;
+      p.svg.height = height;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.width = width;
+      charts[chartname].svg.height = height;
+    }
+  }
+
+  /**
+   * @function setMargins
+   */
+  function setMargins(chartname, margins) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.margins = margins;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.margins = margins;
+    }
+  }
+
+  /**
+   * @function drawSvg
+   */
+  function drawSvg(chartname) {
+
+    var width = charts[chartname].svg.width;
+    var height = charts[chartname].svg.height;
+
+    var svgSelect = chartname + " .donut";
+
+    var interchangeDonutSvg = d3.select(svgSelect).classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + width + " " + height)
+    //class for responsivenesss
+    .classed("svg-content-responsive-pie", true)
+    //.attr("width", width)
+    //.attr("height", height)
+    .append("g")
+    //      .attr("id", "donutchart")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  }
+
+  /**
+   * @function createDrawingFunc
+   * @param {Object} config - donutConfig object
+   */
+  function createDrawingFunc(chartname, config) {
+    var func = donutChart().classMap(config.classMap).constancyFunction(config.constancyFunction).classMapFunction(config.classMapFunction).innerRad(config.innerRad).innerText(columnConfig[charts[chartname].dropdown].innerText).padAngle(config.padAngle).column(charts[chartname].dropdown).innerNumberFunc(columnConfig[charts[chartname].dropdown].innerNumber);
+
+    // create new object for chartname if it doesn't exisit
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.drawFunc = func;
+      charts[chartname] = p;
+    } else {
+      // update drawing function in charts
+      charts[chartname].drawFunc = func;
+    }
+  }
+
+  // Call the drawing function associated with a chartname
+  function draw(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      (function () {
+
+        var arr = charts[chartname].cboxes.getAllChecked();
+        // used returned checked value array to filter data
+        var filteredData = charts[chartname].data.filter(function (obj) {
+          if (arr.indexOf(obj.mcc_name) == -1) {
+            return false;
+          }
+          return true;
+        });
+
+        var loc = d3.select(chartname + " svg g");
+
+        //console.log(data);
+        charts[chartname].drawFunc(loc, filteredData);
+        //Tooltips
+        toolTips();
+      })();
+    }
+  }
+
+  /*
+   * @function addCheckboxes
+   */
+  function addCheckboxes(chartname, valArr, defaultArr) {
+    var cboxes = new Checkboxes(valArr, defaultArr);
+
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.cboxes = cboxes;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].cboxes = cboxes;
+    }
+  }
+
+  /**
+   * @function toggleCheckbox
+   */
+  function toggleCheckbox(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      if (charts[chartname].cboxes != null) {
+        return charts[chartname].cboxes.toggle(value);
+      }
+    } else {
+      throw new Error("Attempt to reference non-existent panel object");
+    }
+  }
+
+  /**
+   * @function observerCallbackBuilder 
+   */
+  function observerCallbackBuilder(chartname) {
+    return function (value) {
+      if (charts.hasOwnProperty(chartname)) {
+
+        var chart = charts[chartname];
+        var resetCount = chart.resetCount;
+
+        // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
+        // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
+        if (resetCount == 0) {
+          // dropdown paramater has not changed, only the checkbox values
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+          draw(chartname);
+        } else if (resetCount > 1) {
+          chart.cboxes.toggle(value);
+          chart.resetCount -= 1;
+        } else {
+          // reset == 1
+          // dropdown parameter has changed, time to do work
+
+          // update resetCount
+          chart.resetCount -= 1;
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+
+          // call draw
+          draw(chartname);
+        }
+      } else {
+        throw new Error("Attempt to reference non-existent panel object");
+      }
+    };
+  }
+
+  /**
+   * Create mutation observers and track them in the charts object
+   * @function initObservers
+   */
+  function initObservers(chartname, idArr, valArr, defaultArr, callback) {
+    addCheckboxes(chartname, valArr, defaultArr);
+
+    var observerFunc = addBootstrapCheckboxObservers().elementIds(idArr).callback(callback);
+
+    var observers = observerFunc();
+
+    // if charts.chartname does not exist, build it
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.observers = observers;
+      p.observerFunc = observerFunc;
+    } else {
+      charts[chartname].observerFunc = observerFunc;
+      charts[chartname].observers = observers;
+    }
+  }
+
+  function setDropdown(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdown = value;
+    } else {
+      throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
+    }
+  }
+
+  function setResetCount(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      var cboxes = charts[chartname].cboxes;
+      var count = _Object$keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+
+      charts[chartname].resetCount = count;
+
+      //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
+      if (count == 0) {
+        draw(chartname);
+      }
+    }
+  }
+
+  function dropdownCallbackBuilder(chartname) {
+    // return d3 event callback
+    return function (d) {
+
+      // get dropdown values
+      var current = d3.select(this).attr('data-value');
+      var old = charts[chartname].dropdown;
+
+      if (current != old) {
+        // set dropdown param
+        setDropdown(chartname, current);
+
+        //UPDATE VALUE FUNCTION, INNERTEXT, INNERNUMBER?
+        charts[chartname].drawFunc.innerText(columnConfig[charts[chartname].dropdown].innerText);
+        charts[chartname].drawFunc.innerNumberFunc(columnConfig[charts[chartname].dropdown].innerNumber);
+        charts[chartname].drawFunc.column(charts[chartname].dropdown);
+
+        // set reset count
+        setResetCount(chartname);
+
+        // check all checkboxes
+        var selector = chartname + " .checkboxes label";
+        d3.selectAll(selector).classed('active', true);
+      }
+    };
+  }
+
+  function addDropdownListener(chartname) {
+    var selector = chartname + " .dropdown-menu li";
+    var cb = dropdownCallbackBuilder(chartname);
+    d3.selectAll(selector).on('click', cb);
+  }
+  return {
+    setters: [function (_3) {
+      d3 = _3;
+    }, function (_) {
+      getInsightsData = _.getInsightsData;
+    }, function (_2) {
+      donutChart = _2['default'];
+    }, function (_e) {
+      _Object$keys = _e['default'];
+    }, function (_c) {
+      addBootstrapCheckboxObservers = _c['default'];
+    }, function (_a) {
+      Panel = _a['default'];
+    }, function (_b) {
+      Checkboxes = _b['default'];
+    }, function (_d) {
+      toolTips = _d.toolTips;
+    }],
+    execute: function () {
+      'use strict';
+
+      _export('buildData', buildData);
+
+      charts = {};
+
+      sumFunc = function sum(data, column) {
+        var number = 0;
+        data.forEach(function (d, j) {
+          number += d[column];
+        });
+        return number;
+      };
+
+      avgFunc = function average(data, column) {
+        var number = 0;
+        if (data.length == 0) {
+          return 0;
+        }
+        data.forEach(function (d, j) {
+          number += d[column];
+        });
+        number = number / data.length;
+        return number;
+      };
+
+      columnConfig = {
+        "amt_fee": { "innerText": "TOTAL INTERCHANGE", "innerNumber": sumFunc },
+        "avg_fee": { "innerText": "AVG INTERCHANGE", "innerNumber": avgFunc },
+        "fee_pc": { "innerText": "INTERCHANGE BY CARD", "innerNumber": avgFunc },
+        "amt_sale": { "innerText": "TOTAL SALES", "innerNumber": sumFunc },
+        "avg_sale": { "innerText": "AVG SALE", "innerNumber": avgFunc },
+        "sale_pc": { "innerText": "AMOUNT PER CARD", "innerNumber": avgFunc },
+        "n_trans": { "innerText": "TOTAL TRANS", "innerNumber": sumFunc },
+        "n_card": { "innerText": "TOTAL CARDS USED", "innerNumber": sumFunc },
+        "trans_pc": { "innerText": "TRANS BY CARD", "innerNumber": avgFunc }
+      };
+      donutExport = {
+        setSvgSize: setSvgSize,
+        setMargins: setMargins,
+        buildData: buildData,
+        drawSvg: drawSvg,
+        draw: draw,
+        createDrawingFunc: createDrawingFunc,
+        toggleCheckbox: toggleCheckbox,
+        observerCallbackBuilder: observerCallbackBuilder,
+        initObservers: initObservers,
+        addDropdownListener: addDropdownListener
+      };
+
+      _export('donutExport', donutExport);
+    }
+  };
+});
+$__System.register("12", [], function (_export) {
+  "use strict";
+
+  _export("default", donutConfig);
+
+  function donutConfig() {
+    this.classMap = null;
+    this.valueFunction = null;
+    this.constancyFunction = null;
+    this.classMapFunction = null;
+    this.innerRad = null;
+    this.innerNumber = null;
+    this.innerText = null;
+    this.padAngle = null;
+
+    this.setClassMap = function (m) {
+      if (arguments.length) {
+        this.classMap = m;
+      }
+
+      return this;
+    };
+
+    this.setValueFunction = function (f) {
+      if (arguments.length) {
+        this.valueFunction = f;
+      }
+
+      return this;
+    };
+
+    this.setConstancyFunction = function (f) {
+      if (arguments.length) {
+        this.constancyFunction = f;
+      }
+
+      return this;
+    };
+
+    this.setClassMapFunction = function (f) {
+      if (arguments.length) {
+        this.classMapFunction = f;
+      }
+
+      return this;
+    };
+
+    this.setInnerRad = function (r) {
+      if (arguments.length) {
+        this.innerRad = r;
+      }
+
+      return this;
+    };
+
+    this.setInnerNumber = function (n) {
+      if (arguments.length) {
+        this.innerNumber = n;
+      }
+
+      return this;
+    };
+
+    this.setInnerText = function (t) {
+      if (arguments.length) {
+        this.innerText = t;
+      }
+
+      return this;
+    };
+
+    this.setPadAngle = function (p) {
+      if (arguments.length) {
+        this.padAngle = p;
+      }
+
+      return this;
+    };
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+$__System.register("13", [], function (_export) {
+  "use strict";
+
+  _export("default", stackConfig);
+
+  function stackConfig() {
+    this.classMap = null;
+    this.classMapFunction = null;
+    this.width = null;
+    this.height = null;
+    this.margin = null;
+
+    this.setClassMap = function (m) {
+      if (arguments.length) {
+        this.classMap = m;
+      }
+
+      return this;
+    };
+
+    this.setClassMapFunction = function (f) {
+      if (arguments.length) {
+        this.classMapFunction = f;
+      }
+
+      return this;
+    };
+
+    this.setWidth = function (r) {
+      if (arguments.length) {
+        this.width = r;
+      }
+
+      return this;
+    };
+
+    this.setHeight = function (n) {
+      if (arguments.length) {
+        this.Height = n;
+      }
+
+      return this;
+    };
+
+    this.setMargin = function (t) {
+      if (arguments.length) {
+        this.margin = t;
+      }
+
+      return this;
+    };
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+$__System.register("14", ["7"], function (_export) {
+  "use strict";
+
+  var d3;
+
+  _export("default", stackChart);
+
+  function stackChart() {
+    var margin = { top: 30, right: 40, bottom: 50, left: 40 };
+    var width = 0; // 900 - margin.left - margin.right;
+    var height = 0; // 300 - margin.top - margin.bottom;
+
+    var x = d3.scaleBand();
+    var y = d3.scaleLinear();
+    var y2 = d3.scaleLinear();
+    var z = d3.scaleOrdinal(d3.schemeCategory20);
+    var classMapFunction = function classMapFunction(d) {
+      return classMap[d.key];
+    };
+
+    var classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
+      "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+      "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
+
+    function chart(svg, data) {
+      x.rangeRound([0, height - margin.top - margin.bottom]);
+
+      y.rangeRound([width - margin.left - margin.right, 0]).domain([0, d3.max(data, function (d) {
+        return d.total;
+      })]).nice();
+
+      y2.rangeRound([0, width - margin.right - margin.left]).domain([0, d3.max(data, function (d) {
+        return d.total;
+      })]).nice();
+
+      var stack = d3.stack().keys(data.columns);
+
+      var gUpdate = svg.selectAll("g").data([data]);
+
+      var g = gUpdate.enter().append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").merge(gUpdate);
+
+      var rectUpdate = g.selectAll("rect").data(stack, function (d) {
+        return d.key;
+      });
+
+      //add and update all rectangles
+      var rect = rectUpdate.enter().append("rect").merge(rectUpdate).attr("title", function (d) {
+        return d.key + ' ' + d[0].data[d.key];
+      }).attr("y", height / 8).attr("height", height / 2).transition().duration(1000).attr("x", function (d) {
+        return y2(d[0][0]);
+      }).attr("width", function (d) {
+        return y(d[0][0]) - y(d[0][1]);
+      }).attr("class", classMapFunction);
+
+      //remove rectangles
+      rectUpdate.exit().transition().duration(1000).attr("width", 0).remove();
+
+      //x axis
+      var newY = height - margin.top - margin.bottom;
+      svg.selectAll("g .x-axis").remove();
+      g.append("g").attr("class", "x-axis").attr("transform", "translate(0," + newY + ")").call(d3.axisBottom(y2).ticks(4, "%"));
+    }
+
+    chart.width = function (value) {
+      if (!arguments.length) return width;
+      width = value;
+      return chart;
+    };
+    chart.margin = function (value) {
+      if (!arguments.length) return margin;
+      margin = value;
+      return chart;
+    };
+    chart.height = function (value) {
+      if (!arguments.length) return height;
+      height = value;
+      return chart;
+    };
+    chart.classMap = function (value) {
+      if (!arguments.length) return classMap;
+      classMap = value;
+      return chart;
+    };
+    chart.classMapFunction = function (value) {
+      if (!arguments.length) return classMapFunction;
+      classMapFunction = value;
+      return chart;
+    };
+
+    return chart;
+  }
+
+  return {
+    setters: [function (_) {
+      d3 = _;
+    }],
+    execute: function () {}
+  };
+});
+$__System.registerDynamic('15', ['16'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $ = $__require('16');
+  module.exports = function defineProperty(it, key, desc) {
+    return $.setDesc(it, key, desc);
+  };
+  return module.exports;
+});
+$__System.registerDynamic("17", ["15"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("15"), __esModule: true };
+  return module.exports;
+});
+$__System.registerDynamic("18", ["17"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var _Object$defineProperty = $__require("17")["default"];
+  exports["default"] = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        _Object$defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+  exports.__esModule = true;
+  return module.exports;
+});
+$__System.registerDynamic("19", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  exports["default"] = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  exports.__esModule = true;
+  return module.exports;
+});
+$__System.register('b', ['18', '19', 'e'], function (_export) {
+  var _createClass, _classCallCheck, _Object$keys, Checkboxes;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_e) {
+      _Object$keys = _e['default'];
+    }],
+    execute: function () {
+      /**
+       * @module checkboxes
+       */
+
+      /** Track a group of checkboxes and their state (checked or unchecked) */
+      'use strict';
+
+      Checkboxes = (function () {
+        /**
+         * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
+         * @param {string[]} namesArr - the name of each checkbox you want to track
+         * @param {bool[]} [valuesArr] - the starting value of each checkbox in nameArr, true means the checkbox is checked
+         */
+
+        function Checkboxes(namesArr, valuesArr) {
+          _classCallCheck(this, Checkboxes);
+
+          // Case 1: only namesArr passed as argument, initialize checkbox properties to false by default
+          if (arguments.length == 1) {
+            this.checkboxes = namesArr.reduce(function (result, val) {
+              result[val] = false;
+              return result;
+            }, {});
+          } else if (arguments.length == 2) {
+            // case 2: namesArr and valuesArr provided
+            // use valuesArr to set starting value of each checkbox
+            this.checkboxes = namesArr.reduce(function (result, val, idx) {
+              result[val] = valuesArr[idx];
+              return result;
+            }, {});
+          } else {
+            // case 3: throw an error
+            throw new Error('Attempted to instantiate Checkboxes class with no parameters');
+          }
+        }
+
+        /**
+         * Return an object containing all checkbox names and values
+         */
+
+        _createClass(Checkboxes, [{
+          key: 'getAll',
+          value: function getAll() {
+            return this.checkboxes;
+          }
+
+          /**
+           * return an array of all properties whose value is true
+           */
+        }, {
+          key: 'getAllChecked',
+          value: function getAllChecked() {
+            // get array of checkbox names
+            var keys = _Object$keys(this.checkboxes);
+            var c = this.checkboxes;
+
+            // go through each checkbox name and drop any that don't have a value of true
+            return keys.filter(function (key) {
+              return c[key];
+            });
+          }
+
+          /**
+           * Return the value belonging to the checkbox associated with name
+           * @param {string} name - name of the checkbox
+           */
+        }, {
+          key: 'getValue',
+          value: function getValue(name) {
+            return this.checkboxes[name];
+          }
+
+          /**
+           * Set all checkbox values to true
+           */
+        }, {
+          key: 'checkAll',
+          value: function checkAll() {
+            var _this = this;
+
+            var keys = _Object$keys(this.checkboxes);
+            keys.forEach(function (k) {
+              _this.checkboxes[k] = true;
+            });
+          }
+
+          /**
+           * Flip the value of the checkbox associated with name
+           * @param {string} name - name of the checkbox
+           * @returns {array}
+           */
+        }, {
+          key: 'toggle',
+          value: function toggle(name) {
+            if (this.checkboxes.hasOwnProperty(name)) {
+              this.checkboxes[name] = !this.checkboxes[name];
+            }
+            return this.getAllChecked();
+          }
+        }]);
+
+        return Checkboxes;
+      })();
+
+      _export('default', Checkboxes);
+    }
+  };
+});
+$__System.register('c', ['b'], function (_export) {
+  /**
+   * @module checkboxObserver
+   */
+
+  /**
+   * @callback changeCallback
+   * @param {string} value associated with the value attribute of input checkboxes
+   */
+
+  /**
+   * Respond to bootstrap checkboxes being checked
+   * @function addBootstrapCheckboxObservers
+   * @returns {function} configurable function a la Mike Bostock style
+   */
+  'use strict';
+
+  var Checkboxes;
+
+  /*
+   * @function addObserver
+   * @param el {DOM Node} a dom element 
+   * @param callback {function} function returned by checkboxChangeBuilder
+   * @description execute a callback function when a bootstrap checkbox is checkedi or unchecked
+   */
+
+  _export('default', addBootstrapCheckboxObservers);
+
+  function addBootstrapCheckboxObservers() {
+
+    var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style)
+    callback; // changeCallback
+
+    /**
+     * Add mutation observers for each element in elementIds
+     * @function observers
+     * @returns {Object} Checkboxes class
+     */
+    function observers() {
+      // get the DOM element tied to each id
+      var domEls = elementIds.map(function (id) {
+        return document.getElementById(id);
+      });
+
+      // add observers for each item in domEls and collect the new mutation observer objects in an array so we can return it
+      var observerArr = domEls.map(function (el) {
+        return addCheckboxObserver(el, callback);
+      });
+
+      return observerArr;
+    }
+
+    // configuration functions (getters and setters)
+    observers.elementIds = function (arr) {
+      if (!arguments.length) {
+        return elementIds;
+      }
+
+      elementIds = arr;
+      return observers;
+    };
+
+    observers.callback = function (func) {
+      if (!arguments.length) {
+        return callback;
+      }
+
+      callback = func;
+      return observers;
+    };
+
+    // take an array of mutation observers and disconnect each one
+    observers.disconnect = function (observersArr) {
+      observersArr.forEach(function (obs) {
+        obs.disconnect();
+      });
+
+      return observers;
+    };
+
+    return observers;
+  }
+
+  function addCheckboxObserver(el, callback) {
+    // wrap the callback so it can be used if the mutation alters the checkbox
+    var mutationFunc = mutationFuncBuilder(callback);
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(mutationFunc);
+    });
+
+    // mutation observer config object, use oldValue: true so we can compare current value to old value
+    // otherwise we won't be able to tell if the active value changed
+    var config = { attributes: true, attributeOldValue: true, attributeFilter: ['class'] };
+
+    // apply the observer to el
+    observer.observe(el, config);
+
+    return observer;
+  }
+
+  /**
+   * Return a function that can be called by mutation observer
+   * @function mutationFuncBuilder
+   * @param {function} changeCallback - function that takes a checkbox value
+   * @returns {function} function that accepts a mutation record
+   */
+  function mutationFuncBuilder(changeCallback) {
+    return function (mutation) {
+      /* mutation will track the old and new value, two cases that we care about
+         1) added active class to the label
+         2) removed active class from the label
+         mutation will fire anytime a class is added or removed, the class may or may
+         not be the active class that signals a checkbox click
+         so we check to see if the active class is the class that changed betwee old and new
+      */
+      var newHasActive = mutation.target.classList.contains('active');
+      var oldHasActive = mutation.oldValue.toString().indexOf('active');
+      if (oldHasActive == -1) oldHasActive = false;else oldHasActive = true;
+
+      if (newHasActive && !oldHasActive || oldHasActive && !newHasActive) {
+        // get the input element nested in the label element so we can pass its value to changeCallback
+        var elArr = mutation.target.getElementsByTagName('input');
+        if (elArr.length) {
+          var inputEl = elArr[0];
+          changeCallback(inputEl.value);
+        }
+      }
+    };
+  }
+  return {
+    setters: [function (_b) {
+      Checkboxes = _b['default'];
+    }],
+    execute: function () {}
+  };
+});
+$__System.register("1a", ["7", "9", "14", "e", "a", "b", "c", "d"], function (_export) {
+  var d3, getInsightsData, stackChart, _Object$keys, Panel, Checkboxes, addBootstrapCheckboxObservers, toolTips, charts, stackExport, getData;
+
+  /**
+   * @function createDrawingFunc
+   * @param {Object} config - stackConfig object
+   */
+  function createDrawingFunc(chartname, config) {
+
+    var func = stackChart().width(charts[chartname].svg.width).height(charts[chartname].svg.height).margin(charts[chartname].svg.margins).classMap(config.classMap).classMapFunction(config.classMapFunction);
+
+    // create new object for chartname if it doesn't exisit
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.drawFunc = func;
+      charts[chartname] = p;
+    } else {
+      // update drawing function in charts
+      charts[chartname].drawFunc = func;
+    }
+  }
+
+  // Call the drawing function associated with a chartname
+  function draw(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+
+      var arr = charts[chartname].cboxes.getAllChecked();
+
+      var filteredData = [];
+      var SpendStackObj = {};
+      filteredData[0] = SpendStackObj;
+      //filter data
+      for (var i = 0; i < arr.length; i++) {
+        filteredData[0][arr[i]] = charts[chartname].data[0][arr[i]];
+      }
+      filteredData[0].total = 1;
+
+      filteredData.columns = _Object$keys(filteredData[0]).filter(function (obj) {
+        return obj != "total";
+      });
+
+      var loc = d3.select(chartname + " svg");
+
+      charts[chartname].drawFunc(loc, filteredData);
+
+      //Tooltips
+      toolTips();
+    }
+  }
+
+  /**
+   * @function setSvgSize
+   */
+  function setSvgSize(chartname, width, height) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.width = width;
+      p.svg.height = height;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.width = width;
+      charts[chartname].svg.height = height;
+    }
+  }
+
+  function setMargins(chartname, margins) {
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.svg.margins = margins;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].svg.margins = margins;
+    }
+  }
+
+  function drawSvg(chartname) {
+
+    var width = charts[chartname].svg.width;
+    var height = charts[chartname].svg.height;
+
+    var svgSelect = chartname + " .stack";
+
+    var svgSpendStack = d3.select(svgSelect).append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + width + " " + height);
+  }
+
+  /**
+   * add or update chartname.data based on txnType and fi
+   */
+  function buildData(chartname, fi, column) {
+
+    getData = getSegmentData().fi(fi).column(column);
+
+    // if chartname object doesn't exist, build new object and add data property
+    //chartname is the selector for the panel
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.data = getData();
+
+      charts[chartname] = p;
+
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      p.dropdown = d3.select(dropDownSelect).attr("data-value");
+    } else {
+      charts[chartname].data = getData();
+
+      var dropDownSelect = chartname + " .dropdown-menu li";
+      charts[chartname].dropdown = d3.select(dropDownSelect).attr("data-value");
+    }
+  }
+
+  /*
+   * @function addCheckboxes
+   */
+  function addCheckboxes(chartname, valArr, defaultArr) {
+    var cboxes = new Checkboxes(valArr, defaultArr);
+
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.cboxes = cboxes;
+
+      charts[chartname] = p;
+    } else {
+      charts[chartname].cboxes = cboxes;
+    }
+  }
+
+  /**
+   * @function toggleCheckbox
+   */
+  function toggleCheckbox(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      if (charts[chartname].cboxes != null) {
+        return charts[chartname].cboxes.toggle(value);
+      }
+    } else {
+      throw new Error("Attempt to reference non-existent panel object");
+    }
+  }
+
+  /**
+   * @function observerCallbackBuilder 
+   */
+  function observerCallbackBuilder(chartname) {
+    return function (value) {
+      if (charts.hasOwnProperty(chartname)) {
+
+        var chart = charts[chartname];
+        var resetCount = chart.resetCount;
+
+        // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
+        // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
+        if (resetCount == 0) {
+          // dropdown paramater has not changed, only the checkbox values
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+          draw(chartname);
+        } else if (resetCount > 1) {
+          chart.cboxes.toggle(value);
+          chart.resetCount -= 1;
+        } else {
+          // reset == 1
+          // dropdown parameter has changed, time to do work
+
+          // update resetCount
+          chart.resetCount -= 1;
+
+          // toggle checkbox value in charts[chartname]
+          chart.cboxes.toggle(value);
+
+          // call draw
+          draw(chartname);
+        }
+      } else {
+        throw new Error("Attempt to reference non-existent panel object");
+      }
+    };
+  }
+
+  /**
+   * Create mutation observers and track them in the charts object
+   * @function initObservers
+   */
+  function initObservers(chartname, idArr, valArr, defaultArr, callback) {
+    addCheckboxes(chartname, valArr, defaultArr);
+
+    var observerFunc = addBootstrapCheckboxObservers().elementIds(idArr).callback(callback);
+
+    var observers = observerFunc();
+
+    // if charts.chartname does not exist, build it
+    if (!charts.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      p.observers = observers;
+      p.observerFunc = observerFunc;
+    } else {
+      charts[chartname].observerFunc = observerFunc;
+      charts[chartname].observers = observers;
+    }
+  }
+
+  function setDropdown(chartname, value) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdown = value;
+    } else {
+      throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
+    }
+  }
+
+  function setResetCount(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      var cboxes = charts[chartname].cboxes;
+      var count = _Object$keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
+
+      charts[chartname].resetCount = count;
+
+      //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
+      if (count == 0) {
+        draw(chartname);
+      }
+    }
+  }
+
+  function dropdownCallbackBuilder(chartname) {
+    // return d3 event callback
+    return function (d) {
+
+      // get dropdown values
+      var current = d3.select(this).attr('data-value');
+      var old = charts[chartname].dropdown;
+
+      if (current != old) {
+        // set dropdown param
+        setDropdown(chartname, current);
+
+        //UPDATE VALUE FUNCTION, INNERTEXT, INNERNUMBER?
+        getData.column(charts[chartname].dropdown);
+        charts[chartname].data = getData();
+
+        //      charts[chartname].drawFunc.column( charts [chartname].dropdown );
+
+        // set reset count
+        setResetCount(chartname);
+
+        // check all checkboxes
+        var selector = chartname + " .checkboxes label";
+        d3.selectAll(selector).classed('active', true);
+      }
+    };
+  }
+
+  function addDropdownListener(chartname) {
+    var selector = chartname + " .dropdown-menu li";
+    var cb = dropdownCallbackBuilder(chartname);
+    d3.selectAll(selector).on('click', cb);
+  }
+
+  function getSegmentData() {
 
     var fi = "My Financial Institution";
+    var column = "sale_pc";
 
     function getData() {
       var bin1Data = getInsightsData("bin 1", fi);
@@ -8763,31 +10469,28 @@ $__System.register("c", ["7", "9"], function (_export) {
 
       for (var i = 0; i < data.length; i++) {
         if (data[i].mcc_name == "Department Store") {
-          salePcDepartmentStore = data[i].sale_pc + salePcDepartmentStore;
+          salePcDepartmentStore = data[i][column] + salePcDepartmentStore;
         }
         if (data[i].mcc_name == "Grocery") {
-          salePcGrocery = data[i].sale_pc + salePcGrocery;
+          salePcGrocery = data[i][column] + salePcGrocery;
         }
         if (data[i].mcc_name == "Pharmacies") {
-          salePcPharmacies = data[i].sale_pc + salePcPharmacies;
+          salePcPharmacies = data[i][column] + salePcPharmacies;
         }
         if (data[i].mcc_name == "Family Clothing") {
-          salePcFamilyClothing = data[i].sale_pc + salePcFamilyClothing;
+          salePcFamilyClothing = data[i][column] + salePcFamilyClothing;
         }
         if (data[i].mcc_name == "Fast Food") {
-          salePcFastFood = data[i].sale_pc + salePcFastFood;
+          salePcFastFood = data[i][column] + salePcFastFood;
         }
-        salePcTotal = salePcTotal + data[i].sale_pc;
+        salePcTotal = salePcTotal + data[i][column];
       }
-
-      //console.log(amtSaleGrocery, amtSalePharmacies, amtSaleDepartmentStore, amtSaleFamilyClothing, amtSaleFastFood, amtSaleTotal)
 
       var percentageDepartmentStore = salePcDepartmentStore / salePcTotal;
       var percentageGrocery = salePcGrocery / salePcTotal;
       var percentagePharmacies = salePcPharmacies / salePcTotal;
       var percentageFamilyClothing = salePcFamilyClothing / salePcTotal;
       var percentageFastFood = salePcFastFood / salePcTotal;
-      //console.log(percentageGrocery, percentagePharmacies, percentageDepartmentStore, percentageFamilyClothing, percentageFastFood);   
 
       var finalData = [];
 
@@ -8802,12 +10505,21 @@ $__System.register("c", ["7", "9"], function (_export) {
 
       finalData[0] = obj;
 
+      finalData.columns = _Object$keys(finalData[0]).filter(function (obj) {
+        return obj != "total";
+      });
+
       return finalData;
     }
 
     getData.fi = function (value) {
       if (!arguments.length) return fi;
       fi = value;
+      return getData;
+    };
+    getData.column = function (value) {
+      if (!arguments.length) return column;
+      column = value;
       return getData;
     };
 
@@ -8819,11 +10531,1294 @@ $__System.register("c", ["7", "9"], function (_export) {
       d3 = _2;
     }, function (_) {
       getInsightsData = _.getInsightsData;
+    }, function (_3) {
+      stackChart = _3["default"];
+    }, function (_e) {
+      _Object$keys = _e["default"];
+    }, function (_a) {
+      Panel = _a["default"];
+    }, function (_b) {
+      Checkboxes = _b["default"];
+    }, function (_c) {
+      addBootstrapCheckboxObservers = _c["default"];
+    }, function (_d) {
+      toolTips = _d.toolTips;
     }],
-    execute: function () {}
+    execute: function () {
+      "use strict";
+
+      _export("getSegmentData", getSegmentData);
+
+      charts = {};
+
+      window.charts = charts;
+
+      stackExport = {
+        setSvgSize: setSvgSize,
+        setMargins: setMargins,
+        buildData: buildData,
+        drawSvg: drawSvg,
+        draw: draw,
+        createDrawingFunc: createDrawingFunc,
+        toggleCheckbox: toggleCheckbox,
+        observerCallbackBuilder: observerCallbackBuilder,
+        initObservers: initObservers,
+        addDropdownListener: addDropdownListener
+      };
+
+      _export("stackExport", stackExport);
+    }
   };
 });
-$__System.register("d", ["7"], function (_export) {
+$__System.registerDynamic("1b", ["1c"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var _Array$from = $__require("1c")["default"];
+  exports["default"] = function (arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+      return arr2;
+    } else {
+      return _Array$from(arr);
+    }
+  };
+  exports.__esModule = true;
+  return module.exports;
+});
+$__System.registerDynamic('1d', ['1e', '1f', '20'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var $export = $__require('1e'),
+        core = $__require('1f'),
+        fails = $__require('20');
+    module.exports = function (KEY, exec) {
+        var fn = (core.Object || {})[KEY] || Object[KEY],
+            exp = {};
+        exp[KEY] = exec(fn);
+        $export($export.S + $export.F * fails(function () {
+            fn(1);
+        }), 'Object', exp);
+    };
+    return module.exports;
+});
+$__System.registerDynamic('21', ['22', '1d'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toObject = $__require('22');
+  $__require('1d')('keys', function ($keys) {
+    return function keys(it) {
+      return $keys(toObject(it));
+    };
+  });
+  return module.exports;
+});
+$__System.registerDynamic('23', ['21', '1f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  $__require('21');
+  module.exports = $__require('1f').Object.keys;
+  return module.exports;
+});
+$__System.registerDynamic("e", ["23"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("23"), __esModule: true };
+  return module.exports;
+});
+$__System.registerDynamic('22', ['24'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var defined = $__require('24');
+  module.exports = function (it) {
+    return Object(defined(it));
+  };
+  return module.exports;
+});
+$__System.registerDynamic('25', ['26'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var ITERATOR = $__require('26')('iterator'),
+      SAFE_CLOSING = false;
+  try {
+    var riter = [7][ITERATOR]();
+    riter['return'] = function () {
+      SAFE_CLOSING = true;
+    };
+    Array.from(riter, function () {
+      throw 2;
+    });
+  } catch (e) {}
+  module.exports = function (exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING) return false;
+    var safe = false;
+    try {
+      var arr = [7],
+          iter = arr[ITERATOR]();
+      iter.next = function () {
+        return { done: safe = true };
+      };
+      arr[ITERATOR] = function () {
+        return iter;
+      };
+      exec(arr);
+    } catch (e) {}
+    return safe;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('27', ['28', '1e', '22', '29', '2a', '2b', '2c', '25'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var ctx = $__require('28'),
+      $export = $__require('1e'),
+      toObject = $__require('22'),
+      call = $__require('29'),
+      isArrayIter = $__require('2a'),
+      toLength = $__require('2b'),
+      getIterFn = $__require('2c');
+  $export($export.S + $export.F * !$__require('25')(function (iter) {
+    Array.from(iter);
+  }), 'Array', { from: function from(arrayLike) {
+      var O = toObject(arrayLike),
+          C = typeof this == 'function' ? this : Array,
+          $$ = arguments,
+          $$len = $$.length,
+          mapfn = $$len > 1 ? $$[1] : undefined,
+          mapping = mapfn !== undefined,
+          index = 0,
+          iterFn = getIterFn(O),
+          length,
+          result,
+          step,
+          iterator;
+      if (mapping) mapfn = ctx(mapfn, $$len > 2 ? $$[2] : undefined, 2);
+      if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
+        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+          result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
+        }
+      } else {
+        length = toLength(O.length);
+        for (result = new C(length); length > index; index++) {
+          result[index] = mapping ? mapfn(O[index], index) : O[index];
+        }
+      }
+      result.length = index;
+      return result;
+    } });
+  return module.exports;
+});
+$__System.registerDynamic('2d', ['2e', '27', '1f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  $__require('2e');
+  $__require('27');
+  module.exports = $__require('1f').Array.from;
+  return module.exports;
+});
+$__System.registerDynamic("1c", ["2d"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("2d"), __esModule: true };
+  return module.exports;
+});
+$__System.registerDynamic("2f", [], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  return module.exports;
+});
+$__System.registerDynamic('30', ['31', '24'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toInteger = $__require('31'),
+      defined = $__require('24');
+  module.exports = function (TO_STRING) {
+    return function (that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('2e', ['30', '32'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var $at = $__require('30')(true);
+  $__require('32')(String, 'String', function (iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function () {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length) return {
+      value: undefined,
+      done: true
+    };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  return module.exports;
+});
+$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function () {/* empty */};
+  return module.exports;
+});
+$__System.registerDynamic('34', ['35'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var cof = $__require('35');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('36', ['34', '24'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var IObject = $__require('34'),
+      defined = $__require('24');
+  module.exports = function (it) {
+    return IObject(defined(it));
+  };
+  return module.exports;
+});
+$__System.registerDynamic('37', ['33', '38', '39', '36', '32'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var addToUnscopables = $__require('33'),
+      step = $__require('38'),
+      Iterators = $__require('39'),
+      toIObject = $__require('36');
+  module.exports = $__require('32')(Array, 'Array', function (iterated, kind) {
+    this._t = toIObject(iterated);
+    this._i = 0;
+    this._k = kind;
+  }, function () {
+    var O = this._t,
+        kind = this._k,
+        index = this._i++;
+    if (!O || index >= O.length) {
+      this._t = undefined;
+      return step(1);
+    }
+    if (kind == 'keys') return step(0, index);
+    if (kind == 'values') return step(0, O[index]);
+    return step(0, [index, O[index]]);
+  }, 'values');
+  Iterators.Arguments = Iterators.Array;
+  addToUnscopables('keys');
+  addToUnscopables('values');
+  addToUnscopables('entries');
+  return module.exports;
+});
+$__System.registerDynamic('3a', ['37', '39'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  $__require('37');
+  var Iterators = $__require('39');
+  Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+  return module.exports;
+});
+$__System.registerDynamic("24", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // 7.2.1 RequireObjectCoercible(argument)
+  module.exports = function (it) {
+    if (it == undefined) throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = true;
+  return module.exports;
+});
+$__System.registerDynamic('3c', ['16', '3d', '3e', '3f', '26'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var $ = $__require('16'),
+      descriptor = $__require('3d'),
+      setToStringTag = $__require('3e'),
+      IteratorPrototype = {};
+  $__require('3f')(IteratorPrototype, $__require('26')('iterator'), function () {
+    return this;
+  });
+  module.exports = function (Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, { next: descriptor(1, next) });
+    setToStringTag(Constructor, NAME + ' Iterator');
+  };
+  return module.exports;
+});
+$__System.registerDynamic('32', ['3b', '1e', '40', '3f', '41', '39', '3c', '3e', '16', '26'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var LIBRARY = $__require('3b'),
+      $export = $__require('1e'),
+      redefine = $__require('40'),
+      hide = $__require('3f'),
+      has = $__require('41'),
+      Iterators = $__require('39'),
+      $iterCreate = $__require('3c'),
+      setToStringTag = $__require('3e'),
+      getProto = $__require('16').getProto,
+      ITERATOR = $__require('26')('iterator'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function () {
+    return this;
+  };
+  module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+    $iterCreate(Constructor, NAME, next);
+    var getMethod = function (kind) {
+      if (!BUGGY && kind in proto) return proto[kind];
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        DEF_VALUES = DEFAULT == VALUES,
+        VALUES_BUG = false,
+        proto = Base.prototype,
+        $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        $default = $native || getMethod(DEFAULT),
+        methods,
+        key;
+    if ($native) {
+      var IteratorPrototype = getProto($default.call(new Base()));
+      setToStringTag(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
+      if (DEF_VALUES && $native.name !== VALUES) {
+        VALUES_BUG = true;
+        $default = function values() {
+          return $native.call(this);
+        };
+      }
+    }
+    if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+      hide(proto, ITERATOR, $default);
+    }
+    Iterators[NAME] = $default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEF_VALUES ? $default : getMethod(VALUES),
+        keys: IS_SET ? $default : getMethod(KEYS),
+        entries: !DEF_VALUES ? $default : getMethod('entries')
+      };
+      if (FORCED) for (key in methods) {
+        if (!(key in proto)) redefine(proto, key, methods[key]);
+      } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+    }
+    return methods;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("38", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (done, value) {
+    return { value: value, done: !!done };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('42', ['1f', '16', '43', '26'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var core = $__require('1f'),
+      $ = $__require('16'),
+      DESCRIPTORS = $__require('43'),
+      SPECIES = $__require('26')('species');
+  module.exports = function (KEY) {
+    var C = core[KEY];
+    if (DESCRIPTORS && C && !C[SPECIES]) $.setDesc(C, SPECIES, {
+      configurable: true,
+      get: function () {
+        return this;
+      }
+    });
+  };
+  return module.exports;
+});
+$__System.registerDynamic('44', ['16', '3f', '45', '28', '46', '24', '47', '32', '38', '48', '41', '49', '42', '43'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var $ = $__require('16'),
+      hide = $__require('3f'),
+      redefineAll = $__require('45'),
+      ctx = $__require('28'),
+      strictNew = $__require('46'),
+      defined = $__require('24'),
+      forOf = $__require('47'),
+      $iterDefine = $__require('32'),
+      step = $__require('38'),
+      ID = $__require('48')('id'),
+      $has = $__require('41'),
+      isObject = $__require('49'),
+      setSpecies = $__require('42'),
+      DESCRIPTORS = $__require('43'),
+      isExtensible = Object.isExtensible || isObject,
+      SIZE = DESCRIPTORS ? '_s' : 'size',
+      id = 0;
+  var fastKey = function (it, create) {
+    if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+    if (!$has(it, ID)) {
+      if (!isExtensible(it)) return 'F';
+      if (!create) return 'E';
+      hide(it, ID, ++id);
+    }
+    return 'O' + it[ID];
+  };
+  var getEntry = function (that, key) {
+    var index = fastKey(key),
+        entry;
+    if (index !== 'F') return that._i[index];
+    for (entry = that._f; entry; entry = entry.n) {
+      if (entry.k == key) return entry;
+    }
+  };
+  module.exports = {
+    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+      var C = wrapper(function (that, iterable) {
+        strictNew(that, C, NAME);
+        that._i = $.create(null);
+        that._f = undefined;
+        that._l = undefined;
+        that[SIZE] = 0;
+        if (iterable != undefined) forOf(iterable, IS_MAP, that[ADDER], that);
+      });
+      redefineAll(C.prototype, {
+        clear: function clear() {
+          for (var that = this, data = that._i, entry = that._f; entry; entry = entry.n) {
+            entry.r = true;
+            if (entry.p) entry.p = entry.p.n = undefined;
+            delete data[entry.i];
+          }
+          that._f = that._l = undefined;
+          that[SIZE] = 0;
+        },
+        'delete': function (key) {
+          var that = this,
+              entry = getEntry(that, key);
+          if (entry) {
+            var next = entry.n,
+                prev = entry.p;
+            delete that._i[entry.i];
+            entry.r = true;
+            if (prev) prev.n = next;
+            if (next) next.p = prev;
+            if (that._f == entry) that._f = next;
+            if (that._l == entry) that._l = prev;
+            that[SIZE]--;
+          }
+          return !!entry;
+        },
+        forEach: function forEach(callbackfn) {
+          var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3),
+              entry;
+          while (entry = entry ? entry.n : this._f) {
+            f(entry.v, entry.k, this);
+            while (entry && entry.r) entry = entry.p;
+          }
+        },
+        has: function has(key) {
+          return !!getEntry(this, key);
+        }
+      });
+      if (DESCRIPTORS) $.setDesc(C.prototype, 'size', { get: function () {
+          return defined(this[SIZE]);
+        } });
+      return C;
+    },
+    def: function (that, key, value) {
+      var entry = getEntry(that, key),
+          prev,
+          index;
+      if (entry) {
+        entry.v = value;
+      } else {
+        that._l = entry = {
+          i: index = fastKey(key, true),
+          k: key,
+          v: value,
+          p: prev = that._l,
+          n: undefined,
+          r: false
+        };
+        if (!that._f) that._f = entry;
+        if (prev) prev.n = entry;
+        that[SIZE]++;
+        if (index !== 'F') that._i[index] = entry;
+      }
+      return that;
+    },
+    getEntry: getEntry,
+    setStrong: function (C, NAME, IS_MAP) {
+      $iterDefine(C, NAME, function (iterated, kind) {
+        this._t = iterated;
+        this._k = kind;
+        this._l = undefined;
+      }, function () {
+        var that = this,
+            kind = that._k,
+            entry = that._l;
+        while (entry && entry.r) entry = entry.p;
+        if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
+          that._t = undefined;
+          return step(1);
+        }
+        if (kind == 'keys') return step(0, entry.k);
+        if (kind == 'values') return step(0, entry.v);
+        return step(0, [entry.k, entry.v]);
+      }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+      setSpecies(NAME);
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic("3d", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('3f', ['16', '3d', '43'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $ = $__require('16'),
+      createDesc = $__require('3d');
+  module.exports = $__require('43') ? function (object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function (object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('40', ['3f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = $__require('3f');
+  return module.exports;
+});
+$__System.registerDynamic('45', ['40'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var redefine = $__require('40');
+  module.exports = function (target, src) {
+    for (var key in src) redefine(target, key, src[key]);
+    return target;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("46", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (it, Constructor, name) {
+    if (!(it instanceof Constructor)) throw TypeError(name + ": use the 'new' operator!");
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("16", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  return module.exports;
+});
+$__System.registerDynamic("41", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function (it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('3e', ['16', '41', '26'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var def = $__require('16').setDesc,
+      has = $__require('41'),
+      TAG = $__require('26')('toStringTag');
+  module.exports = function (it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, {
+      configurable: true,
+      value: tag
+    });
+  };
+  return module.exports;
+});
+$__System.registerDynamic("20", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic('43', ['20'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = !$__require('20')(function () {
+    return Object.defineProperty({}, 'a', { get: function () {
+        return 7;
+      } }).a != 7;
+  });
+  return module.exports;
+});
+$__System.registerDynamic('4a', ['16', '4b', '1e', '20', '3f', '45', '47', '46', '49', '3e', '43'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var $ = $__require('16'),
+      global = $__require('4b'),
+      $export = $__require('1e'),
+      fails = $__require('20'),
+      hide = $__require('3f'),
+      redefineAll = $__require('45'),
+      forOf = $__require('47'),
+      strictNew = $__require('46'),
+      isObject = $__require('49'),
+      setToStringTag = $__require('3e'),
+      DESCRIPTORS = $__require('43');
+  module.exports = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
+    var Base = global[NAME],
+        C = Base,
+        ADDER = IS_MAP ? 'set' : 'add',
+        proto = C && C.prototype,
+        O = {};
+    if (!DESCRIPTORS || typeof C != 'function' || !(IS_WEAK || proto.forEach && !fails(function () {
+      new C().entries().next();
+    }))) {
+      C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+      redefineAll(C.prototype, methods);
+    } else {
+      C = wrapper(function (target, iterable) {
+        strictNew(target, C, NAME);
+        target._c = new Base();
+        if (iterable != undefined) forOf(iterable, IS_MAP, target[ADDER], target);
+      });
+      $.each.call('add,clear,delete,forEach,get,has,set,keys,values,entries'.split(','), function (KEY) {
+        var IS_ADDER = KEY == 'add' || KEY == 'set';
+        if (KEY in proto && !(IS_WEAK && KEY == 'clear')) hide(C.prototype, KEY, function (a, b) {
+          if (!IS_ADDER && IS_WEAK && !isObject(a)) return KEY == 'get' ? undefined : false;
+          var result = this._c[KEY](a === 0 ? 0 : a, b);
+          return IS_ADDER ? this : result;
+        });
+      });
+      if ('size' in proto) $.setDesc(C.prototype, 'size', { get: function () {
+          return this._c.size;
+        } });
+    }
+    setToStringTag(C, NAME);
+    O[NAME] = C;
+    $export($export.G + $export.W + $export.F, O);
+    if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
+    return C;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4c', ['44', '4a'], true, function ($__require, exports, module) {
+  /* */
+  'use strict';
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var strong = $__require('44');
+  $__require('4a')('Set', function (get) {
+    return function Set() {
+      return get(this, arguments.length > 0 ? arguments[0] : undefined);
+    };
+  }, { add: function add(value) {
+      return strong.def(this, value = value === 0 ? 0 : value, value);
+    } }, strong);
+  return module.exports;
+});
+$__System.registerDynamic('1e', ['4b', '1f', '28'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var global = $__require('4b'),
+      core = $__require('1f'),
+      ctx = $__require('28'),
+      PROTOTYPE = 'prototype';
+  var $export = function (type, name, source) {
+    var IS_FORCED = type & $export.F,
+        IS_GLOBAL = type & $export.G,
+        IS_STATIC = type & $export.S,
+        IS_PROTO = type & $export.P,
+        IS_BIND = type & $export.B,
+        IS_WRAP = type & $export.W,
+        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
+        target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
+        key,
+        own,
+        out;
+    if (IS_GLOBAL) source = name;
+    for (key in source) {
+      own = !IS_FORCED && target && key in target;
+      if (own && key in exports) continue;
+      out = own ? target[key] : source[key];
+      exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key] : IS_BIND && own ? ctx(out, global) : IS_WRAP && target[key] == out ? function (C) {
+        var F = function (param) {
+          return this instanceof C ? new C(param) : C(param);
+        };
+        F[PROTOTYPE] = C[PROTOTYPE];
+        return F;
+      }(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+      if (IS_PROTO) (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+    }
+  };
+  $export.F = 1;
+  $export.G = 2;
+  $export.S = 4;
+  $export.P = 8;
+  $export.B = 16;
+  $export.W = 32;
+  module.exports = $export;
+  return module.exports;
+});
+$__System.registerDynamic('4d', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (it) {
+    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('28', ['4d'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var aFunction = $__require('4d');
+  module.exports = function (fn, that, length) {
+    aFunction(fn);
+    if (that === undefined) return fn;
+    switch (length) {
+      case 1:
+        return function (a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function (a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function (a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function () {
+      return fn.apply(that, arguments);
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('29', ['4e'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var anObject = $__require('4e');
+  module.exports = function (iterator, fn, value, entries) {
+    try {
+      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined) anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic('2a', ['39', '26'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var Iterators = $__require('39'),
+        ITERATOR = $__require('26')('iterator'),
+        ArrayProto = Array.prototype;
+    module.exports = function (it) {
+        return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+    };
+    return module.exports;
+});
+$__System.registerDynamic('49', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4e', ['49'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var isObject = $__require('49');
+  module.exports = function (it) {
+    if (!isObject(it)) throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // 7.1.4 ToInteger
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function (it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('2b', ['31'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toInteger = $__require('31'),
+      min = Math.min;
+  module.exports = function (it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = {};
+  return module.exports;
+});
+$__System.registerDynamic('2c', ['4f', '26', '39', '1f'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var classof = $__require('4f'),
+        ITERATOR = $__require('26')('iterator'),
+        Iterators = $__require('39');
+    module.exports = $__require('1f').getIteratorMethod = function (it) {
+        if (it != undefined) return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+    };
+    return module.exports;
+});
+$__System.registerDynamic('47', ['28', '29', '2a', '4e', '2b', '2c'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var ctx = $__require('28'),
+      call = $__require('29'),
+      isArrayIter = $__require('2a'),
+      anObject = $__require('4e'),
+      toLength = $__require('2b'),
+      getIterFn = $__require('2c');
+  module.exports = function (iterable, entries, fn, that) {
+    var iterFn = getIterFn(iterable),
+        f = ctx(fn, that, entries ? 2 : 1),
+        index = 0,
+        length,
+        step,
+        iterator;
+    if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
+    if (isArrayIter(iterFn)) for (length = toLength(iterable.length); length > index; index++) {
+      entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+    } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
+      call(iterator, f, step.value, entries);
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic("35", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toString = {}.toString;
+
+  module.exports = function (it) {
+    return toString.call(it).slice(8, -1);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('50', ['4b'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var global = $__require('4b'),
+        SHARED = '__core-js_shared__',
+        store = global[SHARED] || (global[SHARED] = {});
+    module.exports = function (key) {
+        return store[key] || (store[key] = {});
+    };
+    return module.exports;
+});
+$__System.registerDynamic('48', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var id = 0,
+      px = Math.random();
+  module.exports = function (key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4b', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+  return module.exports;
+});
+$__System.registerDynamic('26', ['50', '48', '4b'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var store = $__require('50')('wks'),
+        uid = $__require('48'),
+        Symbol = $__require('4b').Symbol;
+    module.exports = function (name) {
+        return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+    };
+    return module.exports;
+});
+$__System.registerDynamic('4f', ['35', '26'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var cof = $__require('35'),
+        TAG = $__require('26')('toStringTag'),
+        ARG = cof(function () {
+        return arguments;
+    }()) == 'Arguments';
+    module.exports = function (it) {
+        var O, T, B;
+        return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+    };
+    return module.exports;
+});
+$__System.registerDynamic('51', ['47', '4f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var forOf = $__require('47'),
+      classof = $__require('4f');
+  module.exports = function (NAME) {
+    return function toJSON() {
+      if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
+      var arr = [];
+      forOf(this, false, arr.push, arr);
+      return arr;
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('52', ['1e', '51'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $export = $__require('1e');
+  $export($export.P, 'Set', { toJSON: $__require('51')('Set') });
+  return module.exports;
+});
+$__System.registerDynamic('1f', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var core = module.exports = { version: '1.2.6' };
+  if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+  return module.exports;
+});
+$__System.registerDynamic('53', ['2f', '2e', '3a', '4c', '52', '1f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  $__require('2f');
+  $__require('2e');
+  $__require('3a');
+  $__require('4c');
+  $__require('52');
+  module.exports = $__require('1f').Set;
+  return module.exports;
+});
+$__System.registerDynamic("54", ["53"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("53"), __esModule: true };
+  return module.exports;
+});
+$__System.register('55', [], function (_export) {
+  'use strict';
+
+  var dataJSON;
+  return {
+    setters: [],
+    execute: function () {
+      dataJSON = '{"sig_debit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"pin_debit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"sig_credit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"bin 1":{"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"bin 2":{"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]}}';
+
+      _export('dataJSON', dataJSON);
+    }
+  };
+});
+$__System.register("9", ["55"], function (_export) {
+  /**
+   *@module model
+   *@description model depends on a json file of insights data existing
+   * the model presumes that the data is formatted as specified in
+   * the csv-parser project (https://github.com/unisaurus-rex/csv-parser) 
+   */
+
+  /***** local packages *****/
+
+  /***** model *****/
+  "use strict";
+
+  var dataJSON, insightsData;
+
+  /**
+   * reviver callback passed as second argument to JSON.parse
+   * @function typeConverter
+   * @param {string} key - key from a json string
+   * @param {string} value - value belonging to key in json string
+   * @returns {float | int}
+   * @description convert a data value from a json string to the appropriate type
+   */
+
+  _export("getInsightsData", getInsightsData);
+
+  /**
+   * public interface for retrieving data
+   * @function getInsightsData
+   * @param {string} txn_type - transaction type you want to retrieve data for
+   * @param {string} [fi] - financial instituation you want to retrieve data for  
+   * @returns {Obj}
+   * @description retrieve data for a specific transaction type, or optionally, a fi of a transaction type
+   */
+
+  function getInsightsData(txn_type, fi) {
+    var o = insightsData[txn_type];
+
+    if (fi) {
+      return o[fi];
+    }
+
+    return o;
+  }
+
+  function typeConverter(key, value) {
+    // reviver passes key as string
+    switch (key) {
+      case "amt_fee":
+        return parseFloat(value);
+        break;
+      case "amt_sale":
+        return parseFloat(value);
+        break;
+      case "avg_fee":
+        return parseFloat(value);
+        break;
+      case "avg_sale":
+        return parseFloat(value);
+        break;
+      case "fee_pc":
+        return parseFloat(value);
+        break;
+      case "n_card":
+        return parseInt(value);
+        break;
+      case "n_trans":
+        return parseInt(value);
+        break;
+      case "sale_pc":
+        return parseFloat(value);
+        break;
+      case "trans_pc":
+        return parseFloat(value);
+        break;
+      default:
+        return value;
+        break;
+    }
+  }
+  return {
+    setters: [function (_) {
+      dataJSON = _.dataJSON;
+    }],
+    execute: function () {
+      insightsData = JSON.parse(dataJSON, typeConverter);
+    }
+  };
+});
+$__System.register("56", ["7"], function (_export) {
     "use strict";
 
     var d3;
@@ -8889,158 +11884,315 @@ $__System.register("d", ["7"], function (_export) {
         execute: function () {}
     };
 });
-$__System.register("e", ["7"], function (_export) {
+$__System.register("a", [], function (_export) {
   "use strict";
 
-  var d3;
+  _export("default", Panel);
 
-  _export("default", donutChart);
-
-  function donutChart() {
-
-    var width = 500,
-        height = 500,
-        innerText = "TOTAL TRANS";
-    var radius = Math.min(width, height) / 2;
-    var innerRad = radius / 4;
-    var hoverRad = 15;
-    var padAngle = 0;
-    var valueFunction = function valueFunction(d) {
-      return d.number;
+  function Panel() {
+    this.cboxes = null;
+    this.chartConfig = null;
+    this.data = null;
+    this.drawFunc = null;
+    this.dropdown = null;
+    this.observerFunc = null;
+    this.observers = null;
+    this.resetCount = 0;
+    this.svg = {
+      width: 0,
+      height: 0,
+      margins: { top: 0, left: 0, right: 0, bottom: 0 }
     };
-    var constancyFunction = function constancyFunction(d) {
-      return d.transactionType;
-    };
-    var classMap = { "declines": "fill-danger", "authorizations": "fill-success", "chargebacks": "fill-warning" };
-    var classMapFunction = function classMapFunction(d) {
-      return classMap[d.data.transactionType];
-    };
-
-    var innerNumber = 0;
-
-    function chart(container, dataArr) {
-
-      //remove current number
-      container.select("text.data").transition().duration(100).style("opacity", 0).remove();
-
-      //update number
-      container.append("text").attr("dy", ".95em").style("text-anchor", "middle").style("opacity", 0).attr("class", "data").text(function (d) {
-        return innerNumber;
-      }).transition().duration(1000).style("opacity", 1);
-
-      //remove and add inner text
-      container.selectAll("text.inside").remove();
-      container.append("text").attr("dy", "-0.5em").style("text-anchor", "middle").attr("class", "inside").text(function () {
-        return innerText;
-      });
-
-      var arc = d3.arc().outerRadius(radius).innerRadius(radius - innerRad);
-
-      var hoverArc = d3.arc().outerRadius(radius - innerRad).innerRadius(radius + hoverRad);
-
-      var pie = d3.pie().sort(null).value(valueFunction).padAngle(padAngle);
-
-      var sel = container.selectAll("path").data(pie(dataArr), constancyFunction);
-
-      sel.data(pie(dataArr)).enter().append("path").merge(sel).data(pie(dataArr)).on("mouseover", function (d) {
-        d3.select(this).transition().duration(1000).attr("d", hoverArc);
-      }).on("mouseout", function (d) {
-        d3.select(this).transition().duration(1000).attr("d", arc);
-      }).attr("class", classMapFunction).transition().duration(700).attrTween('d', function (d) {
-        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
-        return function (t) {
-          return arc(interpolate(t));
-        };
-      });
-
-      sel.exit().transition().duration(700).attrTween('d', function (d) {
-        var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
-        return function (t) {
-          return arc(interpolate(t));
-        };
-      }).style("opacity", 0).remove();
-
-      function arcTween(a) {
-        var startAngle = a.startAngle; //<-- keep reference to start angle
-        var i = d3.interpolate(a.startAngle, a.endAngle, a); //<-- interpolate start to end
-        return function (t) {
-          return arc({ //<-- return arc at each iteration from start to interpolate end
-            startAngle: startAngle,
-            endAngle: i(t)
-          });
-        };
-      }
-    }
-
-    chart.width = function (value) {
-      if (!arguments.length) return width;
-      width = value;
-      return chart;
-    };
-
-    chart.height = function (value) {
-      if (!arguments.length) return height;
-      height = value;
-      return chart;
-    };
-    chart.innerText = function (value) {
-      if (!arguments.length) return innerText;
-      innerText = value;
-      return chart;
-    };
-    chart.innerRad = function (value) {
-      if (!arguments.length) return innerRad;
-      innerRad = value;
-      return chart;
-    };
-    chart.hoverRad = function (value) {
-      if (!arguments.length) return hoverRad;
-      hoverRad = value;
-      return chart;
-    };
-    chart.padAngle = function (value) {
-      if (!arguments.length) return padAngle;
-      padAngle = value;
-      return chart;
-    };
-    chart.constancyFunction = function (value) {
-      if (!arguments.length) return constancyFunction;
-      constancyFunction = value;
-      return chart;
-    };
-    chart.valueFunction = function (value) {
-      if (!arguments.length) return valueFunction;
-      valueFunction = value;
-      return chart;
-    };
-    chart.classMap = function (value) {
-      if (!arguments.length) return classMap;
-      classMap = value;
-      return chart;
-    };
-    chart.classMapFunction = function (value) {
-      if (!arguments.length) return classMapFunction;
-      classMapFunction = value;
-      return chart;
-    };
-
-    chart.innerNumber = function (value) {
-      if (!arguments.length) return innerNumber;
-      innerNumber = value;
-      return chart;
-    };
-
-    return chart;
   }
 
   return {
-    setters: [function (_) {
-      d3 = _;
-    }],
+    setters: [],
     execute: function () {}
   };
 });
-$__System.registerDynamic('f', [], true, function ($__require, exports, module) {
+$__System.register('57', ['7', '9', '54', '56', '1b', 'e', '1c', 'a'], function (_export) {
+  var d3, getInsightsData, _Set, tableChart, _toConsumableArray, _Object$keys, _Array$from, Panel, tables, tableExport, testing;
+
+  /***** Public Functions *****/
+
+  /**
+   * draw a table with head and body inside the location defined by using chartname as a selector
+   * @function drawTable
+   * @param {String} chartname - css selector for chart
+   */
+  function addTable(chartname) {
+    if (!tables.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      tables[chartname] = p;
+
+      // assume that we only draw the table if the tables does not yet have a key for chartname
+      // because of how the groupedBar and table are both in panel body, we require that a div be in panel
+      // body with class of tableContainer
+      var table = d3.select(chartname + ' .tableContainer').append("table").attr("class", "table");
+
+      // table should have a head and body
+      table.append("thead");
+      table.append("tbody");
+    }
+  }
+
+  /**
+   * Set the data needed for the table 
+   * @function buildData
+   * @param {String} chartname - css selector for chart
+   * @param {String} txnType
+   */
+  function setData(chartname, txnType) {
+    if (!tables.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      tables[chartname] = p;
+    }
+
+    var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
+    tables[chartname].data = insightsData;
+  }
+
+  /**
+   * Create and store the drawing function for the table
+   * @function createDrawingFunc
+   * @param {String} chartname - css selector for chart
+   */
+  function createDrawingFunc(chartname) {
+    if (!tables.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      tables[chartname] = p;
+    }
+
+    tables[chartname].drawFunc = tableChart();
+  }
+
+  /**
+  * If it exists, call the drawing function associated with chartname
+  * @function draw
+  * @param {String} chartname - css selector for chart
+  */
+  function draw(chartname) {
+    // make sure chartname exists before drawing
+    if (tables.hasOwnProperty(chartname)) {
+      // drawing function takes a d3 selection
+      var selector = chartname + " .tableContainer";
+      var selection = d3.select(selector);
+      var data = buildData(chartname);
+
+      tables[chartname].drawFunc(selection, data);
+    } else {
+      throw new Error("Attempt to call draw function for non-existent table panel object");
+    }
+  }
+
+  /** 
+   * @function addDropdownListener
+   * @param {String} chartname - css selector for chart
+   */
+  function addDropdownListener(chartname) {
+    // don't add listener if chart doesn't exist
+    if (tables.hasOwnProperty(chartname)) {
+      // add listener
+      var selector = chartname + " .dropdown-menu li";
+      var cb = dropdownCallbackBuilder(chartname);
+      //"click.mine" prevents previous event listeners from being overwritten
+      d3.selectAll(selector).on('click.mine', cb);
+    } else {
+      throw new Error("Attempt to add dropdown listener for non-existent table panel object");
+    }
+  }
+
+  /***** Private Functions *****/
+  // this var for exporting functions to be tested only, not intended to be used in code
+
+  /**
+   * Find the unique mcc_name properties
+   * @private
+   * @function uniqueMccNames
+   * @param {Object} data - object belonging to transaction type in the model
+   * @returns {string[]}
+   */
+  function uniqueMccNames(data) {
+    // for each fi, get all mcc_names, result is array of arrays
+    var fiNames = _Object$keys(data);
+    var mccArrays = fiNames.map(function (fi) {
+      var arr = data[fi];
+      return arr.map(function (obj) {
+        return obj.mcc_name;
+      });
+    });
+
+    // join arrays to form single array
+    var allMccNames = mccArrays.reduce(function (res, current) {
+      return res.concat(current);
+    }, []);
+
+    // remove repeated values
+    return _Array$from(new _Set(allMccNames));
+  }
+
+  /**
+  * Return the data structure needed by the table drawing function
+  * @private
+  * @function buildTableData
+  * @param {Object} data - object belonging to transaction type in the model
+  * @param {string} param - value to extract
+  * @param {string[]} mccNames - mccNames to use for columns and headers
+  * @returns {Object[]} array of objects
+  */
+  function buildTableData(chartname, data, mccNames) {
+    if (tables.hasOwnProperty(chartname)) {
+      var fiNames;
+      var tableData;
+
+      var _ret = (function () {
+        var param = tables[chartname].dropdown;
+
+        // need to build one object per fi
+        fiNames = _Object$keys(data);
+
+        // each object should have key/values = mcc_name: param
+        // each object also needs an fi key
+        tableData = fiNames.map(function (fi) {
+          // value of each fi key is an array of objects
+          // table is expecting array of objects, one object per row
+          // reduce array of objects to one object
+          var rowObj = data[fi].reduce(function (res, obj) {
+            // extract the requested param from the object
+            var key = obj.mcc_name;
+            res[key] = obj[param];
+            return res;
+          }, {});
+
+          // add an fi key
+          rowObj["fi"] = fi;
+
+          return rowObj;
+        });
+
+        tableData.columns = ["fi"].concat(_toConsumableArray(mccNames));
+        tableData.headers = ["FI"].concat(_toConsumableArray(mccNames));
+
+        return {
+          v: tableData
+        };
+      })();
+
+      if (typeof _ret === 'object') return _ret.v;
+    } else {
+      throw new Error("Attempt to build data for non-existent tables panel object");
+    }
+  }
+
+  /**
+   * Shape data for passing to draw function
+   * @function buildData
+   * @param {String} chartname - css selector for chart
+   */
+  function buildData(chartname) {
+    // check that chartname exists
+    if (tables.hasOwnProperty(chartname)) {
+      // make sure dropdown param is set, if param is null, dropdown wasn't set yet
+      if (tables[chartname].dropdown === null) {
+        setDropdown(chartname);
+      }
+
+      // get raw data
+      var insightsData = tables[chartname].data;
+
+      // get list of unique mcc_names
+      var mccNames = uniqueMccNames(insightsData);
+
+      // shape and return the data
+      return buildTableData(chartname, insightsData, mccNames);
+    } else {
+      throw new Error("Attempt to call data property in non-existent tables panel object");
+    }
+  }
+
+  /**
+   * Set the dropdown param of the associated chart
+   * @function setDropdown
+   * @param {String} chartname - css selector for chart
+   * @param {String} [val] - optional dropdown value
+   */
+  function setDropdown(chartname, val) {
+    if (!tables.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      tables[chartname] = p;
+    }
+
+    // if user did not pass in val, default to first dropdown list element
+    if (val === undefined) {
+      var selector = chartname + ' .dropdown-menu li';
+      val = d3.select(selector).attr('data-value');
+    }
+
+    tables[chartname].dropdown = val;
+  }
+
+  /**
+   * @function dropdownCallbackBuilder
+   * @param {String} chartname - css selector for chart
+   */
+  function dropdownCallbackBuilder(chartname) {
+    return function (d) {
+      // get selected dropdown value
+      var val = d3.select(this).attr('data-value');
+
+      // set dropdown value
+      setDropdown(chartname, val);
+
+      // draw table
+      draw(chartname);
+    };
+  }
+  return {
+    setters: [function (_3) {
+      d3 = _3;
+    }, function (_2) {
+      getInsightsData = _2.getInsightsData;
+    }, function (_) {
+      _Set = _['default'];
+    }, function (_4) {
+      tableChart = _4['default'];
+    }, function (_b) {
+      _toConsumableArray = _b['default'];
+    }, function (_e) {
+      _Object$keys = _e['default'];
+    }, function (_c) {
+      _Array$from = _c['default'];
+    }, function (_a) {
+      Panel = _a['default'];
+    }],
+    execute: function () {
+      /**
+       * @module tableController
+       */
+
+      'use strict';
+
+      tables = {};
+      tableExport = {
+        addTable: addTable,
+        setData: setData,
+        createDrawingFunc: createDrawingFunc,
+        draw: draw,
+        addDropdownListener: addDropdownListener
+      };
+
+      _export('tableExport', tableExport);
+
+      testing = {
+        uniqueMccNames: uniqueMccNames,
+        buildTableData: buildTableData
+      };
+
+      _export('testing', testing);
+    }
+  };
+});
+$__System.registerDynamic('58', [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -9163,14 +12315,14 @@ $__System.registerDynamic('f', [], true, function ($__require, exports, module) 
 	})(typeof exports === 'undefined' ? this.base64js = {} : exports);
 	return module.exports;
 });
-$__System.registerDynamic("10", ["f"], true, function ($__require, exports, module) {
+$__System.registerDynamic("59", ["58"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("f");
+  module.exports = $__require("58");
   return module.exports;
 });
-$__System.registerDynamic("11", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("5a", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -9261,14 +12413,14 @@ $__System.registerDynamic("11", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("12", ["11"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5b", ["5a"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("11");
+  module.exports = $__require("5a");
   return module.exports;
 });
-$__System.registerDynamic('13', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('5c', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -9280,14 +12432,14 @@ $__System.registerDynamic('13', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("14", ["13"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5d", ["5c"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("13");
+  module.exports = $__require("5c");
   return module.exports;
 });
-$__System.registerDynamic('15', ['10', '12', '14'], true, function ($__require, exports, module) {
+$__System.registerDynamic('5e', ['59', '5b', '5d'], true, function ($__require, exports, module) {
   /*!
    * The buffer module from node.js, for the browser.
    *
@@ -9301,9 +12453,9 @@ $__System.registerDynamic('15', ['10', '12', '14'], true, function ($__require, 
   var define,
       global = this || self,
       GLOBAL = global;
-  var base64 = $__require('10');
-  var ieee754 = $__require('12');
-  var isArray = $__require('14');
+  var base64 = $__require('59');
+  var ieee754 = $__require('5b');
+  var isArray = $__require('5d');
 
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
@@ -10806,29 +13958,29 @@ $__System.registerDynamic('15', ['10', '12', '14'], true, function ($__require, 
   }
   return module.exports;
 });
-$__System.registerDynamic("16", ["15"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5f", ["5e"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("15");
+  module.exports = $__require("5e");
   return module.exports;
 });
-$__System.registerDynamic('17', ['16'], true, function ($__require, exports, module) {
+$__System.registerDynamic('60', ['5f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('16');
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('5f');
   return module.exports;
 });
-$__System.registerDynamic("18", ["17"], true, function ($__require, exports, module) {
+$__System.registerDynamic("61", ["60"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("17");
+  module.exports = $__require("60");
   return module.exports;
 });
-$__System.registerDynamic('19', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('62', [], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
@@ -11013,28 +14165,28 @@ $__System.registerDynamic('19', [], true, function ($__require, exports, module)
     };
     return module.exports;
 });
-$__System.registerDynamic("1a", ["19"], true, function ($__require, exports, module) {
+$__System.registerDynamic("63", ["62"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("19");
+  module.exports = $__require("62");
   return module.exports;
 });
-$__System.registerDynamic('1b', ['1a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('64', ['63'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__System._nodeRequire ? process : $__require('1a');
+  module.exports = $__System._nodeRequire ? process : $__require('63');
   return module.exports;
 });
-$__System.registerDynamic("1c", ["1b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("65", ["64"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("1b");
+  module.exports = $__require("64");
   return module.exports;
 });
-$__System.registerDynamic('1d', ['18', '1c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('66', ['61', '65'], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -24763,1861 +27915,106 @@ $__System.registerDynamic('1d', ['18', '1c'], true, function ($__require, export
       exports.geoTransverseMercatorRaw = transverseMercatorRaw;
       Object.defineProperty(exports, '__esModule', { value: true });
     });
-  })($__require('18').Buffer, $__require('1c'));
+  })($__require('61').Buffer, $__require('65'));
   return module.exports;
 });
-$__System.registerDynamic("7", ["1d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("7", ["66"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("1d");
+  module.exports = $__require("66");
   return module.exports;
 });
-$__System.register("1e", ["7"], function (_export) {
-  "use strict";
+$__System.register('d', ['7'], function (_export) {
+    'use strict';
 
-  var d3;
+    var d3;
 
-  _export("default", stackChart);
+    _export('toolTips', toolTips);
 
-  function stackChart() {
-    var margin = { top: 30, right: 40, bottom: 50, left: 40 };
-    var width = 0; // 900 - margin.left - margin.right;
-    var height = 0; // 300 - margin.top - margin.bottom;
+    function toolTips() {
 
-    var x = d3.scaleBand();
-    var y = d3.scaleLinear();
-    var y2 = d3.scaleLinear();
-    var z = d3.scaleOrdinal(d3.schemeCategory20);
-    var classMapFunction = function classMapFunction(d) {
-      return classMap[d.key];
-    };
+        $(document).ready(function () {
 
-    var classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
-      "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-      "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
+            //Part 0  Due to cross browser inconsistency you need to normalize the scrollTop/pageYOffset pixels
+            function getScrollTop() {
+                if (typeof pageYOffset != 'undefined') {
+                    //most browsers except IE before #9
+                    return pageYOffset;
+                } else {
+                    var B = document.body; //Chrome and IE 'quirks' mode use the body as the first measured element
+                    var D = document.documentElement; //IE with doctype, because the documentElement is the first scroll measured element THANKS IE
+                    D = D.clientHeight ? D : B; //If D has a clientHieght (true) then use D as defined above, else D will equal B as described above... just a fancy inline if else
+                    return D.scrollTop;
+                }
+            }
 
-    function chart(svg, data) {
-      x.rangeRound([0, height - margin.top - margin.bottom]);
+            // Part #1 Opt-in for bootstrap tool tip with a few options, this is for any element that is NOT a SVG drawing. The element will need to have the [data-toggle="tooltip"] attribute to work
+            $('[data-toggle="tooltip"]').tooltip({
+                container: 'body',
+                placement: 'auto',
+                title: 'No Value'
+            });
 
-      y.rangeRound([width - margin.left - margin.right, 0]).domain([0, d3.max(data, function (d) {
-        return d.total;
-      })]).nice();
+            // Part #2 Uses a hidden tooltip with id svg-tooltip to place tooltip on mouse pointer on mouse move and leave events for selections
+            $("circle, rect, path").on('mousemove', function (e) {
+                //Elements to select for the tooltip function,as we add new ones we need to update
+                $("#svg-tooltip").css({ top: e.pageY + getScrollTop(), left: e.pageX }); //css absolute top is event y position plus the scroll postion of bodyn x is event x position
+                $('#svg-tooltip').prop('title', $(this).attr('title')); //Sets the tilte attribute of the element the pointer is on
+                $('#svg-tooltip').tooltip('show'); //Shows the tooltip LAST to reduce flicker and jumping
+            });
 
-      y2.rangeRound([0, width - margin.right - margin.left]).domain([0, d3.max(data, function (d) {
-        return d.total;
-      })]).nice();
-
-      var stack = d3.stack().keys(data.columns);
-
-      var gUpdate = svg.selectAll("g").data([data]);
-
-      var g = gUpdate.enter().append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").merge(gUpdate);
-
-      var rectUpdate = g.selectAll("rect").data(stack, function (d) {
-        return d.key;
-      });
-
-      //add and update all rectangles
-      var rect = rectUpdate.enter().append("rect").merge(rectUpdate).attr("y", height / 8).attr("height", height / 2).transition().duration(1000).attr("x", function (d) {
-        return y2(d[0][0]);
-      }).attr("width", function (d) {
-        return y(d[0][0]) - y(d[0][1]);
-      }).attr("class", classMapFunction);
-
-      //remove rectangles
-      rectUpdate.exit().transition().duration(1000).attr("width", 0).remove();
-
-      //x axis
-      var newY = height - margin.top - margin.bottom;
-      svg.selectAll("g .x-axis").remove();
-      g.append("g").attr("class", "x-axis").attr("transform", "translate(0," + newY + ")").call(d3.axisBottom(y2).ticks(4, "%"));
-    }
-
-    chart.width = function (value) {
-      if (!arguments.length) return width;
-      width = value;
-      return chart;
-    };
-    chart.margin = function (value) {
-      if (!arguments.length) return margin;
-      margin = value;
-      return chart;
-    };
-    chart.height = function (value) {
-      if (!arguments.length) return height;
-      height = value;
-      return chart;
-    };
-    chart.classMap = function (value) {
-      if (!arguments.length) return classMap;
-      classMap = value;
-      return chart;
-    };
-    chart.classMapFunction = function (value) {
-      if (!arguments.length) return classMapFunction;
-      classMapFunction = value;
-      return chart;
-    };
-
-    return chart;
-  }
-
-  return {
-    setters: [function (_) {
-      d3 = _;
-    }],
-    execute: function () {}
-  };
-});
-$__System.registerDynamic("1f", ["20"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var _Array$from = $__require("20")["default"];
-  exports["default"] = function (arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-      return arr2;
-    } else {
-      return _Array$from(arr);
-    }
-  };
-  exports.__esModule = true;
-  return module.exports;
-});
-$__System.registerDynamic('21', ['22'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var ITERATOR = $__require('22')('iterator'),
-      SAFE_CLOSING = false;
-  try {
-    var riter = [7][ITERATOR]();
-    riter['return'] = function () {
-      SAFE_CLOSING = true;
-    };
-    Array.from(riter, function () {
-      throw 2;
-    });
-  } catch (e) {}
-  module.exports = function (exec, skipClosing) {
-    if (!skipClosing && !SAFE_CLOSING) return false;
-    var safe = false;
-    try {
-      var arr = [7],
-          iter = arr[ITERATOR]();
-      iter.next = function () {
-        return { done: safe = true };
-      };
-      arr[ITERATOR] = function () {
-        return iter;
-      };
-      exec(arr);
-    } catch (e) {}
-    return safe;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('23', ['24', '25', '26', '27', '28', '29', '2a', '21'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var ctx = $__require('24'),
-      $export = $__require('25'),
-      toObject = $__require('26'),
-      call = $__require('27'),
-      isArrayIter = $__require('28'),
-      toLength = $__require('29'),
-      getIterFn = $__require('2a');
-  $export($export.S + $export.F * !$__require('21')(function (iter) {
-    Array.from(iter);
-  }), 'Array', { from: function from(arrayLike) {
-      var O = toObject(arrayLike),
-          C = typeof this == 'function' ? this : Array,
-          $$ = arguments,
-          $$len = $$.length,
-          mapfn = $$len > 1 ? $$[1] : undefined,
-          mapping = mapfn !== undefined,
-          index = 0,
-          iterFn = getIterFn(O),
-          length,
-          result,
-          step,
-          iterator;
-      if (mapping) mapfn = ctx(mapfn, $$len > 2 ? $$[2] : undefined, 2);
-      if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
-        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-          result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
-        }
-      } else {
-        length = toLength(O.length);
-        for (result = new C(length); length > index; index++) {
-          result[index] = mapping ? mapfn(O[index], index) : O[index];
-        }
-      }
-      result.length = index;
-      return result;
-    } });
-  return module.exports;
-});
-$__System.registerDynamic('2b', ['2c', '23', '2d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  $__require('2c');
-  $__require('23');
-  module.exports = $__require('2d').Array.from;
-  return module.exports;
-});
-$__System.registerDynamic("20", ["2b"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("2b"), __esModule: true };
-  return module.exports;
-});
-$__System.registerDynamic("2e", [], true, function ($__require, exports, module) {
-  /* */
-  "format cjs";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  return module.exports;
-});
-$__System.registerDynamic('2f', ['30', '31'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toInteger = $__require('30'),
-      defined = $__require('31');
-  module.exports = function (TO_STRING) {
-    return function (that, pos) {
-      var s = String(defined(that)),
-          i = toInteger(pos),
-          l = s.length,
-          a,
-          b;
-      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('2c', ['2f', '32'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var $at = $__require('2f')(true);
-  $__require('32')(String, 'String', function (iterated) {
-    this._t = String(iterated);
-    this._i = 0;
-  }, function () {
-    var O = this._t,
-        index = this._i,
-        point;
-    if (index >= O.length) return {
-      value: undefined,
-      done: true
-    };
-    point = $at(O, index);
-    this._i += point.length;
-    return {
-      value: point,
-      done: false
-    };
-  });
-  return module.exports;
-});
-$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function () {/* empty */};
-  return module.exports;
-});
-$__System.registerDynamic('34', ['35'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var cof = $__require('35');
-  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-    return cof(it) == 'String' ? it.split('') : Object(it);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('36', ['34', '31'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var IObject = $__require('34'),
-      defined = $__require('31');
-  module.exports = function (it) {
-    return IObject(defined(it));
-  };
-  return module.exports;
-});
-$__System.registerDynamic('37', ['33', '38', '39', '36', '32'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var addToUnscopables = $__require('33'),
-      step = $__require('38'),
-      Iterators = $__require('39'),
-      toIObject = $__require('36');
-  module.exports = $__require('32')(Array, 'Array', function (iterated, kind) {
-    this._t = toIObject(iterated);
-    this._i = 0;
-    this._k = kind;
-  }, function () {
-    var O = this._t,
-        kind = this._k,
-        index = this._i++;
-    if (!O || index >= O.length) {
-      this._t = undefined;
-      return step(1);
-    }
-    if (kind == 'keys') return step(0, index);
-    if (kind == 'values') return step(0, O[index]);
-    return step(0, [index, O[index]]);
-  }, 'values');
-  Iterators.Arguments = Iterators.Array;
-  addToUnscopables('keys');
-  addToUnscopables('values');
-  addToUnscopables('entries');
-  return module.exports;
-});
-$__System.registerDynamic('3a', ['37', '39'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  $__require('37');
-  var Iterators = $__require('39');
-  Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
-  return module.exports;
-});
-$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = true;
-  return module.exports;
-});
-$__System.registerDynamic('3c', ['3d', '3e', '3f', '40', '22'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var $ = $__require('3d'),
-      descriptor = $__require('3e'),
-      setToStringTag = $__require('3f'),
-      IteratorPrototype = {};
-  $__require('40')(IteratorPrototype, $__require('22')('iterator'), function () {
-    return this;
-  });
-  module.exports = function (Constructor, NAME, next) {
-    Constructor.prototype = $.create(IteratorPrototype, { next: descriptor(1, next) });
-    setToStringTag(Constructor, NAME + ' Iterator');
-  };
-  return module.exports;
-});
-$__System.registerDynamic('32', ['3b', '25', '41', '40', '42', '39', '3c', '3f', '3d', '22'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var LIBRARY = $__require('3b'),
-      $export = $__require('25'),
-      redefine = $__require('41'),
-      hide = $__require('40'),
-      has = $__require('42'),
-      Iterators = $__require('39'),
-      $iterCreate = $__require('3c'),
-      setToStringTag = $__require('3f'),
-      getProto = $__require('3d').getProto,
-      ITERATOR = $__require('22')('iterator'),
-      BUGGY = !([].keys && 'next' in [].keys()),
-      FF_ITERATOR = '@@iterator',
-      KEYS = 'keys',
-      VALUES = 'values';
-  var returnThis = function () {
-    return this;
-  };
-  module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
-    $iterCreate(Constructor, NAME, next);
-    var getMethod = function (kind) {
-      if (!BUGGY && kind in proto) return proto[kind];
-      switch (kind) {
-        case KEYS:
-          return function keys() {
-            return new Constructor(this, kind);
-          };
-        case VALUES:
-          return function values() {
-            return new Constructor(this, kind);
-          };
-      }
-      return function entries() {
-        return new Constructor(this, kind);
-      };
-    };
-    var TAG = NAME + ' Iterator',
-        DEF_VALUES = DEFAULT == VALUES,
-        VALUES_BUG = false,
-        proto = Base.prototype,
-        $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
-        $default = $native || getMethod(DEFAULT),
-        methods,
-        key;
-    if ($native) {
-      var IteratorPrototype = getProto($default.call(new Base()));
-      setToStringTag(IteratorPrototype, TAG, true);
-      if (!LIBRARY && has(proto, FF_ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
-      if (DEF_VALUES && $native.name !== VALUES) {
-        VALUES_BUG = true;
-        $default = function values() {
-          return $native.call(this);
-        };
-      }
-    }
-    if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
-      hide(proto, ITERATOR, $default);
-    }
-    Iterators[NAME] = $default;
-    Iterators[TAG] = returnThis;
-    if (DEFAULT) {
-      methods = {
-        values: DEF_VALUES ? $default : getMethod(VALUES),
-        keys: IS_SET ? $default : getMethod(KEYS),
-        entries: !DEF_VALUES ? $default : getMethod('entries')
-      };
-      if (FORCED) for (key in methods) {
-        if (!(key in proto)) redefine(proto, key, methods[key]);
-      } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
-    }
-    return methods;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("38", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (done, value) {
-    return { value: value, done: !!done };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('43', ['2d', '3d', '44', '22'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var core = $__require('2d'),
-      $ = $__require('3d'),
-      DESCRIPTORS = $__require('44'),
-      SPECIES = $__require('22')('species');
-  module.exports = function (KEY) {
-    var C = core[KEY];
-    if (DESCRIPTORS && C && !C[SPECIES]) $.setDesc(C, SPECIES, {
-      configurable: true,
-      get: function () {
-        return this;
-      }
-    });
-  };
-  return module.exports;
-});
-$__System.registerDynamic('45', ['3d', '40', '46', '24', '47', '31', '48', '32', '38', '49', '42', '4a', '43', '44'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var $ = $__require('3d'),
-      hide = $__require('40'),
-      redefineAll = $__require('46'),
-      ctx = $__require('24'),
-      strictNew = $__require('47'),
-      defined = $__require('31'),
-      forOf = $__require('48'),
-      $iterDefine = $__require('32'),
-      step = $__require('38'),
-      ID = $__require('49')('id'),
-      $has = $__require('42'),
-      isObject = $__require('4a'),
-      setSpecies = $__require('43'),
-      DESCRIPTORS = $__require('44'),
-      isExtensible = Object.isExtensible || isObject,
-      SIZE = DESCRIPTORS ? '_s' : 'size',
-      id = 0;
-  var fastKey = function (it, create) {
-    if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-    if (!$has(it, ID)) {
-      if (!isExtensible(it)) return 'F';
-      if (!create) return 'E';
-      hide(it, ID, ++id);
-    }
-    return 'O' + it[ID];
-  };
-  var getEntry = function (that, key) {
-    var index = fastKey(key),
-        entry;
-    if (index !== 'F') return that._i[index];
-    for (entry = that._f; entry; entry = entry.n) {
-      if (entry.k == key) return entry;
-    }
-  };
-  module.exports = {
-    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
-      var C = wrapper(function (that, iterable) {
-        strictNew(that, C, NAME);
-        that._i = $.create(null);
-        that._f = undefined;
-        that._l = undefined;
-        that[SIZE] = 0;
-        if (iterable != undefined) forOf(iterable, IS_MAP, that[ADDER], that);
-      });
-      redefineAll(C.prototype, {
-        clear: function clear() {
-          for (var that = this, data = that._i, entry = that._f; entry; entry = entry.n) {
-            entry.r = true;
-            if (entry.p) entry.p = entry.p.n = undefined;
-            delete data[entry.i];
-          }
-          that._f = that._l = undefined;
-          that[SIZE] = 0;
-        },
-        'delete': function (key) {
-          var that = this,
-              entry = getEntry(that, key);
-          if (entry) {
-            var next = entry.n,
-                prev = entry.p;
-            delete that._i[entry.i];
-            entry.r = true;
-            if (prev) prev.n = next;
-            if (next) next.p = prev;
-            if (that._f == entry) that._f = next;
-            if (that._l == entry) that._l = prev;
-            that[SIZE]--;
-          }
-          return !!entry;
-        },
-        forEach: function forEach(callbackfn) {
-          var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3),
-              entry;
-          while (entry = entry ? entry.n : this._f) {
-            f(entry.v, entry.k, this);
-            while (entry && entry.r) entry = entry.p;
-          }
-        },
-        has: function has(key) {
-          return !!getEntry(this, key);
-        }
-      });
-      if (DESCRIPTORS) $.setDesc(C.prototype, 'size', { get: function () {
-          return defined(this[SIZE]);
-        } });
-      return C;
-    },
-    def: function (that, key, value) {
-      var entry = getEntry(that, key),
-          prev,
-          index;
-      if (entry) {
-        entry.v = value;
-      } else {
-        that._l = entry = {
-          i: index = fastKey(key, true),
-          k: key,
-          v: value,
-          p: prev = that._l,
-          n: undefined,
-          r: false
-        };
-        if (!that._f) that._f = entry;
-        if (prev) prev.n = entry;
-        that[SIZE]++;
-        if (index !== 'F') that._i[index] = entry;
-      }
-      return that;
-    },
-    getEntry: getEntry,
-    setStrong: function (C, NAME, IS_MAP) {
-      $iterDefine(C, NAME, function (iterated, kind) {
-        this._t = iterated;
-        this._k = kind;
-        this._l = undefined;
-      }, function () {
-        var that = this,
-            kind = that._k,
-            entry = that._l;
-        while (entry && entry.r) entry = entry.p;
-        if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
-          that._t = undefined;
-          return step(1);
-        }
-        if (kind == 'keys') return step(0, entry.k);
-        if (kind == 'values') return step(0, entry.v);
-        return step(0, [entry.k, entry.v]);
-      }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
-      setSpecies(NAME);
-    }
-  };
-  return module.exports;
-});
-$__System.registerDynamic("3e", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('40', ['3d', '3e', '44'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $ = $__require('3d'),
-      createDesc = $__require('3e');
-  module.exports = $__require('44') ? function (object, key, value) {
-    return $.setDesc(object, key, createDesc(1, value));
-  } : function (object, key, value) {
-    object[key] = value;
-    return object;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('41', ['40'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = $__require('40');
-  return module.exports;
-});
-$__System.registerDynamic('46', ['41'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var redefine = $__require('41');
-  module.exports = function (target, src) {
-    for (var key in src) redefine(target, key, src[key]);
-    return target;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("47", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (it, Constructor, name) {
-    if (!(it instanceof Constructor)) throw TypeError(name + ": use the 'new' operator!");
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("42", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var hasOwnProperty = {}.hasOwnProperty;
-  module.exports = function (it, key) {
-    return hasOwnProperty.call(it, key);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('3f', ['3d', '42', '22'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var def = $__require('3d').setDesc,
-      has = $__require('42'),
-      TAG = $__require('22')('toStringTag');
-  module.exports = function (it, tag, stat) {
-    if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, {
-      configurable: true,
-      value: tag
-    });
-  };
-  return module.exports;
-});
-$__System.registerDynamic('44', ['4b'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = !$__require('4b')(function () {
-    return Object.defineProperty({}, 'a', { get: function () {
-        return 7;
-      } }).a != 7;
-  });
-  return module.exports;
-});
-$__System.registerDynamic('4c', ['3d', '4d', '25', '4b', '40', '46', '48', '47', '4a', '3f', '44'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var $ = $__require('3d'),
-      global = $__require('4d'),
-      $export = $__require('25'),
-      fails = $__require('4b'),
-      hide = $__require('40'),
-      redefineAll = $__require('46'),
-      forOf = $__require('48'),
-      strictNew = $__require('47'),
-      isObject = $__require('4a'),
-      setToStringTag = $__require('3f'),
-      DESCRIPTORS = $__require('44');
-  module.exports = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
-    var Base = global[NAME],
-        C = Base,
-        ADDER = IS_MAP ? 'set' : 'add',
-        proto = C && C.prototype,
-        O = {};
-    if (!DESCRIPTORS || typeof C != 'function' || !(IS_WEAK || proto.forEach && !fails(function () {
-      new C().entries().next();
-    }))) {
-      C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-      redefineAll(C.prototype, methods);
-    } else {
-      C = wrapper(function (target, iterable) {
-        strictNew(target, C, NAME);
-        target._c = new Base();
-        if (iterable != undefined) forOf(iterable, IS_MAP, target[ADDER], target);
-      });
-      $.each.call('add,clear,delete,forEach,get,has,set,keys,values,entries'.split(','), function (KEY) {
-        var IS_ADDER = KEY == 'add' || KEY == 'set';
-        if (KEY in proto && !(IS_WEAK && KEY == 'clear')) hide(C.prototype, KEY, function (a, b) {
-          if (!IS_ADDER && IS_WEAK && !isObject(a)) return KEY == 'get' ? undefined : false;
-          var result = this._c[KEY](a === 0 ? 0 : a, b);
-          return IS_ADDER ? this : result;
+            $("circle, rect, path").on('mouseleave', function (e) {
+                $('#svg-tooltip').tooltip('destroy'); //cannot simply 'hide' this because it will take a hit to performance as well as confuse the tooltip
+            });
         });
-      });
-      if ('size' in proto) $.setDesc(C.prototype, 'size', { get: function () {
-          return this._c.size;
-        } });
     }
-    setToStringTag(C, NAME);
-    O[NAME] = C;
-    $export($export.G + $export.W + $export.F, O);
-    if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
-    return C;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('4e', ['45', '4c'], true, function ($__require, exports, module) {
-  /* */
-  'use strict';
 
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var strong = $__require('45');
-  $__require('4c')('Set', function (get) {
-    return function Set() {
-      return get(this, arguments.length > 0 ? arguments[0] : undefined);
+    return {
+        setters: [function (_) {
+            d3 = _;
+        }],
+        execute: function () {}
     };
-  }, { add: function add(value) {
-      return strong.def(this, value = value === 0 ? 0 : value, value);
-    } }, strong);
-  return module.exports;
 });
-$__System.registerDynamic('27', ['4f'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var anObject = $__require('4f');
-  module.exports = function (iterator, fn, value, entries) {
-    try {
-      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
-    } catch (e) {
-      var ret = iterator['return'];
-      if (ret !== undefined) anObject(ret.call(iterator));
-      throw e;
-    }
-  };
-  return module.exports;
-});
-$__System.registerDynamic('28', ['39', '22'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var Iterators = $__require('39'),
-        ITERATOR = $__require('22')('iterator'),
-        ArrayProto = Array.prototype;
-    module.exports = function (it) {
-        return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
-    };
-    return module.exports;
-});
-$__System.registerDynamic('4a', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-  return module.exports;
-});
-$__System.registerDynamic('4f', ['4a'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var isObject = $__require('4a');
-  module.exports = function (it) {
-    if (!isObject(it)) throw TypeError(it + ' is not an object!');
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("30", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // 7.1.4 ToInteger
-  var ceil = Math.ceil,
-      floor = Math.floor;
-  module.exports = function (it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('29', ['30'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toInteger = $__require('30'),
-      min = Math.min;
-  module.exports = function (it) {
-    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = {};
-  return module.exports;
-});
-$__System.registerDynamic('2a', ['50', '22', '39', '2d'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var classof = $__require('50'),
-        ITERATOR = $__require('22')('iterator'),
-        Iterators = $__require('39');
-    module.exports = $__require('2d').getIteratorMethod = function (it) {
-        if (it != undefined) return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
-    };
-    return module.exports;
-});
-$__System.registerDynamic('48', ['24', '27', '28', '4f', '29', '2a'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var ctx = $__require('24'),
-      call = $__require('27'),
-      isArrayIter = $__require('28'),
-      anObject = $__require('4f'),
-      toLength = $__require('29'),
-      getIterFn = $__require('2a');
-  module.exports = function (iterable, entries, fn, that) {
-    var iterFn = getIterFn(iterable),
-        f = ctx(fn, that, entries ? 2 : 1),
-        index = 0,
-        length,
-        step,
-        iterator;
-    if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
-    if (isArrayIter(iterFn)) for (length = toLength(iterable.length); length > index; index++) {
-      entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
-    } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
-      call(iterator, f, step.value, entries);
-    }
-  };
-  return module.exports;
-});
-$__System.registerDynamic("35", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toString = {}.toString;
+$__System.register('1', ['3', '5', '7', '8', '11', '12', '13', '57', 'f', '1a', 'd'], function (_export) {
+  /***** jspm packages *****/
 
-  module.exports = function (it) {
-    return toString.call(it).slice(8, -1);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('51', ['4d'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var global = $__require('4d'),
-        SHARED = '__core-js_shared__',
-        store = global[SHARED] || (global[SHARED] = {});
-    module.exports = function (key) {
-        return store[key] || (store[key] = {});
-    };
-    return module.exports;
-});
-$__System.registerDynamic('49', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var id = 0,
-      px = Math.random();
-  module.exports = function (key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-  };
-  return module.exports;
-});
-$__System.registerDynamic('22', ['51', '49', '4d'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var store = $__require('51')('wks'),
-        uid = $__require('49'),
-        Symbol = $__require('4d').Symbol;
-    module.exports = function (name) {
-        return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
-    };
-    return module.exports;
-});
-$__System.registerDynamic('50', ['35', '22'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var cof = $__require('35'),
-        TAG = $__require('22')('toStringTag'),
-        ARG = cof(function () {
-        return arguments;
-    }()) == 'Arguments';
-    module.exports = function (it) {
-        var O, T, B;
-        return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-    };
-    return module.exports;
-});
-$__System.registerDynamic('52', ['48', '50'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var forOf = $__require('48'),
-      classof = $__require('50');
-  module.exports = function (NAME) {
-    return function toJSON() {
-      if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
-      var arr = [];
-      forOf(this, false, arr.push, arr);
-      return arr;
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('53', ['25', '52'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $export = $__require('25');
-  $export($export.P, 'Set', { toJSON: $__require('52')('Set') });
-  return module.exports;
-});
-$__System.registerDynamic('54', ['2e', '2c', '3a', '4e', '53', '2d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  $__require('2e');
-  $__require('2c');
-  $__require('3a');
-  $__require('4e');
-  $__require('53');
-  module.exports = $__require('2d').Set;
-  return module.exports;
-});
-$__System.registerDynamic("55", ["54"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("54"), __esModule: true };
-  return module.exports;
-});
-$__System.register('56', [], function (_export) {
-  'use strict';
-
-  var dataJSON;
-  return {
-    setters: [],
-    execute: function () {
-      dataJSON = '{"sig_debit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"pin_debit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"sig_credit":{"All Issuers":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"Total","mcc_name":"Total","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"}],"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"Total","mcc_name":"Total","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"}],"Issuer 1":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"Total","mcc_name":"Total","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"}],"Issuer 2":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"Total","mcc_name":"Total","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"}],"Issuer CUs":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"bin 1":{"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]},"bin 2":{"My Financial Institution":[{"mcc":"5311","mcc_name":"Department Store","n_trans":"13500645","amt_sale":"410057046.4","amt_fee":"6841539.66","n_card":"3516257","avg_sale":"30.37","avg_fee":"0.50675","trans_pc":"3.839493245","sale_pc":"116.61","fee_pc":"1.94568"},{"mcc":"5411","mcc_name":"Grocery","n_trans":"84462","amt_sale":"2174070.81","amt_fee":"24905.26522","n_card":"15271","avg_sale":"25.74","avg_fee":"0.29486","trans_pc":"5.530875516","sale_pc":"142.36","fee_pc":"1.63088"},{"mcc":"5651","mcc_name":"Family Clothing","n_trans":"98607","amt_sale":"3534368.75","amt_fee":"24944.9153","n_card":"41206","avg_sale":"35.84","avg_fee":"0.25297","trans_pc":"2.393025288","sale_pc":"85.77","fee_pc":"0.60537"},{"mcc":"5814","mcc_name":"Fast Food","n_trans":"1740167","amt_sale":"51407298.63","amt_fee":"991155.0007","n_card":"436500","avg_sale":"29.54","avg_fee":"0.56957","trans_pc":"3.986636884","sale_pc":"117.77","fee_pc":"2.27068"},{"mcc":"5912","mcc_name":"Pharmacies","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"},{"mcc":"Total","mcc_name":"Total","n_trans":"2880427","amt_sale":"91878232.95","amt_fee":"1199707.591","n_card":"654373","avg_sale":"31.89","avg_fee":"0.4165","trans_pc":"4.401812116","sale_pc":"140.4","fee_pc":"1.83336"}]}}';
-
-      _export('dataJSON', dataJSON);
-    }
-  };
-});
-$__System.register("9", ["56"], function (_export) {
-  /**
-   *@module model
-   *@description model depends on a json file of insights data existing
-   * the model presumes that the data is formatted as specified in
-   * the csv-parser project (https://github.com/unisaurus-rex/csv-parser) 
-   */
+  //Tooltips
 
   /***** local packages *****/
-
-  /***** model *****/
-  "use strict";
-
-  var dataJSON, insightsData;
-
-  /**
-   * reviver callback passed as second argument to JSON.parse
-   * @function typeConverter
-   * @param {string} key - key from a json string
-   * @param {string} value - value belonging to key in json string
-   * @returns {float | int}
-   * @description convert a data value from a json string to the appropriate type
-   */
-
-  _export("getInsightsData", getInsightsData);
-
-  /**
-   * public interface for retrieving data
-   * @function getInsightsData
-   * @param {string} txn_type - transaction type you want to retrieve data for
-   * @param {string} [fi] - financial instituation you want to retrieve data for  
-   * @returns {Obj}
-   * @description retrieve data for a specific transaction type, or optionally, a fi of a transaction type
-   */
-
-  function getInsightsData(txn_type, fi) {
-    var o = insightsData[txn_type];
-
-    if (fi) {
-      return o[fi];
-    }
-
-    return o;
-  }
-
-  function typeConverter(key, value) {
-    // reviver passes key as string
-    switch (key) {
-      case "amt_fee":
-        return parseFloat(value);
-        break;
-      case "amt_sale":
-        return parseFloat(value);
-        break;
-      case "avg_fee":
-        return parseFloat(value);
-        break;
-      case "avg_sale":
-        return parseFloat(value);
-        break;
-      case "fee_pc":
-        return parseFloat(value);
-        break;
-      case "n_card":
-        return parseInt(value);
-        break;
-      case "n_trans":
-        return parseInt(value);
-        break;
-      case "sale_pc":
-        return parseFloat(value);
-        break;
-      case "trans_pc":
-        return parseFloat(value);
-        break;
-      default:
-        return value;
-        break;
-    }
-  }
-  return {
-    setters: [function (_) {
-      dataJSON = _.dataJSON;
-    }],
-    execute: function () {
-      insightsData = JSON.parse(dataJSON, typeConverter);
-    }
-  };
-});
-$__System.register("57", ["9", "20", "55", "1f", "a"], function (_export) {
-  var getInsightsData, _Array$from, _Set, _toConsumableArray, _Object$keys, testing;
-
-  /**
-   * Take data from the model for a specific transaction type and return
-   * a data structure that can be used by the table drawing function
-   * @function getData
-   * @returns {function} - configurable function that can be used to format table data 
-   */
-
-  function getData() {
-    var txnType;
-
-    function dataBuilder(param) {
-      var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
-
-      // get list of unique mcc_names
-      var mccNames = uniqueMccNames(insightsData);
-
-      // use list of names to build array of row objects
-      return buildTableData(insightsData, param, mccNames);
-    };
-
-    dataBuilder.txnType = function (type) {
-      if (!arguments.length) {
-        return txnType;
-      }
-
-      txnType = type;
-    };
-
-    return dataBuilder;
-  }
-
-  /***** Private Functions *****/
-  // this var for exporting functions to be tested only, not intended to be used in code
-
-  /**
-   * Find the unique mcc_name properties
-   * @private
-   * @function uniqueMccNames
-   * @param {Object} data - object belonging to transaction type in the model
-   * @returns {string[]}
-   */
-  function uniqueMccNames(data) {
-    // for each fi, get all mcc_names, result is array of arrays
-    var fiNames = _Object$keys(data);
-    var mccArrays = fiNames.map(function (fi) {
-      var arr = data[fi];
-      return arr.map(function (obj) {
-        return obj.mcc_name;
-      });
-    });
-
-    // join arrays to form single array
-    var allMccNames = mccArrays.reduce(function (res, current) {
-      return res.concat(current);
-    }, []);
-
-    // remove repeated values
-    return _Array$from(new _Set(allMccNames));
-  }
-
-  /**
-   * Return the data structure needed by the table drawing function
-   * @private
-   * @function buildTableData
-   * @param {Object} data - object belonging to transaction type in the model
-   * @param {string} param - value to extract
-   * @param {string[]} mccNames - mccNames to use for columns and headers
-   * @returns {Object[]} array of objects
-   */
-  function buildTableData(data, param, mccNames) {
-    // need to build one object per fi
-    var fiNames = _Object$keys(data);
-    // each object should have key/values = mcc_name: param
-    // each object also needs an fi key
-    var tableData = fiNames.map(function (fi) {
-      // value of each fi key is an array of objects
-      // table is expecting array of objects, one object per row
-      // reduce array of objects to one object
-      var rowObj = data[fi].reduce(function (res, obj) {
-        // extract the requested param from the object
-        var key = obj.mcc_name;
-        res[key] = obj[param];
-        return res;
-      }, {});
-
-      // add an fi key
-      rowObj["fi"] = fi;
-
-      return rowObj;
-    });
-
-    tableData.columns = ["fi"].concat(_toConsumableArray(mccNames));
-    tableData.headers = ["FI"].concat(_toConsumableArray(mccNames));
-
-    return tableData;
-  }
-  return {
-    setters: [function (_3) {
-      getInsightsData = _3.getInsightsData;
-    }, function (_) {
-      _Array$from = _["default"];
-    }, function (_2) {
-      _Set = _2["default"];
-    }, function (_f) {
-      _toConsumableArray = _f["default"];
-    }, function (_a) {
-      _Object$keys = _a["default"];
-    }],
-    execute: function () {
-      /**
-       * @module tableController
-       */
-
-      "use strict";
-
-      _export("getData", getData);
-
-      testing = { uniqueMccNames: uniqueMccNames,
-        buildTableData: buildTableData
-      };
-
-      _export("testing", testing);
-    }
-  };
-});
-$__System.registerDynamic("3d", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $Object = Object;
-  module.exports = {
-    create: $Object.create,
-    getProto: $Object.getPrototypeOf,
-    isEnum: {}.propertyIsEnumerable,
-    getDesc: $Object.getOwnPropertyDescriptor,
-    setDesc: $Object.defineProperty,
-    setDescs: $Object.defineProperties,
-    getKeys: $Object.keys,
-    getNames: $Object.getOwnPropertyNames,
-    getSymbols: $Object.getOwnPropertySymbols,
-    each: [].forEach
-  };
-  return module.exports;
-});
-$__System.registerDynamic('58', ['3d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $ = $__require('3d');
-  module.exports = function defineProperty(it, key, desc) {
-    return $.setDesc(it, key, desc);
-  };
-  return module.exports;
-});
-$__System.registerDynamic("59", ["58"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("58"), __esModule: true };
-  return module.exports;
-});
-$__System.registerDynamic("5a", ["59"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var _Object$defineProperty = $__require("59")["default"];
-  exports["default"] = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        _Object$defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-  exports.__esModule = true;
-  return module.exports;
-});
-$__System.registerDynamic("5b", [], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  exports["default"] = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  exports.__esModule = true;
-  return module.exports;
-});
-$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // 7.2.1 RequireObjectCoercible(argument)
-  module.exports = function (it) {
-    if (it == undefined) throw TypeError("Can't call method on  " + it);
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('26', ['31'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var defined = $__require('31');
-  module.exports = function (it) {
-    return Object(defined(it));
-  };
-  return module.exports;
-});
-$__System.registerDynamic('4d', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-  if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-
-  return module.exports;
-});
-$__System.registerDynamic('5c', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (it) {
-    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('24', ['5c'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var aFunction = $__require('5c');
-  module.exports = function (fn, that, length) {
-    aFunction(fn);
-    if (that === undefined) return fn;
-    switch (length) {
-      case 1:
-        return function (a) {
-          return fn.call(that, a);
-        };
-      case 2:
-        return function (a, b) {
-          return fn.call(that, a, b);
-        };
-      case 3:
-        return function (a, b, c) {
-          return fn.call(that, a, b, c);
-        };
-    }
-    return function () {
-      return fn.apply(that, arguments);
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('25', ['4d', '2d', '24'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var global = $__require('4d'),
-      core = $__require('2d'),
-      ctx = $__require('24'),
-      PROTOTYPE = 'prototype';
-  var $export = function (type, name, source) {
-    var IS_FORCED = type & $export.F,
-        IS_GLOBAL = type & $export.G,
-        IS_STATIC = type & $export.S,
-        IS_PROTO = type & $export.P,
-        IS_BIND = type & $export.B,
-        IS_WRAP = type & $export.W,
-        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
-        target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
-        key,
-        own,
-        out;
-    if (IS_GLOBAL) source = name;
-    for (key in source) {
-      own = !IS_FORCED && target && key in target;
-      if (own && key in exports) continue;
-      out = own ? target[key] : source[key];
-      exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key] : IS_BIND && own ? ctx(out, global) : IS_WRAP && target[key] == out ? function (C) {
-        var F = function (param) {
-          return this instanceof C ? new C(param) : C(param);
-        };
-        F[PROTOTYPE] = C[PROTOTYPE];
-        return F;
-      }(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-      if (IS_PROTO) (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
-    }
-  };
-  $export.F = 1;
-  $export.G = 2;
-  $export.S = 4;
-  $export.P = 8;
-  $export.B = 16;
-  $export.W = 32;
-  module.exports = $export;
-  return module.exports;
-});
-$__System.registerDynamic("4b", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = function (exec) {
-    try {
-      return !!exec();
-    } catch (e) {
-      return true;
-    }
-  };
-  return module.exports;
-});
-$__System.registerDynamic('5d', ['25', '2d', '4b'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var $export = $__require('25'),
-        core = $__require('2d'),
-        fails = $__require('4b');
-    module.exports = function (KEY, exec) {
-        var fn = (core.Object || {})[KEY] || Object[KEY],
-            exp = {};
-        exp[KEY] = exec(fn);
-        $export($export.S + $export.F * fails(function () {
-            fn(1);
-        }), 'Object', exp);
-    };
-    return module.exports;
-});
-$__System.registerDynamic('5e', ['26', '5d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toObject = $__require('26');
-  $__require('5d')('keys', function ($keys) {
-    return function keys(it) {
-      return $keys(toObject(it));
-    };
-  });
-  return module.exports;
-});
-$__System.registerDynamic('2d', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var core = module.exports = { version: '1.2.6' };
-  if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-
-  return module.exports;
-});
-$__System.registerDynamic('5f', ['5e', '2d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  $__require('5e');
-  module.exports = $__require('2d').Object.keys;
-  return module.exports;
-});
-$__System.registerDynamic("a", ["5f"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("5f"), __esModule: true };
-  return module.exports;
-});
-$__System.register('60', ['5a', '5b', 'a'], function (_export) {
-  var _createClass, _classCallCheck, _Object$keys, Checkboxes;
-
-  return {
-    setters: [function (_a) {
-      _createClass = _a['default'];
-    }, function (_b) {
-      _classCallCheck = _b['default'];
-    }, function (_a2) {
-      _Object$keys = _a2['default'];
-    }],
-    execute: function () {
-      /**
-       * @module checkboxes
-       */
-
-      /** Track a group of checkboxes and their state (checked or unchecked) */
-      'use strict';
-
-      Checkboxes = (function () {
-        /**
-         * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
-         * @param {string[]} namesArr - the name of each checkbox you want to track
-         * @param {bool[]} [valuesArr] - the starting value of each checkbox in nameArr, true means the checkbox is checked
-         */
-
-        function Checkboxes(namesArr, valuesArr) {
-          _classCallCheck(this, Checkboxes);
-
-          // Case 1: only namesArr passed as argument, initialize checkbox properties to false by default
-          if (arguments.length == 1) {
-            this.checkboxes = namesArr.reduce(function (result, val) {
-              result[val] = false;
-              return result;
-            }, {});
-          } else if (arguments.length == 2) {
-            // case 2: namesArr and valuesArr provided
-            // use valuesArr to set starting value of each checkbox
-            this.checkboxes = namesArr.reduce(function (result, val, idx) {
-              result[val] = valuesArr[idx];
-              return result;
-            }, {});
-          } else {
-            // case 3: throw an error
-            throw new Error('Attempted to instantiate Checkboxes class with no parameters');
-          }
-        }
-
-        /**
-         * Return an object containing all checkbox names and values
-         */
-
-        _createClass(Checkboxes, [{
-          key: 'getAll',
-          value: function getAll() {
-            return this.checkboxes;
-          }
-
-          /**
-           * return an array of all properties whose value is true
-           */
-        }, {
-          key: 'getAllChecked',
-          value: function getAllChecked() {
-            // get array of checkbox names
-            var keys = _Object$keys(this.checkboxes);
-            var c = this.checkboxes;
-
-            // go through each checkbox name and drop any that don't have a value of true
-            return keys.filter(function (key) {
-              return c[key];
-            });
-          }
-
-          /**
-           * Return the value belonging to the checkbox associated with name
-           * @param {string} name - name of the checkbox
-           */
-        }, {
-          key: 'getValue',
-          value: function getValue(name) {
-            return this.checkboxes[name];
-          }
-
-          /**
-           * Flip the value of the checkbox associated with name
-           * @param {string} name - name of the checkbox
-           * @returns {array}
-           */
-        }, {
-          key: 'toggle',
-          value: function toggle(name) {
-            this.checkboxes[name] = !this.checkboxes[name];
-            return this.getAllChecked();
-          }
-        }]);
-
-        return Checkboxes;
-      })();
-
-      _export('default', Checkboxes);
-    }
-  };
-});
-$__System.register('61', ['60'], function (_export) {
-  /**
-   * @module checkboxObserver
-   */
-
-  /**
-   * @callback changeCallback
-   * @param {string[]} string values associated with the value attribute of input checkboxes
-   */
-
-  /**
-   * Respond to bootstrap checkboxes being checked
-   * @function addBootstrapCheckboxObservers
-   * @returns {function} configurable function a la Mike Bostock style
-   */
   'use strict';
 
-  var Checkboxes;
-
-  /**
-   * Expose a way to track checkbox toggling that can be used by other functions
-   * to drive their behavior
-   * @function checkboxChangeBuilder 
-   * @param {Object} boxes - Checkboxes class
-   * @param {changeCallback} callback  
-   * @returns {function} a function that accepts a single value, this function can be passed to mutationFuncBuilder  
-   */
-
-  _export('default', addBootstrapCheckboxObservers);
-
-  function addBootstrapCheckboxObservers() {
-
-    var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style)
-    values, // array of strings, each string is the value attribute of an input checkbox
-    defaults, // array of bools, the starting state of each checkbox in values, true = checked
-    callback; // changeCallback
-
-    /**
-     * Add mutation observers for each element in elementIds
-     * @function observers
-     * @returns {Object} Checkboxes class
-     */
-    function observers() {
-      var boxes = new Checkboxes(values, defaults);
-
-      // build the callback that is passed to addCheckboxObserver
-      var changeCallback = checkboxChangeBuilder(boxes, callback);
-
-      // get the DOM element tied to each id
-      var domEls = elementIds.map(function (id) {
-        return document.getElementById(id);
-      });
-
-      // add observers for each item
-      domEls.forEach(function (el) {
-        return addCheckboxObserver(el, changeCallback);
-      });
-
-      return boxes;
-    }
-
-    // configuration functions (getters and setters)
-    observers.elementIds = function (arr) {
-      if (!arguments.length) {
-        return elementIds;
-      }
-
-      elementIds = arr;
-      return observers;
-    };
-
-    observers.values = function (arr) {
-      if (!arguments.length) {
-        return values;
-      }
-
-      values = arr;
-      return observers;
-    };
-
-    observers.defaults = function (arr) {
-      if (!arguments.length) {
-        return defaults;
-      }
-
-      defaults = arr;
-      return observers;
-    };
-
-    observers.callback = function (func) {
-      if (!arguments.length) {
-        return callback;
-      }
-
-      callback = func;
-      return observers;
-    };
-
-    return observers;
-  }
-
-  function checkboxChangeBuilder(boxes, callback) {
-    return function (value) {
-      callback(boxes.toggle(value));
-    };
-  }
-
-  /*
-   * @function addObserver
-   * @param el {DOM Node} a dom element 
-   * @param callback {function} function returned by checkboxChangeBuilder
-   * @description execute a callback function when a bootstrap checkbox is checkedi or unchecked
-   */
-  function addCheckboxObserver(el, callback) {
-    // wrap the callback so it can be used if the mutation alters the checkbox
-    var mutationFunc = mutationFuncBuilder(callback);
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(mutationFunc);
-    });
-
-    // mutation observer config object, use oldValue: true so we can compare current value to old value
-    // otherwise we won't be able to tell if the active value changed
-    var config = { attributes: true, attributeOldValue: true, attributeFilter: ['class'] };
-
-    // apply the observer to el
-    observer.observe(el, config);
-  }
-
-  /**
-   * Return a function that can be called by mutation observer
-   * @function mutationFuncBuilder
-   * @param {function} changeCallback - function that takes a checkbox value
-   * @returns {function} function that accepts a mutation record
-   */
-  function mutationFuncBuilder(changeCallback) {
-    return function (mutation) {
-      /* mutation will track the old and new value, two cases that we care about
-         1) added active class to the label
-         2) removed active class from the label
-         mutation will fire anytime a class is added or removed, the class may or may
-         not be the active class that signals a checkbox click
-         so we check to see if the active class is the class that changed betwee old and new
-      */
-      var newHasActive = mutation.target.classList.contains('active');
-      var oldHasActive = mutation.oldValue.includes('active');
-      if (newHasActive && !oldHasActive || oldHasActive && !newHasActive) {
-        // get the input element nested in the label element so we can pass its value to changeCallback
-        var elArr = mutation.target.getElementsByTagName('input');
-        if (elArr.length) {
-          var inputEl = elArr[0];
-          changeCallback(inputEl.value);
-        }
-      }
-    };
-  }
-  return {
-    setters: [function (_) {
-      Checkboxes = _['default'];
-    }],
-    execute: function () {}
-  };
-});
-$__System.register('1', ['3', '5', '6', '7', '8', '9', '57', '60', '61', 'a', 'b', 'c', 'd', 'e', '1e'], function (_export) {
-  var jquery, bootstrap, groupedBarChart, d3, groupedBarController, getInsightsData, getTableData, Checkboxes, addBootstrapCheckboxObservers, _Object$keys, donutController, getSpendByMerchantSegmentData, getPurchaseByMerchantSegmentData, tableChart, donutChart, stackChart, classMap, vals, defaults, getGroupedBarData, groupedBarData, groupedWidth, groupedHeight, groupedMargin, gBarSvg, classMapFunctionBar, formatPercent, groupRangeFunction, x0, jsonGroupNames, x1, y, xAxis, yAxis, test, groupedIds, groupedVals, groupedDefaults, groupedCback, groupedObserversFunc, table, tableDataFunc, tableData, drawTable, getDonutData, donutData, constancyFunction, classMapFunction, donutWidth, donutHeight, innerRad, padAngle, interchangeDonutSvg, interchangeValueFunction, interchangeInnerNumber, drawDonut, idsInterchangeDonut, cbackInterchangeDonut, observersFuncInterchangeDonut, salesDonutSvg, salesValueFunction, salesInnerNumber, idsSalesDonut, cbackSalesDonut, observersFuncSalesDonut, transactionsDonutSvg, transactionsValueFunction, transactionsInnerNumber, idsTransactionDonut, cbackTransactionDonut, observersFuncTransactionDonut, getSpendData, spendData, svgSpendStack, stackedClassMapFunction, stackedMargin, stackedWidth, stackedHeight, drawStack, idsSpendStack, cbackSpendStack, observersFuncSpendStack, getPurchaseData, purchaseData, svgPurchaseStack, idsPurchaseStack, cbackPurchaseStack, observersFuncPurchaseStack;
-
+  var jquery, bootstrap, d3, groupedExport, donutExport, donutConfig, stackConfig, tableExport, testing, groupedBarConfig, stackExport, toolTips, classMap, vals, defaults, groupedWidth, groupedHeight, groupedName, groupedMargin, gBarSvg, groupedBarData, classMapFunctionBar, groupRangeFunction, groupedConfig, groupedIds, groupedVals, groupedDefaults, groupedCb, sigDebitTableName, constancyFunction, classMapFunction, donutWidth, donutHeight, innerRad, padAngle, donutInterchangeName, donutMargin, interchangeValueFunction, donutConfiguration, donutOneCb, idsInterchangeDonut, donutSalesName, salesValueFunction, donutTwoCb, idsSalesDonut, donutTransactionsName, donutThreeCb, idsTransactionsDonut, stackedClassMapFunction, stackConfiguration, spendStackName, stackedMargin, spendStackCb, idsSpendStack, purchaseStackName, stackedMargin, purchaseStackCb, idsPurchaseStack;
   return {
     setters: [function (_) {
       jquery = _['default'];
     }, function (_2) {
       bootstrap = _2['default'];
-    }, function (_6) {
-      groupedBarChart = _6['default'];
     }, function (_3) {
       d3 = _3;
-    }, function (_7) {
-      groupedBarController = _7['default'];
     }, function (_4) {
-      getInsightsData = _4.getInsightsData;
-    }, function (_8) {
-      getTableData = _8.getData;
+      groupedExport = _4.groupedExport;
     }, function (_5) {
-      Checkboxes = _5['default'];
-    }, function (_9) {
-      addBootstrapCheckboxObservers = _9['default'];
+      donutExport = _5.donutExport;
+    }, function (_6) {
+      donutConfig = _6['default'];
+    }, function (_7) {
+      stackConfig = _7['default'];
+    }, function (_8) {
+      tableExport = _8.tableExport;
+      testing = _8.testing;
+    }, function (_f) {
+      groupedBarConfig = _f['default'];
     }, function (_a) {
-      _Object$keys = _a['default'];
-    }, function (_b) {
-      donutController = _b['default'];
-    }, function (_c) {
-      getSpendByMerchantSegmentData = _c.getSpendByMerchantSegmentData;
-      getPurchaseByMerchantSegmentData = _c.getPurchaseByMerchantSegmentData;
+      stackExport = _a.stackExport;
     }, function (_d) {
-      tableChart = _d['default'];
-    }, function (_e) {
-      donutChart = _e['default'];
-    }, function (_e2) {
-      stackChart = _e2['default'];
+      toolTips = _d.toolTips;
     }],
     execute: function () {
-      /***** jspm packages *****/
+      toolTips();
 
       /************************************************ ALL CHARTS ************************************************/
-
-      /***** local packages *****/
-      'use strict';
-
       classMap = { "Department Store": "fill-blue", "Grocery": "fill-red",
         "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
         "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
@@ -26628,22 +28025,19 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '57', '60', '61', 'a', 'b
 
       /************************************************ Grouped Bar Chart ************************************************/
 
-      //get data from controller
-      getGroupedBarData = groupedBarController().txnType("sig_debit");
-      groupedBarData = getGroupedBarData();
-
-      //chart parameters
+      //set up SVG and margins
       groupedWidth = 500;
       groupedHeight = 100;
-      groupedMargin = { top: 20, right: 20, bottom: 0, left: 0 };
+      groupedName = "#sigDebitGrouped";
 
-      groupedWidth = groupedWidth - groupedMargin.right - groupedMargin.left;
-      groupedHeight = groupedHeight - groupedMargin.top - groupedMargin.bottom;
+      groupedExport.setSvgSize(groupedName, groupedWidth, groupedHeight);
+      groupedMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
-      //create svg
-      gBarSvg = d3.select("div#groupedBarSigDebit").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + groupedWidth + " " + groupedHeight).style("overflow", "visible")
-      //class to make it responsive
-      .classed("svg-content-responsive", true);
+      groupedExport.setMargins(groupedName, groupedMargin);
+      gBarSvg = groupedExport.drawSvg(groupedName);
+
+      //Get data
+      groupedBarData = groupedExport.buildData(groupedName, "sig_debit");
 
       // stuff to pass to config
 
@@ -26651,119 +28045,48 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '57', '60', '61', 'a', 'b
         return classMap[d.name];
       };
 
-      // Axes
-      //formatting for y axis
-
-      formatPercent = function formatPercent(d) {
-        return d + "%";
-      };
-
-      //define function to define range for a group
-
       groupRangeFunction = function groupRangeFunction(d) {
         return "translate(" + x0(d.Issuer) + ",0)";
       };
 
-      //create scales
-      x0 = d3.scaleBand().rangeRound([0, groupedWidth]).domain(groupedBarData.map(function (d) {
-        return d.Issuer;
-      }));
+      //Create config for drawing function
+      groupedConfig = new groupedBarConfig().setClassMap(classMap).setClassMapFunction(classMapFunctionBar).setGroupRangeFunction(groupRangeFunction);
 
-      // used for scales
-      jsonGroupNames = groupedBarData.columns;
-
-      // scales
-      x1 = d3.scaleBand().paddingOuter(1).domain(jsonGroupNames).rangeRound([0, x0.bandwidth()]);
-      y = d3.scaleLinear().range([groupedHeight, 0]).domain([0, d3.max(groupedBarData, function (d) {
-        return d3.max(d.groups, function (d) {
-          return d.value;
-        });
-      })]);
-
-      ;
-
-      //create axes
-      xAxis = d3.axisBottom().scale(x0).tickSize(0).tickPadding(10);
-      yAxis = d3.axisLeft().scale(y).tickFormat(formatPercent).ticks(5).tickSizeInner(-groupedWidth).tickSizeOuter(0).tickPadding(0);
-
-      //draw axes
-      gBarSvg.append("g").attr("class", "x axis").attr("transform", "translate(0," + groupedHeight + ")").call(xAxis);
-      gBarSvg.append("g").attr("class", "y axis").call(yAxis);
-
-      //chart config
-      test = groupedBarChart().width(groupedWidth).height(groupedHeight).classMap(classMap).classMapFunction(classMapFunctionBar).x0(x0).x1(x1).y(y).groupRangeFunction(groupRangeFunction);
-
-      //draw chart
-      test(gBarSvg, groupedBarData);
-
-      /******* GROUPED BAR CHECKBOXES *******/
-
-      // add observers
+      //Setup checkboxes
       groupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
       groupedVals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery", "Total"];
       groupedDefaults = [true, true, true, true, true, true];
+      groupedCb = groupedExport.observerCallbackBuilder(groupedName);
 
-      // function to execute when a change happens
+      groupedExport.initObservers(groupedName, groupedIds, groupedVals, groupedDefaults, groupedCb);
 
-      groupedCback = function groupedCback(arr) {
-        //add issuer to object
-        arr.push("Issuer");
+      //Draw chart
+      groupedExport.createDrawingFunc(groupedName, groupedConfig);
+      groupedExport.draw(groupedName);
 
-        //filter data
-        var filteredData = groupedBarData.map(function (d) {
-          return arr.reduce(function (result, key) {
-            result[key] = d[key];
-            return result;
-          }, {});
-        });
-
-        //add group attribute
-        var jsonGroupNames = d3.keys(filteredData[0]).filter(function (key) {
-          return key !== "Issuer";
-        });
-        filteredData.forEach(function (d) {
-          d.groups = jsonGroupNames.map(function (name) {
-            return { name: name, value: +d[name] };
-          });
-        });
-
-        //redraw chart
-        test(gBarSvg, filteredData);
-      };
-
-      //config
-      groupedObserversFunc = addBootstrapCheckboxObservers().elementIds(groupedIds).values(groupedVals).defaults(groupedDefaults).callback(groupedCback);
-
-      groupedObserversFunc();
+      //Add dropdown event listeners
+      groupedExport.addDropdownListener(groupedName);
 
       /************************************************ TABLE ************************************************/
 
-      // add table to page
-      table = d3.select("#drawtable").append("table").attr("class", "table");
+      //console.log(tableExport);
 
-      // table should have a head and body
-      table.append("thead");
-      table.append("tbody");
+      sigDebitTableName = "#sigDebitGrouped";
+
+      // add table to page
+      tableExport.addTable(sigDebitTableName);
 
       // get data for drawing the table
-      tableDataFunc = getTableData();
-
-      tableDataFunc.txnType("sig_debit");
-      tableData = tableDataFunc('n_trans');
+      tableExport.setData(sigDebitTableName, "sig_debit");
 
       // draw the table
-      drawTable = tableChart();
-
-      drawTable(table, tableData);
+      tableExport.createDrawingFunc(sigDebitTableName);
+      tableExport.draw(sigDebitTableName);
+      tableExport.addDropdownListener(sigDebitTableName);
 
       /************************************************ DONUTS ************************************************/
 
-      /********** USED FOR ALL DONUTS **********/
-      //get data from controller
-      getDonutData = donutController().txnType("sig_debit").fi("My Financial Institution");
-      donutData = getDonutData();
-
-      //config objects
+      //ALL DONUTS
 
       constancyFunction = function constancyFunction(d) {
         return d.mcc_name;
@@ -26775,284 +28098,180 @@ $__System.register('1', ['3', '5', '6', '7', '8', '9', '57', '60', '61', 'a', 'b
 
       donutWidth = 500;
       donutHeight = 500;
-      innerRad = 90;
+      innerRad = 75;
       padAngle = 0.03;
 
       /********* Donut 1 (AVG INTERCHANGE) *********/
-      //draw svg
 
-      interchangeDonutSvg = d3.select("div#interchangeFeesDonut").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-      //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
+      //Get div id
+      donutInterchangeName = "#sigDebitInterchange";
+
+      //Setup SVG
+      donutMargin = { top: 20, left: 20, right: 30, bottom: 50 };
+
+      donutExport.setSvgSize(donutInterchangeName, donutWidth, donutHeight);
+      donutExport.setMargins(donutInterchangeName, donutMargin);
+      donutExport.drawSvg(donutInterchangeName);
+
+      //Get Data
+      donutExport.buildData(donutInterchangeName, "sig_debit", "My Financial Institution");
+
+      //Setup Config
 
       interchangeValueFunction = function interchangeValueFunction(d) {
         return d.avg_fee;
       };
 
-      interchangeInnerNumber = 0;
+      donutConfiguration = new donutConfig().setClassMap(classMap)
+      //  .setValueFunction(interchangeValueFunction)
+      .setConstancyFunction(constancyFunction).setClassMapFunction(classMapFunction).setInnerRad(innerRad).setPadAngle(padAngle);
 
-      donutData.forEach(function (d, j) {
-        interchangeInnerNumber += d.avg_fee;
-      });
-      interchangeInnerNumber = interchangeInnerNumber / donutData.length;
-
-      //config donut
-      drawDonut = donutChart().classMap(classMap).valueFunction(interchangeValueFunction).constancyFunction(constancyFunction).classMapFunction(classMapFunction).innerRad(innerRad).innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE").padAngle(padAngle);
-
-      //draw donut
-      drawDonut(interchangeDonutSvg, donutData);
-
-      /********* DONUT 1 CHECKBOXES *********/
-
-      // add observers
+      //Add Checkboxes
+      donutOneCb = donutExport.observerCallbackBuilder(donutInterchangeName);
       idsInterchangeDonut = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11'];
 
-      // function to execute when a change happens
+      donutExport.initObservers(donutInterchangeName, idsInterchangeDonut, vals, defaults, donutOneCb);
 
-      cbackInterchangeDonut = function cbackInterchangeDonut(arr) {
+      //Config Draw Function and Chart
+      donutExport.createDrawingFunc(donutInterchangeName, donutConfiguration);
+      donutExport.draw(donutInterchangeName);
 
-        //filter data
-        var filteredInterchangeDonut = donutData.filter(function (obj) {
-          if (arr.indexOf(obj.mcc_name) == -1) {
-            return false;
-          }
-          return true;
-        });
-
-        //update inner number
-        interchangeInnerNumber = 0;
-        filteredInterchangeDonut.forEach(function (d, j) {
-          interchangeInnerNumber += d.avg_fee;
-        });
-        interchangeInnerNumber = interchangeInnerNumber / filteredInterchangeDonut.length;
-        if (!interchangeInnerNumber || interchangeInnerNumber == NaN) {
-          interchangeInnerNumber = 0;
-        }
-        drawDonut.innerNumber(interchangeInnerNumber).innerText("AVG INTERCHANGE");
-
-        //redraw donut
-        drawDonut(interchangeDonutSvg, filteredInterchangeDonut);
-      };
-
-      //config checkboxes
-      observersFuncInterchangeDonut = addBootstrapCheckboxObservers().elementIds(idsInterchangeDonut).values(vals).defaults(defaults).callback(cbackInterchangeDonut);
-
-      observersFuncInterchangeDonut();
+      //Add dropdown event handler
+      donutExport.addDropdownListener(donutInterchangeName);
 
       /********* Donut 2 (TOTAL SALES) *********/
 
-      //draw svg
-      salesDonutSvg = d3.select("div#salesDonut").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-      //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
+      //Get div id
+      donutSalesName = "#sigDebitSales";
+
+      //Setup SVG
+      donutExport.setSvgSize(donutSalesName, donutWidth, donutHeight);
+      donutExport.setMargins(donutSalesName, donutMargin);
+      donutExport.drawSvg(donutSalesName);
+
+      //Get Data
+      donutExport.buildData(donutSalesName, "sig_debit", "My Financial Institution");
+
+      //Setup Config
 
       salesValueFunction = function salesValueFunction(d) {
         return d.amt_sale;
       };
 
-      salesInnerNumber = 0;
+      //donutConfiguration.setClassMap(classMap)
+      //  .setValueFunction(salesValueFunction)
+      //;
 
-      donutData.forEach(function (d, j) {
-        salesInnerNumber += d.amt_sale;
-      });
-
-      //config
-      drawDonut.valueFunction(salesValueFunction).innerNumber(salesInnerNumber).innerText("TOTAL SALES");
-
-      //draw donut
-      drawDonut(salesDonutSvg, donutData);
-
-      /********* DONUT 2 CHECKBOXES *********/
-
-      // add observers
+      //Add Checkboxes
+      donutTwoCb = donutExport.observerCallbackBuilder(donutSalesName);
       idsSalesDonut = ['groupedCbox12', 'groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16'];
 
-      // function to execute when a change happens
+      donutExport.initObservers(donutSalesName, idsSalesDonut, vals, defaults, donutTwoCb);
 
-      cbackSalesDonut = function cbackSalesDonut(arr) {
+      //Config Draw Function and Chart
+      donutExport.createDrawingFunc(donutSalesName, donutConfiguration);
+      donutExport.draw(donutSalesName);
 
-        var filteredSalesDonut = donutData.filter(function (obj) {
-          if (arr.indexOf(obj.mcc_name) == -1) {
-            return false;
-          }
-          return true;
-        });
-
-        //update inner number
-        salesInnerNumber = 0;
-        filteredSalesDonut.forEach(function (d, j) {
-          salesInnerNumber += d.amt_sale;
-        });
-        drawDonut.innerNumber(salesInnerNumber).innerText("TOTAL SALES");
-
-        //redraw donut
-        drawDonut(salesDonutSvg, filteredSalesDonut);
-      };
-
-      //config checkboxes
-      observersFuncSalesDonut = addBootstrapCheckboxObservers().elementIds(idsSalesDonut).values(vals).defaults(defaults).callback(cbackSalesDonut);
-
-      observersFuncSalesDonut();
+      //Add dropdown event handler
+      donutExport.addDropdownListener(donutSalesName);
 
       /********* Donut 3 (TOTAL TRANS) *********/
-      //draw svg
-      transactionsDonutSvg = d3.select("div#donutTransactions").classed("svg-container", true).append("svg").attr("viewBox", "0 0 " + donutWidth + " " + donutHeight)
-      //class for responsivenesss
-      .classed("svg-content-responsive-pie", true).attr("width", donutWidth).attr("height", donutHeight).append("g").attr("id", "donutchart").attr("transform", "translate(" + donutWidth / 2 + "," + donutHeight / 2 + ")");
 
-      transactionsValueFunction = function transactionsValueFunction(d) {
-        return d.n_trans;
-      };
+      //Get div id
+      donutTransactionsName = "#sigDebitTransactions";
 
-      transactionsInnerNumber = 0;
+      //Setup SVG
+      donutExport.setSvgSize(donutTransactionsName, donutWidth, donutHeight);
+      donutExport.setMargins(donutTransactionsName, donutMargin);
+      donutExport.drawSvg(donutTransactionsName);
+      donutExport.buildData(donutTransactionsName, "sig_debit", "My Financial Institution");
 
-      donutData.forEach(function (d, j) {
-        transactionsInnerNumber += d.n_trans;
-      });
+      //Setup Config
+      //var transactionsValueFunction = function(d){
+      //  return d.amt_sale;
+      //}
+      //donutConfiguration
+      //  .setValueFunction(transactionsValueFunction)
+      //;
 
-      //config
-      drawDonut.valueFunction(transactionsValueFunction).innerNumber(transactionsInnerNumber).innerText("TOTAL TRANS");
+      //Add checkboxes
+      donutThreeCb = donutExport.observerCallbackBuilder(donutTransactionsName);
+      idsTransactionsDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
 
-      //draw donut
-      drawDonut(transactionsDonutSvg, donutData);
+      donutExport.initObservers(donutTransactionsName, idsTransactionsDonut, vals, defaults, donutThreeCb);
 
-      /********* DONUT 3 CHECKBOXES *********/
+      //Config Draw Function and Chart
+      donutExport.createDrawingFunc(donutTransactionsName, donutConfiguration);
+      donutExport.draw(donutTransactionsName);
 
-      // add observers
-      idsTransactionDonut = ['groupedCbox17', 'groupedCbox18', 'groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
-
-      // function to execute when a change happens
-
-      cbackTransactionDonut = function cbackTransactionDonut(arr) {
-
-        //filter data
-        var filteredTransactionDonut = donutData.filter(function (obj) {
-          if (arr.indexOf(obj.mcc_name) == -1) {
-            return false;
-          }
-          return true;
-        });
-
-        //update inner number
-        transactionsInnerNumber = 0;
-        filteredTransactionDonut.forEach(function (d, j) {
-          transactionsInnerNumber += d.n_trans;
-        });
-        drawDonut.innerNumber(transactionsInnerNumber).innerText("TOTAL TRANS");
-
-        //redraw donut
-        drawDonut(transactionsDonutSvg, filteredTransactionDonut);
-      };
-
-      //config checkboxes
-      observersFuncTransactionDonut = addBootstrapCheckboxObservers().elementIds(idsTransactionDonut).values(vals).defaults(defaults).callback(cbackTransactionDonut);
-
-      observersFuncTransactionDonut();
+      //Add dropdown event handler
+      donutExport.addDropdownListener(donutTransactionsName);
 
       /************************************************ Stacked Charts ************************************************/
 
-      /****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
-
-      getSpendData = getSpendByMerchantSegmentData();
-      spendData = getSpendData();
-
-      //add columns attribute
-      spendData.columns = _Object$keys(spendData[0]).filter(function (obj) {
-        return obj != "total";
-      });
-
-      svgSpendStack = d3.select("#spendStack").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + 900 + " " + 300);
+      //ALL STACKS
 
       stackedClassMapFunction = function stackedClassMapFunction(d) {
         return classMap[d.key];
       };
 
+      stackConfiguration = new stackConfig().setClassMap(classMap).setClassMapFunction(stackedClassMapFunction);
+
+      /****************** GET SPEND BY MERCHANGE SEGMENT DATA STACK ******************/
+
+      //div name
+      spendStackName = "#spendStack";
+
+      //setup margins and svg
+      stackExport.setSvgSize(spendStackName, 900, 300);
       stackedMargin = { top: 30, right: 40, bottom: 50, left: 40 };
-      stackedWidth = 900;
-      stackedHeight = 300;
-      drawStack = stackChart().margin(stackedMargin).width(stackedWidth).height(stackedHeight).classMap(classMap).classMapFunction(stackedClassMapFunction);
 
-      drawStack(svgSpendStack, spendData);
-      /********* GET SPEND BY MERCHANT DATA CHECKBOXES *********/
+      stackExport.setMargins(spendStackName, stackedMargin);
+      stackExport.drawSvg(spendStackName);
 
-      // add observers
+      //get data
+      stackExport.buildData(spendStackName, "My Financial Institution", "amt_sale");
+
+      //set up checkboxes
+      spendStackCb = stackExport.observerCallbackBuilder(spendStackName);
       idsSpendStack = ['groupedCbox22', 'groupedCbox23', 'groupedCbox24', 'groupedCbox25', 'groupedCbox26'];
 
-      // function to execute when a change happens
+      stackExport.initObservers(spendStackName, idsSpendStack, vals, defaults, spendStackCb);
 
-      cbackSpendStack = function cbackSpendStack(arr) {
+      //Config Draw Function and Chart
+      stackExport.createDrawingFunc(spendStackName, stackConfiguration);
+      stackExport.draw(spendStackName);
 
-        var filteredSpendData = [];
-        var SpendStackObj = {};
-        filteredSpendData[0] = SpendStackObj;
-        //filter data
-        for (var i = 0; i < arr.length; i++) {
-          filteredSpendData[0][arr[i]] = spendData[0][arr[i]];
-        }
-        filteredSpendData[0].total = 1;
-
-        filteredSpendData.columns = _Object$keys(filteredSpendData[0]).filter(function (obj) {
-          return obj != "total";
-        });
-
-        //redraw stack
-        drawStack(svgSpendStack, filteredSpendData);
-      };
-
-      //config checkboxes
-      observersFuncSpendStack = addBootstrapCheckboxObservers().elementIds(idsSpendStack).values(vals).defaults(defaults).callback(cbackSpendStack);
-
-      observersFuncSpendStack();
+      //add dropdown event listener
+      stackExport.addDropdownListener(spendStackName);
 
       /****************** GET PURCHASE BY MERCHANGE SEGMENT DATA STACK ******************/
 
-      getPurchaseData = getPurchaseByMerchantSegmentData();
-      purchaseData = getPurchaseData();
+      //div name
+      purchaseStackName = "#purchaseStack";
 
-      //add columns attribute
-      purchaseData.columns = _Object$keys(purchaseData[0]).filter(function (obj) {
-        return obj != "total";
-      });
+      //setup margins and svg
+      stackExport.setSvgSize(purchaseStackName, 900, 300);
+      stackedMargin = { top: 30, right: 40, bottom: 50, left: 40 };
 
-      //add columns attribute
-      purchaseData.columns = _Object$keys(purchaseData[0]).filter(function (obj) {
-        return obj != "total";
-      });
+      stackExport.setMargins(purchaseStackName, stackedMargin);
+      stackExport.drawSvg(purchaseStackName);
 
-      svgPurchaseStack = d3.select("#purchaseStack").append("div").classed("svg-container", true).append("svg").attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 " + 900 + " " + 300);
+      //get data
+      stackExport.buildData(purchaseStackName, "My Financial Institution", "n_trans");
 
-      drawStack(svgPurchaseStack, purchaseData);
-
-      /********* GET PURCHASE BY MERCHANT SEGMENT CHECKBOXES *********/
-
-      // add observers
+      //set up checkboxes
+      purchaseStackCb = stackExport.observerCallbackBuilder(purchaseStackName);
       idsPurchaseStack = ['groupedCbox27', 'groupedCbox28', 'groupedCbox29', 'groupedCbox30', 'groupedCbox31'];
 
-      // function to execute when a change happens
+      stackExport.initObservers(purchaseStackName, idsPurchaseStack, vals, defaults, purchaseStackCb);
 
-      cbackPurchaseStack = function cbackPurchaseStack(arr) {
+      //Config Draw Function and Chart
+      stackExport.createDrawingFunc(purchaseStackName, stackConfiguration);
+      stackExport.draw(purchaseStackName);
 
-        var filteredPurchaseStackData = [];
-        var PurchaseStackObj = {};
-        filteredPurchaseStackData[0] = PurchaseStackObj;
-        //filter data
-        for (var i = 0; i < arr.length; i++) {
-          filteredPurchaseStackData[0][arr[i]] = purchaseData[0][arr[i]];
-        }
-        filteredPurchaseStackData[0].total = 1;
-
-        filteredPurchaseStackData.columns = _Object$keys(filteredPurchaseStackData[0]).filter(function (obj) {
-          return obj != "total";
-        });
-
-        //redraw stack
-        drawStack(svgPurchaseStack, filteredPurchaseStackData);
-      };
-
-      //config checkboxes
-      observersFuncPurchaseStack = addBootstrapCheckboxObservers().elementIds(idsPurchaseStack).values(vals).defaults(defaults).callback(cbackPurchaseStack);
-
-      observersFuncPurchaseStack();
+      //add dropdown event listener
+      stackExport.addDropdownListener(purchaseStackName);
     }
   };
 });
