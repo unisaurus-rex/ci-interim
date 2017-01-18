@@ -17,6 +17,14 @@
   <!-- Custom CSS -->
   <link href="styles/css/style.css" rel="stylesheet">
 
+    <!-- Uncomment for electron build release -->
+    <!--<script>-->
+        <!--window.nodeRequire = require;-->
+        <!--delete window.require;-->
+        <!--delete window.exports;-->
+        <!--delete window.module;-->
+    <!--</script>-->
+
   <!--&lt;!&ndash; HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries &ndash;&gt;-->
   <!--&lt;!&ndash; WARNING: Respond.js doesn't work if you view the page via file:// &ndash;&gt;-->
   <!--&lt;!&ndash;[if lt IE 9]>-->
@@ -54,7 +62,7 @@
       <!-- StackedBar and Table Row with one column: 12 -->
       <div class="flex-row row">
         <div class="col-sm-12 ">
-          <div class="panel">
+          <div class="panel" id="sigDebitGrouped">
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
               <div class="col-lg-6 col-md-12">
@@ -66,34 +74,25 @@
                       Dropdown <span class="caret"></span>
                     </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
+                    <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
+                    <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
+                    <li data-value="n_card"><a href="#" onclick="return false">Total Number of Cards Used</a></li>
+                    <li data-value="avg_sale"><a href="#" onclick="return false">Average Sales Amount</a></li>
+                      <li data-value="avg_fee"><a href="#" onclick="return false">Average Interchange Fee Amount</a></li>
+                      <li data-value="trans_pc"><a href="#" onclick="return false">Transactions Per Card</a></li>
+                      <li data-value="sale_pc"><a href="#" onclick="return false">Dollar Amount Per Card</a></li>
+                      <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
-
-
             </div>
             <div class="panel-body">
-
-              <div class="col-sm-8">
-                <div id="groupedBarSigDebit">
-
-                </div>
-
+              <div class="col-sm-8 grouped">
               </div>
               <div class="col-sm-4">
-                <div id="drawtable">
-                  <p id="tablename"></p>
-
+                <div class="tableContainer">
                 </div>
               </div>
               <!--Charts and tables go here-->
@@ -103,43 +102,43 @@
               <div class="checkboxes">
                 <ul class="list-inline text-center">
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox1">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
+                    <label class="btn btn-xs btn-blue active" id="groupedCbox1">
+                        <input type="checkbox" value="Department Store"
                                name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Department Store
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox2">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
+                    <label class="btn btn-xs btn-red active" id="groupedCbox2">
+                        <input type="checkbox" value="Grocery"
                                name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Grocery
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox3">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
+                    <label class="btn btn-xs btn-gray-light active" id="groupedCbox3">
+                        <input type="checkbox" value="Family Clothing"
                                name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Family Clothing
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox4">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
+                    <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox4">
+                        <input type="checkbox" value="Fast Food"
                                name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Fast Food
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox5">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
+                    <label class="btn btn-xs btn-teal active" id="groupedCbox5">
+                        <input type="checkbox" value="Pharmacies"
                                name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Pharmacies
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-gray-dark active" name="transactionType" id="groupedCbox6">
-                        <input type="checkbox" autocomplete="off" value="Total" name="transactionType">
+                    <label class="btn btn-xs btn-gray-dark active" id="groupedCbox6">
+                        <input type="checkbox" value="Total" name="transactionType">
                         <i class="fa fa-check"></i>
                       </label> Total
                   </li>
@@ -151,9 +150,9 @@
       </div>
 
       <!-- Second row that contains 3 columns: 4, 4, and 4 -->
-      <div class="flex-row row">
+      <div class="flex-row row donutRow">
         <div class="col-lg-4 col-md-12 col-sm-12 ">
-          <div class="panel">
+          <div class="panel" id="sigDebitInterchange">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Interchange Fees</h2>
@@ -161,64 +160,56 @@
               <div class=" col-sm-12 text-left">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Dropdown <span class="caret"></span>
-                    </button>
+                    Interchange Fees<span class="caret"></span>
+                  </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li data-value="amt_fee"><a href="#" onclick="return false;">Total Amount of Interchange Fee</a></li>
+                    <li data-value="avg_fee"><a href="#" onclick="return false;">Average Interchange Fee Amount</a></li>
+                    <li data-value="fee_pc"><a href="#" onclick="return false;">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="interchangeFeesDonut">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
-              <div class="checkboxes">
+              <div class="checkboxes" id="interchangeDonut">
                 <ul class="list-inline text-center">
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox7">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Department Store
+                    <label class="btn btn-xs btn-blue active" id="groupedCbox7">
+                      <input type="checkbox" value="Department Store"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Department Store
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox8">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Grocery
+                    <label class="btn btn-xs btn-red active" id="groupedCbox8">
+                      <input type="checkbox" value="Grocery"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Grocery
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox9">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Family Clothing
+                    <label class="btn btn-xs btn-gray-light active" id="groupedCbox9">
+                      <input type="checkbox" value="Family Clothing"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Family Clothing
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox10">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Fast Food
+                    <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox10">
+                      <input type="checkbox" value="Fast Food"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Fast Food
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox11">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Pharmacies
+                    <label class="btn btn-xs btn-teal active" id="groupedCbox11">
+                      <input type="checkbox" value="Pharmacies"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Pharmacies
                   </li>
                 </ul>
               </div>
@@ -226,7 +217,7 @@
           </div>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12">
-          <div class="panel">
+          <div class="panel" id="sigDebitSales">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Sales</h2>
@@ -234,64 +225,56 @@
               <div class=" col-sm-12 text-left">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Dropdown <span class="caret"></span>
-                    </button>
+                    Dropdown <span class="caret"></span>
+                  </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li data-value="amt_sale"><a href="#" onclick="return false;">Total Amount of Sales</a></li>
+                    <li data-value="avg_sale"><a href="#" onclick="return false;">Average Sales Amount</a></li>
+                    <li data-value="sale_pc"><a href="#" onclick="return false;">Dollar Amount Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="salesDonut">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
               <div class="checkboxes">
                 <ul class="list-inline text-center">
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox12">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Department Store
+                    <label class="btn btn-xs btn-blue active" id="groupedCbox12">
+                      <input type="checkbox" value="Department Store"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Department Store
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox13">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Grocery
+                    <label class="btn btn-xs btn-red active" id="groupedCbox13">
+                      <input type="checkbox" value="Grocery"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Grocery
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox14">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Family Clothing
+                    <label class="btn btn-xs btn-gray-light active" id="groupedCbox14">
+                      <input type="checkbox" value="Family Clothing"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Family Clothing
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox15">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Fast Food
+                    <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox15">
+                      <input type="checkbox" value="Fast Food"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Fast Food
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox16">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Pharmacies
+                    <label class="btn btn-xs btn-teal active" id="groupedCbox16">
+                      <input type="checkbox" value="Pharmacies"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Pharmacies
                   </li>
                 </ul>
               </div>
@@ -299,7 +282,7 @@
           </div>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12">
-          <div class="panel">
+          <div class="panel" id="sigDebitTransactions">
             <div class="panel-heading">
               <div class="col-sm-12">
                 <h2>Signature Debit - Transactions</h2>
@@ -307,64 +290,56 @@
               <div class=" col-sm-12 text-left">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Dropdown <span class="caret"></span>
-                    </button>
+                    Dropdown <span class="caret"></span>
+                  </button>
                   <ul class="dropdown-menu">
-                    <li value="n_trans">Number of Transactions</li>
-                    <li value="amt_sale">Total Amount of Sales</li>
-                    <li value="amt_fee">Total Amount of Interchange Fee</li>
-                    <li value="n_card">Total Number of Cards Used</li>
-                    <li value="avg_sale">Average Sales Amount</option>
-                      <li value="avg_fee">Average Interchange Fee Amount</li>
-                      <li value="trans_pc">Transactions Per Card</li>
-                      <li value="sale_pc">Dollar Amount Per Card</li>
-                      <li value="fee_pc">Interchange Fee Per Card</li>
+                    <li data-value="n_trans"><a href="#" onclick="return false;">Number of Transactions</a></li>
+                    <li data-value="n_card"><a href="#" onclick="return false;">Total Number of Cards Used</a></li>
+                    <li data-value="trans_pc"><a href="#" onclick="return false;">Transactions Per Card</a></li>
                   </ul>
                 </div>
                 <div class="text-right"><i class="fa fa-question-circle"></i></div>
               </div>
             </div>
-            <div class="panel-body">
-              <div id="donutTransactions">
-              </div>
+            <div class="panel-body donut">
             </div>
             <div class="panel-footer">
               <div class="checkboxes">
                 <ul class="list-inline text-center" role="group">
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox17">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Department Store
+                    <label class="btn btn-xs btn-blue active" id="groupedCbox17">
+                      <input type="checkbox" value="Department Store"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Department Store
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox18">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Grocery
+                    <label class="btn btn-xs btn-red active" id="groupedCbox18">
+                      <input type="checkbox" value="Grocery"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Grocery
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox19">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Family Clothing
+                    <label class="btn btn-xs btn-gray-light active" id="groupedCbox19">
+                      <input type="checkbox" value="Family Clothing"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Family Clothing
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox20">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Fast Food
+                    <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox20">
+                      <input type="checkbox" value="Fast Food"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Fast Food
                   </li>
                   <li data-toggle="buttons">
-                    <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox21">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Pharmacies
+                    <label class="btn btn-xs btn-teal active" id="groupedCbox21">
+                      <input type="checkbox" value="Pharmacies"
+                             name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label> Pharmacies
                   </li>
                 </ul>
               </div>
@@ -377,7 +352,7 @@
     <!-- Third row that contains 2 columns: 6 and 6 -->
     <div class="flex-row row">
       <div class="col-lg-6 col-md-6 col-sm-12 ">
-        <div class="panel">
+        <div class="panel" id="spendStack">
           <div class="panel-heading">
             <div class="col-sm-12">
               <h2>Spend by Merchant Segment</h2>
@@ -385,57 +360,57 @@
             <div class=" col-sm-12 text-left">
               <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Dropdown <span class="caret"></span>
-                    </button>
+                  Dropdown <span class="caret"></span>
+                </button>
                 <ul class="dropdown-menu">
-                  <li value="n_trans">Number of Transactions</li>
-                  <li value="amt_sale">Total Amount of Sales</li>
-                  <li value="amt_fee">Total Amount of Interchange Fee</li>
+                  <li data-value="n_trans"> <a href="#" onclick="return false">Number of Transactions</a></li>
+                  <li data-value="amt_sale"> <a href="#" onclick="return false">Total Amount of Sales</a></li>
+                  <li data-value="amt_fee"> <a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
                 </ul>
               </div>
               <div class="text-right"><i class="fa fa-question-circle"></i></div>
             </div>
           </div>
-          <div class="panel-body">
-            <div id="spendStack"> </div>
+          <div class="panel-body stack">
+
           </div>
           <div class="panel-footer">
             <div class="checkboxes">
               <ul class="list-inline text-center" role="group">
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox22">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Department Store
+                  <label class="btn btn-xs btn-blue active" id="groupedCbox22">
+                    <input type="checkbox" value="Department Store"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Department Store
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox23">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Grocery
+                  <label class="btn btn-xs btn-red active" id="groupedCbox23">
+                    <input type="checkbox" value="Grocery"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Grocery
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox24">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Family Clothing
+                  <label class="btn btn-xs btn-gray-light active" id="groupedCbox24">
+                    <input type="checkbox" value="Family Clothing"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Family Clothing
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox25">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Fast Food
+                  <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox25">
+                    <input type="checkbox" value="Fast Food"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Fast Food
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox26">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Pharmacies
+                  <label class="btn btn-xs btn-teal active" id="groupedCbox26">
+                    <input type="checkbox" value="Pharmacies"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Pharmacies
                 </li>
               </ul>
             </div>
@@ -443,7 +418,7 @@
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sm-12">
-        <div class="panel">
+        <div class="panel" id="purchaseStack">
           <div class="panel-heading">
             <div class="col-sm-12">
               <h2>Purchase by Merchant Segment</h2>
@@ -451,57 +426,57 @@
             <div class=" col-sm-12 text-left">
               <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Dropdown <span class="caret"></span>
-                    </button>
+                  Dropdown <span class="caret"></span>
+                </button>
                 <ul class="dropdown-menu">
-                  <li value="n_trans">Number of Transactions</li>
-                  <li value="amt_sale">Total Amount of Sales</li>
-                  <li value="amt_fee">Total Amount of Interchange Fee</li>
+                  <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
+                  <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
+                  <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
                 </ul>
               </div>
               <div class="text-right"><i class="fa fa-question-circle"></i></div>
             </div>
           </div>
-          <div class="panel-body">
-            <div id="purchaseStack"> </div>
+          <div class="panel-body stack">
+            
           </div>
           <div class="panel-footer">
             <div class="checkboxes">
               <ul class="list-inline text-center" role="group">
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-blue active" name="transactionType" id="groupedCbox27">
-                        <input type="checkbox" autocomplete="off" value="Department Store"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Department Store
+                  <label class="btn btn-xs btn-blue active" id="groupedCbox27">
+                    <input type="checkbox" value="Department Store"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Department Store
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-red active" name="transactionType" id="groupedCbox28">
-                        <input type="checkbox" autocomplete="off" value="Grocery"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Grocery
+                  <label class="btn btn-xs btn-red active" id="groupedCbox28">
+                    <input type="checkbox" value="Grocery"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Grocery
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-gray-light active" name="transactionType" id="groupedCbox29">
-                        <input type="checkbox" autocomplete="off" value="Family Clothing"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Family Clothing
+                  <label class="btn btn-xs btn-gray-light active" id="groupedCbox29">
+                    <input type="checkbox" value="Family Clothing"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Family Clothing
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-orange-yellow active" name="transactionType" id="groupedCbox30">
-                        <input type="checkbox" autocomplete="off" value="Fast Food"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Fast Food
+                  <label class="btn btn-xs btn-orange-yellow active" id="groupedCbox30">
+                    <input type="checkbox" value="Fast Food"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Fast Food
                 </li>
                 <li data-toggle="buttons">
-                  <label class="btn btn-xs btn-teal active" name="transactionType" id="groupedCbox31">
-                        <input type="checkbox" autocomplete="off" value="Pharmacies"
-                               name="transactionType">
-                        <i class="fa fa-check"></i>
-                      </label> Pharmacies
+                  <label class="btn btn-xs btn-teal active" id="groupedCbox31">
+                    <input type="checkbox" value="Pharmacies"
+                           name="transactionType">
+                    <i class="fa fa-check"></i>
+                  </label> Pharmacies
                 </li>
               </ul>
             </div>
@@ -511,24 +486,24 @@
     </div>
   </div>
 
-  <!-- /#page-content-wrapper -->
-  </div>
 
   <!-- /#wrapper -->
   <footer></footer>
+  <i id="svg-tooltip" data-toggle="tooltip" data-placement="auto" title="Tooltip for svg elements" data-animation="false" data-trigger="manual"></i>
+
 
   <!-- For Development Only -->
   <script src="jspm_packages/system.js"></script>
   <script src="config.js"></script>
 
   <script>
-    System.import('startup');
+   System.import('startup');
   </script>
-<!-- End Of Development Only -->
+  <!-- End Of Development Only -->
 
 
-<!-- For Build vesion, remove the comment below, comment out 'Development Only' section -->
-<!-- <script src="build/build.js"></script> -->
+  <!-- For Build vesion, remove the comment below, comment out 'Development Only' section -->
+  <!-- <script src="build.js"></script> -->
 
 
 </body>

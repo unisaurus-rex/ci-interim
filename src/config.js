@@ -10,47 +10,40 @@ System.config({
   },
   paths: {
     "github:*": "jspm_packages/github/*",
-    "npm:*": "jspm_packages/npm/*"
+    "npm:*": "jspm_packages/npm/*",
+    "charts:*": "scripts/charts/*",
+    "model:*": "scripts/model/*",
+    "utils:*": "scripts/utils/*",
+    "controllers:*": "scripts/controllers/*"
   },
 
   map: {
-
-
-    "tableController": 'scripts/controllers/tableController.js',
-    "stackedController": 'scripts/controllers/stackedController.js',
-    "groupedBarController": "scripts/controllers/groupedBarController.js",
-    "donutController": "scripts/controllers/donutController.js",
-    "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
-    "table": "scripts/charts/table/table.js",
-    "donut": "scripts/charts/donut/donut.js",
-    "stacked": "scripts/charts/stacked/stacked.js",
-
+    "panel": "scripts/utils/panelObject.js",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
-    "checkboxObserver": "scripts/utils/checkboxObserver.js",
+    "newCheckboxObserver": "scripts/utils/newCheckboxObserver.js",
+    "checkboxObserver": "scripts/util/checkboxObserver.js",
     "checkboxes": "scripts/utils/checkboxes.js",
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",
-
-    "font-awesome": "npm:font-awesome@4.6.3",
-    "jquery": "npm:jquery@3.1.1",
-    "model": "scripts/model/model.js",
-    "startup": "scripts/startup.js",
-
-
     "donut": "scripts/charts/donut/donut.js",
+    "donutConfig": "scripts/charts/donut/donutConfig.js",
+    "tooltips": "scripts/utils/tooltips.js",
     "donutController": "scripts/controllers/donutController.js",
     "font-awesome": "npm:font-awesome@4.6.3",
     "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
+    "groupedBarConfig": "scripts/charts/groupedBar/groupedBarConfig.js",
+    "stackConfig": "scripts/charts/stacked/stackConfig.js",
     "groupedBarController": "scripts/controllers/groupedBarController.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "scripts/model/model.js",
+    "stacked": "scripts/charts/stacked/stacked.js",
+    "stackedController": "scripts/controllers/stackedController.js",
     "startup": "scripts/startup.js",
     "table": "scripts/charts/table/table.js",
     "tableController": "scripts/controllers/tableController.js",
-
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },

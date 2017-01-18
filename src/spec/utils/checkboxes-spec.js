@@ -58,4 +58,17 @@ describe("Checkboxes: ", function() {
     });
     
   });
+
+  describe("checkAll function", function() {
+    var cbox = new Checkboxes(['one', 'two', 'three'], [true, false, false]);
+
+    it("sets all values to true", function() {
+      cbox.checkAll();
+      var vals = Object.values(cbox.getAll());
+      var allTrue = vals.every((function(val) {return val === true;}));
+
+      expect(allTrue).toBe(true);
+    });
+
+  });
 });

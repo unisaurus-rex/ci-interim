@@ -52,12 +52,12 @@
 
 .svg-content-responsive {
   //axes
-  padding-left: 5%;
+  //padding-left: 5%;
   //scale graph
   width: 100%;
 }
 
-#groupedBarSigDebit{
+.grouped{
   margin-top: 7%;
 }
 
@@ -66,10 +66,12 @@ $donut-width: 50%;
 svg.svg-content-responsive-pie{
   display: block;
   margin: auto;
-  width: $donut-width;
-  height: $donut-width;
-  padding: 2%;
+  width: 50%;
+  height: auto;
+  padding-right: 5%;
+  padding-left: 5%;
   overflow: visible;
+  min-width: 15em;
 }
 text.data, text.inside{
   font-size: 2.5em;
