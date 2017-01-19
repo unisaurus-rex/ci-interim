@@ -95,7 +95,7 @@ export default function groupedBarChart(){
     var enterAndUpdate = 
       issuer.enter().append("g")
       .merge(issuer)
-      .attr("class", "issuer")
+      //.attr("class", "issuer")
       .attr("transform", groupRangeFunction)
     ;
 
