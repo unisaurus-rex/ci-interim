@@ -52,7 +52,12 @@ export default function groupedBarChart(){
       tickFormatFunc = d3.format(',.2f');
     }
 
-
+    //create axes
+    var xAxis = d3.axisBottom()
+        .scale(x0)
+        .tickSize(0)
+        .tickPadding(10)
+    ;
     var yAxis = d3.axisLeft()
         .scale(y)
         .tickFormat(tickFormatFunc)
@@ -61,13 +66,6 @@ export default function groupedBarChart(){
     ;
 
     if (svg.selectAll(".x.axis")._groups[0].length < 1){
-      //create axes
-      var xAxis = d3.axisBottom()
-          .scale(x0)
-          .tickSize(0)
-          .tickPadding(10)
-      ;
-
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -95,7 +93,7 @@ export default function groupedBarChart(){
     var enterAndUpdate = 
       issuer.enter().append("g")
       .merge(issuer)
-      //.attr("class", "issuer")
+      .attr("class", "issuer")
       .attr("transform", groupRangeFunction)
     ;
 
@@ -105,12 +103,13 @@ export default function groupedBarChart(){
       
     sel
       .enter().append("rect")
+      .attr("y", height)
+      .merge(sel)
+          .data(function(d) { return d.groups; })
       .attr("title", function(d){return d.name + ": " + d.value;})
       .attr("width", x1.bandwidth())
       .attr("x", function(d) {  return x1(d.name); })    
       .attr("class", classMapFunction)
-
-      .merge(sel)
       .transition()
       .duration(1000)
       .attr("y", function(d) { return y(d.value); })
@@ -122,8 +121,7 @@ export default function groupedBarChart(){
       .duration(1000)
       .attr("height", 0)
       .attr("y", function(d) {return height})
-      //.remove(); //avoid calling remove so all the enter styles do not have to be recomputed
-      ;
+      .remove();
   }
 
   chart.width = function(value){
