@@ -103,13 +103,12 @@ export default function groupedBarChart(){
       
     sel
       .enter().append("rect")
-      .attr("y", height)
-      .merge(sel)
-          .data(function(d) { return d.groups; })
-      .attr("title", function(d){return d.name + ": " + d.value;})
       .attr("width", x1.bandwidth())
       .attr("x", function(d) {  return x1(d.name); })    
       .attr("class", classMapFunction)
+      .merge(sel)
+        .data(function(d) { return d.groups; })
+      .attr("title", function(d){return d.name + ": " + d.value;})
       .transition()
       .duration(1000)
       .attr("y", function(d) { return y(d.value); })
@@ -121,7 +120,7 @@ export default function groupedBarChart(){
       .duration(1000)
       .attr("height", 0)
       .attr("y", function(d) {return height})
-      .remove();
+      //.remove();
   }
 
   chart.width = function(value){
