@@ -39,6 +39,7 @@ System.config({
     "panel": "scripts/utils/panelObject.js",
     "stackConfig": "scripts/charts/stacked/stackConfig.js",
     "stacked": "scripts/charts/stacked/stacked.js",
+    "groupedStack": "scripts/charts/groupedStack/groupedStack.js",
     "stackedController": "scripts/controllers/stackedController.js",
     "startup": "scripts/startup.js",
     "table": "scripts/charts/table/table.js",

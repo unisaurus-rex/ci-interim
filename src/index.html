@@ -65,10 +65,10 @@
           <div class="panel" id="sigDebitGrouped">
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
-              <div class="col-lg-6 col-md-12">
+              <div class="col-md-12 col-lg-6">
                 <h2>Signature Debit</h2>
               </div>
-              <div class="col-lg-6 col-md-12 col-sm-12 text-left">
+              <div class="col-sm-12 col-md-12 col-lg-6 text-left">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       Dropdown <span class="caret"></span>
@@ -89,9 +89,9 @@
               </div>
             </div>
             <div class="panel-body">
-              <div class="col-sm-8 grouped">
+              <div class="col-sm-12 col-md-12 col-lg-7 grouped">
               </div>
-              <div class="col-sm-4">
+              <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="tableContainer">
                 </div>
               </div>
@@ -178,9 +178,9 @@
               </div>
             </div>
             <div class="panel-body">
-              <div class="col-sm-8 grouped">
+              <div class="col-sm-12 col-md-12 col-lg-8 grouped">
               </div>
-              <div class="col-sm-4">
+              <div class="col-sm-12 col-md-12 col-lg-4">
                 <div class="tableContainer">
                 </div>
               </div>
@@ -268,9 +268,9 @@
               </div>
             </div>
             <div class="panel-body">
-              <div class="col-sm-8 grouped">
+              <div class="col-sm-12 col-md-12 col-lg-8 grouped">
               </div>
-              <div class="col-sm-4">
+              <div class="col-sm-12 col-md-12 col-lg-4">
                 <div class="tableContainer">
                 </div>
               </div>
@@ -321,6 +321,72 @@
                         <i class="fa fa-check"></i>
                       </label> Total
                   </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+                  <!-- GroupedStack and Table Row with one column: 12 -->
+      <div class="flex-row row">
+        <div class="col-sm-12 ">
+          <div class="panel" id="groupedStack">
+            <div class="panel-heading">
+              <!--Title, help icon and dropdown button filters go here-->
+              <div class="col-lg-6 col-md-12">
+                <h2>Signature Credit</h2>
+              </div>
+              <div class="col-lg-6 col-md-12 col-sm-12 text-left">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Dropdown <span class="caret"></span>
+                    </button>
+                  <ul class="dropdown-menu">
+                    <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
+                    <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
+                    <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
+                    <li data-value="n_card"><a href="#" onclick="return false">Total Number of Cards Used</a></li>
+                    <li data-value="avg_sale"><a href="#" onclick="return false">Average Sales Amount</a></li>
+                    <li data-value="avg_fee"><a href="#" onclick="return false">Average Interchange Fee Amount</a></li>
+                    <li data-value="trans_pc"><a href="#" onclick="return false">Transactions Per Card</a></li>
+                    <li data-value="sale_pc"><a href="#" onclick="return false">Dollar Amount Per Card</a></li>
+                    <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
+                  </ul>
+                </div>
+                <div class="text-right"><i class="fa fa-question-circle"></i></div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="col-sm-12 groupedStack">
+              </div>
+              <!--Charts and tables go here-->
+
+            </div>
+            <div class="panel-footer">
+              <div class="checkboxes">
+                <ul class="list-inline text-center">
+                  <li class="btn-group btn-group-xs" data-toggle="buttons">
+                    <label class="btn btn-blue active" name="transactionType" id="groupedCbox1">
+                      <input type="checkbox" autocomplete="off" value="Department Store" name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label>
+                  </li>
+                  <li>Pin Debit</li>
+                  <li class="btn-group btn-group-xs" data-toggle="buttons">
+                    <label class="btn btn-red active" name="transactionType" id="groupedCbox2">
+                      <input type="checkbox" autocomplete="off" value="Grocery" name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label>
+                  </li>
+                  <li>Sig Credit</li>
+                  <li class="btn-group btn-group-xs" data-toggle="buttons">
+                    <label class="btn btn-gray-light active" name="transactionType" id="groupedCbox3">
+                      <input type="checkbox" autocomplete="off" value="Family Clothing" name="transactionType">
+                      <i class="fa fa-check"></i>
+                    </label>
+                  </li>
+                  <li>Sig Debit</li>
                 </ul>
               </div>
             </div>

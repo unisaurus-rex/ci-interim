@@ -12,6 +12,7 @@ import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
+import {stacksChart} from 'groupedStack';
 
 //Tooltips
 toolTips();
@@ -19,8 +20,8 @@ toolTips();
 /************************************************ ALL GROUPED BAR CHARTS ************************************************/
 
 //set up SVG and margins
-var groupedWidth = 500;
-var groupedHeight = 100;
+var groupedWidth = 400;
+var groupedHeight = 150;
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
 var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
@@ -46,7 +47,9 @@ var groupedDefaults = [true, true, true, true, true, true];
 /***********************************************************************************************************************/
 
 
-/************************************************ Grouped Bar Sig Debit ************************************************/
+/************************************************ SIG DEBIT ************************************************/
+
+/*********************** SIG DEBIT GROUPED BAR *********************/
 var sigDebitSelector =  "#sigDebitGrouped";
 groupedExport.setSvgSize(sigDebitSelector, groupedWidth, groupedHeight);
 
@@ -69,8 +72,7 @@ groupedExport.draw(sigDebitSelector);
 //Add dropdown event listeners
 groupedExport.addDropdownListener(sigDebitSelector);
 
-/************************************************ SIG DEBIT TABLE ************************************************/
-
+/*********************** SIG DEBIT TABLE *********************/
 // add table to page
 tableExport.addTable(sigDebitSelector);
 
@@ -83,8 +85,9 @@ tableExport.draw(sigDebitSelector);
 tableExport.addDropdownListener(sigDebitSelector);
 
 
+/************************************************ PIN DEBIT ************************************************/
 
-/************************************************ Grouped Bar Pin Debit ************************************************/
+/*********************** PIN DEBIT GROUPED BAR *********************/
 var pinDebitSelector =  "#pinDebitGrouped";
 groupedExport.setSvgSize(pinDebitSelector, groupedWidth, groupedHeight);
 
@@ -107,8 +110,7 @@ groupedExport.draw(pinDebitSelector);
 //Add dropdown event listeners
 groupedExport.addDropdownListener(pinDebitSelector);
 
-/************************************************ PIN DEBIT TABLE ************************************************/
-
+/*********************** PIN DEBIT TABLE *********************/
 // add table to page
 tableExport.addTable(pinDebitSelector);
 
@@ -120,7 +122,10 @@ tableExport.createDrawingFunc(pinDebitSelector);
 tableExport.draw(pinDebitSelector);
 tableExport.addDropdownListener(pinDebitSelector);
 
-/************************************************ Grouped Bar Sig Credit ************************************************/
+
+/************************************************ SIG CREDIT ************************************************/
+
+/*********************** SIG CREDIT GROUPED BAR *********************/
 var sigCreditSelector =  "#sigCreditGrouped";
 groupedExport.setSvgSize(sigCreditSelector, groupedWidth, groupedHeight);
 
@@ -143,8 +148,7 @@ groupedExport.draw(sigCreditSelector);
 //Add dropdown event listeners
 groupedExport.addDropdownListener(sigCreditSelector);
 
-/************************************************ PIN DEBIT TABLE ************************************************/
-
+/*********************** SIG CREDIT TABLE *********************/
 // add table to page
 tableExport.addTable(sigCreditSelector);
 
@@ -155,3 +159,105 @@ tableExport.setData(sigCreditSelector, "sig_credit");
 tableExport.createDrawingFunc(sigCreditSelector);
 tableExport.draw(sigCreditSelector);
 tableExport.addDropdownListener(sigCreditSelector);
+
+/************************************************ GROUPED STACK ************************************************/
+
+//set up sizing
+var groupedStackMargin = {top: 40, right: 40, bottom: 40, left: 40};
+var groupedStackWidth =400;
+var groupedStackHeight =150;
+ 
+//draw svg
+var groupedStackSvg = d3.select("#groupedStack .groupedStack")  .append("div")
+  .classed("svg-container", true)
+  .append("svg")
+  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("viewBox", -groupedStackMargin.left + " " + -groupedStackMargin.right + " "+ groupedStackWidth + " " + groupedStackHeight)
+;
+
+//setup config objects
+var groupedStackClassMapFunction = function (d){
+  return classMap[ d.key ];
+}
+
+var groupedStackClassMap =  {"pin_debit": "fill-blue", "sig_credit": "fill-red",
+"sig_debit": "fill-gray-light", "Fast Food": "fill-orange-yellow",
+"Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
+
+//create test data
+var groupedStackData = [ {key: "fiName"}, { key: "fiName2"}, { key: "fiName3"}, { key: "fiName4"}, { key: "fiName5"}, { key: "fiName6"}];
+
+groupedStackData[0].groups = [{
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.5,
+  total: 1
+}];
+groupedStackData[0].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+groupedStackData[1].groups = [ {
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.50,
+  total: 1
+}]
+groupedStackData[1].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+groupedStackData[2].groups = [ {
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.50,
+  total: 1
+}]
+groupedStackData[2].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+groupedStackData[3].groups = [ {
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.50,
+  total: 1
+}]
+groupedStackData[3].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+groupedStackData[4].groups = [ {
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.50,
+  total: 1
+}]
+groupedStackData[4].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+groupedStackData[5].groups = [ {
+  "sig_debit" : 0.25,
+  "sig_credit" : 0.25,
+  "pin_debit" : 0.50,
+  total: 1
+}]
+groupedStackData[5].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+
+//config chart
+var testStacks = stacksChart()
+  .margin( groupedStackMargin)
+  .width(groupedStackWidth )
+  .height(groupedStackHeight )
+;
+
+//draw chart
+testStacks(groupedStackSvg, groupedStackData);
+
+//groupedStackFilter(groupedStackData, ["sig_debit", "sig_credit"]);
+//console.log(groupedStackData);
+
+//testStacks(groupedStackSvg, groupedStackData);
+
+function groupedStackFilter(data, checked){
+  //loop through data array
+  for (var i=0; i< data.length; i++){
+    //update columns to contain only what was checked
+    data[i].groups.columns = data[i].groups.columns.filter( 
+      function(d){ 
+        if ( checked.indexOf(d) > -1 )
+          return d;
+      })
+  }
+}

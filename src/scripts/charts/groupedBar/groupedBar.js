@@ -34,7 +34,7 @@ export default function groupedBarChart(){
     x0 = d3.scaleBand()
       .rangeRound([0, width])
       .domain(data.map(function(d) { return d.Issuer; }))
-      .paddingInner(0.05)
+      .paddingInner(0.1)
       .paddingOuter(0)
     ;
 

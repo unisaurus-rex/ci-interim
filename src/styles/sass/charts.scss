@@ -55,10 +55,11 @@
   //padding-left: 5%;
   //scale graph
   width: 100%;
+  max-height: 30em;
 }
 
 .grouped{
-  margin-top: 7%;
+  //margin-top: 7%;
 }
 
 //donut
@@ -85,3 +86,7 @@ text.inside {
   fill: $vantiv-blue;
 }
 
+/* grouped Stack*/
+.groupedStack .tick text{
+  font-size: 7px;
+}

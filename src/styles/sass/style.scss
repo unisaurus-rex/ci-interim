@@ -95,9 +95,9 @@ font-weight: normal; font-style: normal; }
 //** Panels **//
 
 .panel { //!!!!!!!need to clean up and make modular later!!!!
-  margin: 20px 10px 0 10px;
+//  margin: 20px 10px 0 10px;
   border-radius: 2px;
-  max-height: 600px;
+//  max-height: 600px;
   font-size: 13px;
  a{
   font-size: 12px;
@@ -170,7 +170,7 @@ font-weight: normal; font-style: normal; }
   overflow-y: auto;
 }
 .flex-row .panel-body{
-  overflow-y: auto;
+  //overflow-y: auto;
 }
 .flex-text {
     flex-grow: 1;
@@ -183,6 +183,9 @@ font-weight: normal; font-style: normal; }
 //** Custom Table **//
 tbody {
     color: #8b8c8d;
+}
+.tableContainer{
+  overflow: auto;
 }
 
 //** D3 axis text **//
