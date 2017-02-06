@@ -32,7 +32,7 @@ export function stacksChart(){
     x
       .rangeRound([width - margin.left - margin.right, 0])
       .domain( data.map( function(d){ return d.key} ) )
-      .padding(0.5)
+      .padding(0.6)
     ;
     
     //set y scale
@@ -98,6 +98,7 @@ export function stacksChart(){
         .attr("width", x.bandwidth())
         .attr("class", function(d){ return classMapFunction(d)})
       .merge(gUpdate)
+        .attr("title", function(d){ return d.key + ': '+ d[0].data[d.key]})
         .transition()
         .duration(2000)
         .attr("y", function(d) { return y(d[0][1]); })   
