@@ -17,3 +17,7 @@
 .btn-gray-dark{
    @include button-variant($btn-gray-dark-color, $btn-gray-dark-bg, $btn-gray-dark-border);
 }
+
+.checkboxes ul li{
+	padding-bottom: 5px;
+}
