@@ -1,0 +1,19 @@
+// Custom button checkbox styles
+.btn-blue{
+   @include button-variant($btn-blue-color, $btn-blue-bg, $btn-blue-border);
+}
+.btn-teal{
+   @include button-variant($btn-teal-color, $btn-teal-bg, $btn-teal-border);
+}
+.btn-red{
+   @include button-variant($btn-red-color, $btn-red-bg, $btn-red-border);
+}
+.btn-orange-yellow{
+   @include button-variant($btn-orange-yellow-color, $btn-orange-yellow-bg, $btn-orange-yellow-border);
+}
+.btn-gray-light{
+   @include button-variant($btn-gray-light-color, $btn-gray-light-bg, $btn-gray-light-border);
+}
+.btn-gray-dark{
+   @include button-variant($btn-gray-dark-color, $btn-gray-dark-bg, $btn-gray-dark-border);
+}

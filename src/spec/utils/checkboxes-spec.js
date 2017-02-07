@@ -44,4 +44,31 @@ describe("Checkboxes: ", function() {
     });
        
   });
+
+  describe("toggle function", function() {
+    var cbox = new Checkboxes(['one', 'two', 'three'], [true, false, false]);
+    var checkedArr = cbox.toggle('one');
+
+    it("flips the value of the toggle box", function() {
+      expect(cbox.getValue('one')).toBe(false);
+    });
+
+    it("returns array of checkboxes that are checked", function() {
+      expect(checkedArr.length).toBe(0);
+    });
+    
+  });
+
+  describe("checkAll function", function() {
+    var cbox = new Checkboxes(['one', 'two', 'three'], [true, false, false]);
+
+    it("sets all values to true", function() {
+      cbox.checkAll();
+      var vals = Object.values(cbox.getAll());
+      var allTrue = vals.every((function(val) {return val === true;}));
+
+      expect(allTrue).toBe(true);
+    });
+
+  });
 });

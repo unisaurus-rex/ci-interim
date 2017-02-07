@@ -2,45 +2,31 @@
 Prototype of interim data insights email
 
 ## Install
-First, run
-
-    npm install
+First, run ```npm install```
     
-Then, run
-
-    jspm install
+Then, run ```jspm install```
     
 ## Installing Dependencies
 Any dev dependencies should be installed with npm.  Any client side dependencies should be installed with jspm.
-
-## This Project is a Dev Envrionment
-The files and folders have been organized to support a development workflow.  If you would like to produce a production build, there are npm scripts you can run to install files in the build folder.
 ## Serving the Development Version
 Download your favorite server package of choice ([http-server](https://www.npmjs.com/package/http-server) is nice). 
+## Creating the Production Version
+
+1) From the project root run ```npm run build``` 
+
+2) Copy ```src/index.html``` to  ```build```
+
+3) Find the comments at the end of ```build/index.html```. Remove the scripts needed for the development version only and uncomment the script needed for the build version. 
+
 ### A Note on JavaScript Modules
 Any module you write needs to be imported in ```scripts/startup.js```, or used by a module imported in ```startup.js```
 ## Custom NPM Scripts
-The following scripts can be run using
-
-    npm run <command-name>
-    
-For more information see the package.json file
-
-```npm run bundle-js```
-
-Package all javascript dependencies into a single file, minify and write the file to build/build.js
-
-```npm run bundle-sass```
-
-Compile sass files in styles/sass and output the result to build/styles
+The following scripts can be run using ```npm run <command-name>```
 
 ```npm run build```
 
-Run bundle-js and bundle-sass
+Create a production version of the site in ```build``` folder 
 
-```npm run clean-styles```
-
-Remove build/styles/css and build/styles/fonts folders
 
 ```npm run sass```
 
@@ -50,13 +36,10 @@ Compile sass files in styles/sass and output to styles/css
 
 Watch styles/sass for changes. On any change, compile to styles/css
 
-## Serving the Production Version
-Run your server with a root folder of ```./build```
-
 ## Testing
 
 ### Unit Testing
-[Jasmine](https://jasmine.github.io/) and [Karma](https://karma-runner.github.io/1.0/index.html) are used for unit testing.  Jasmine is a testing framework and Karma is a test runner. What's the difference, you ask?  You write your tests using Jasmine and it's libraries.  Once you write your tests, you need to run the code in a browser javascript engine.  We use Karma to handle a lot of the annoying things that come with trying to run your code in different browser engines.  
+[Jasmine](https://jasmine.github.io/) and [Karma](https://karma-runner.github.io/1.0/index.html) are used for unit testing.  Jasmine is a testing framework and Karma is a test runner. What's the difference, you ask?  You write your tests using Jasmine and it's libraries.  Once you write your tests, you need to run the code in a browser javascript engine.  Karma handles a lot of the annoying things that come with trying to run your code in different browser engines.  
 
 #### Set up
 Most of what you need to run tests will be installed when you run ```npm install```, but there are some additional steps you also need to take.
@@ -93,3 +76,22 @@ When you try to run your new spec, you may encounter errors loading files import
 The Model module reads a json string that represents the insights data and exposes a function for retrieving subsections of the data.  See the [csv-parser repo](https://github.com/unisaurus-rex/csv-parser) for more details about the structure of the data.
 ### Checkboxes
 The default export from the Checkboxes module is the Checkboxes class.  Use this class for tracking the state of a checkbox or checkboxes. A checkbox can have a value of either ```true``` or ```false```.  The class considers a checkbox to be checked if it has a value of ```true```. The class exposes methods for getting the values of a single checkbox or all checkboxes, toggling a checkbox, and retrieving an a list of all boxes that are currently checkbox.
+In practice you should not need to use the Checkboxes module directly as it is used internally by the checkboxObserver module.
+### checkboxObserver
+This module is necessary because of [Bootstrap's checkbox implementation](http://getbootstrap.com/css/#checkboxes-and-radios). Bootstrap requires that you wrap an input element in a label. Checking or unchecking a Bootstrap checkbox is only guaranteed to add or remove the 'active' class from the label. 
+
+By default, the module exports a single function, ```addBootstrapCheckboxObservers```. Calling ```addBoostrapCheckboxObserver``` returns a configurable function in the style of Mike Bostock. Calling the returned function will create listeners that check for the addition or removal of the 'active' class from the label. If the listener detects this change, it will pass an array of strings representing the currently checked values to a callback function. In addition, calling the returned function will return a Checkboxes object that can be used to get the current checked values. 
+
+Example usage:
+
+```
+// config observer function
+var observersFunc = addBootstrapCheckboxObservers().elementIds(<myIds>)
+    .values(<myVals>)
+    .defaults(<myDefaults>)
+    .callback(<myCallback>);
+
+// add observers
+// observersFunc returns a Checkbox object that can be used to get checked values
+var boxes = observersFunc();
+```
