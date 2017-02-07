@@ -14,6 +14,15 @@ import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
 import {stacksChart} from 'groupedStack';
 
+window.d3 = d3;
+//change company name
+function updateCompanyName(title){
+  d3.select("#navbar li")._groups[0][0].innerHTML = 
+  "<a>" + title+ " |" + "<strong> 2017 </string> </a>" 
+  //d3.select("#navbar li")[0][0].textContent
+}
+
+updateCompanyName( " something else");
 //Tooltips
 toolTips();
 
