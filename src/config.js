@@ -18,6 +18,7 @@ System.config({
   },
 
   map: {
+    "errorObjects": "utils/errorObjects.js",
     "groupedBarModel": "model/groupedBarModel.js",
     "tableModel": "model/tableModel.js",
     "panelClass": "utils/panelClass.js",
