@@ -18,6 +18,7 @@ System.config({
   },
 
   map: {
+    "groupedBarModel": "model/groupedBarModel.js",
     "tableModel": "model/tableModel.js",
     "panelClass": "utils/panelClass.js",
     "babel": "npm:babel-core@5.8.38",

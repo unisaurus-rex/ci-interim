@@ -1,15 +1,30 @@
 import Panel from 'panelClass';
 
 describe('Panel class:', function() {
-  describe('data property', function() {
+
+  describe('checkbox toggle', function() {
     var p = new Panel();
-    
-    it('sets data', function() {
-      var data = 'data';
-      p.data = data;
-      expect(p.data).toBe(data);
+    var valArr = ['one', 'two', 'three'];
+    var defaultArr = [false, false, false]; 
+    var resetCount;
+
+    beforeEach(function() {
+      // initialize checkboxes
+      p.createCboxes(valArr, defaultArr);
+      resetCount = p.resetCount;
+    });
+               
+    it('checking a box reduces the reset count', function() {
+      // flip a checkbox to checked
+      p.toggleCheckbox('one');
+      expect(p.resetCount).toBe(resetCount - 1);
     });
 
+    it('toggling the same checkbox twice produces the original reset count', function() {
+      p.toggleCheckbox('one');
+      p.toggleCheckbox('one');
+      expect(p.resetCount).toBe(resetCount);
+    });
   });
 
 });
