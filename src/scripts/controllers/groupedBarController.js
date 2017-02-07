@@ -92,8 +92,7 @@ function drawSvg(chartname){
 	var gBarSvg = d3.select(svgSelect)
 	    .append("div")
 	    .classed("svg-container", true)
-	    .append("svg")
-	    .attr("preserveAspectRatio", "xMinYMin meet")     
+	    .append("svg")  
 	    .attr("viewBox", "-" + charts[chartname].svg.margins.left + " -"+ charts[chartname].svg.margins.top + " "+ width + " " + height)
 	    .classed("svg-content-responsive", true)
 	;
@@ -256,6 +255,7 @@ function dropdownCallbackBuilder(chartname) {
 
   	// get dropdown values
     let current = d3.select(this).attr('data-value');
+
     let old = charts[chartname].dropdown;
 
     if( current != old) {
@@ -273,13 +273,34 @@ function dropdownCallbackBuilder(chartname) {
       // check all checkboxes
       let selector = chartname + " .checkboxes label";
       d3.selectAll(selector).classed('active', true);
+
+      //update dropdown text
+      updateDropdownText( chartname, d3.select(this).html());
+      //update Panel Title
+      updatePanelTitle( chartname, d3.select(this).html());
     }
   };
 }
 
+//
+function updateDropdownText( chartname, text ){
+  //console.log (chartname, text);
+  let selection = chartname + " button";
+  let button = d3.select( selection );
+  button._groups[0][0].innerText = text;
+}
+
+function updatePanelTitle( chartname, text){
+  let selection = chartname + " h2";
+  let title = d3.select(selection);
+  //console.log( d3.select (title._groups[0][0]).attr("data-value") );
+
+  title._groups[0][0].innerText = d3.select (title._groups[0][0]).attr("data-value") + ": "+ text;
+
+}
 
 function addDropdownListener(chartname) {
-  let selector = chartname + " .dropdown-menu li";
+  let selector = chartname + " .dropdown-menu li a";
   let cb = dropdownCallbackBuilder(chartname);
   d3.selectAll(selector).on('click', cb);
 }
@@ -295,7 +316,7 @@ function buildData(chartname, txnType) {
   //chartname is the selector for the panel
   if(!charts.hasOwnProperty(chartname)) {
     var p = new Panel();
-    var dropDownSelect = chartname + " .dropdown-menu li";
+    var dropDownSelect = chartname + " .dropdown-menu li a";
     p.dropdown = d3.select( dropDownSelect ).attr("data-value");
 
     get.column(p.dropdown);
@@ -305,13 +326,16 @@ function buildData(chartname, txnType) {
 
   }
   else{
-    var dropDownSelect = chartname + " .dropdown-menu li";
+    var dropDownSelect = chartname + " .dropdown-menu li a";
     charts[chartname].dropdown = d3.select( dropDownSelect ).attr("data-value");
     get.column(charts[chartname].dropdown);
     charts[chartname].data = get();
 
   }
 
+  //update dropdown
+  updateDropdownText( chartname, d3.select(dropDownSelect).html());
+  updatePanelTitle( chartname, d3.select(dropDownSelect).html());
   return charts[chartname].data;
 }
 

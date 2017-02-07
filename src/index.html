@@ -53,7 +53,7 @@
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
               <!-- <li><a href="#menu-toggle" class="" id="menu-toggle">Toggle Menu</a></li> -->
-              <li><a>Comapny Name or # |<strong> Q1 2016</strong></a></li>
+              <li><a>Company Name or # |<strong> Q1 2016</strong></a></li>
             </ul>
           </div>
         </div>
@@ -66,7 +66,7 @@
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
               <div class="col-md-12 col-lg-6">
-                <h2>Signature Debit</h2>
+                <h2 data-value="Signature Debit">Signature Debit</h2>
               </div>
               <div class="col-sm-12 col-md-12 col-lg-6 text-left">
                 <div class="btn-group">
@@ -74,22 +74,27 @@
                       Dropdown <span class="caret"></span>
                     </button>
                   <ul class="dropdown-menu">
-                    <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
-                    <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
-                    <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
-                    <li data-value="n_card"><a href="#" onclick="return false">Total Number of Cards Used</a></li>
-                    <li data-value="avg_sale"><a href="#" onclick="return false">Average Sales Amount</a></li>
-                    <li data-value="avg_fee"><a href="#" onclick="return false">Average Interchange Fee Amount</a></li>
-                    <li data-value="trans_pc"><a href="#" onclick="return false">Transactions Per Card</a></li>
-                    <li data-value="sale_pc"><a href="#" onclick="return false">Dollar Amount Per Card</a></li>
-                    <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
+                    <li><a href="#" data-value="n_trans" onclick="return false">Number of Transactions</a></li>
+                    <li><a href="#" data-value="amt_sale" onclick="return false">Total Amount of Sales</a></li>
+                    <li><a href="#" data-value="amt_fee" onclick="return false">Total Amount of Interchange Fee</a></li>
+                    <li><a href="#" data-value="n_card" onclick="return false">Total Number of Cards Used</a></li>
+                    <li><a href="#" data-value="avg_sale" onclick="return false">Average Sales Amount</a></li>
+                    <li><a href="#" data-value="avg_fee" onclick="return false">Average Interchange Fee Amount</a></li>
+                    <li><a href="#" data-value="trans_pc" onclick="return false">Transactions Per Card</a></li>
+                    <li><a href="#" data-value="sale_pc" onclick="return false">Dollar Amount Per Card</a></li>
+                    <li><a href="#" data-value="fee_pc" onclick="return false">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
-                <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                <div class="text-right">
+                  <a href="#" data-toggle="modal" data-target="#helpModal"> 
+                    <i class="fa fa-question-circle"></i> 
+                  </a>
+                </div>
               </div>
             </div>
             <div class="panel-body">
               <div class="col-sm-12 col-md-12 col-lg-7 grouped">
+
               </div>
               <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="tableContainer">
@@ -155,7 +160,7 @@
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
               <div class="col-lg-6 col-md-12">
-                <h2>Pin Debit</h2>
+                <h2 data-value="Pin Debit">Pin Debit</h2>
               </div>
               <div class="col-lg-6 col-md-12 col-sm-12 text-left">
                 <div class="btn-group">
@@ -163,24 +168,28 @@
                       Dropdown <span class="caret"></span>
                     </button>
                   <ul class="dropdown-menu">
-                    <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
-                    <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
-                    <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
-                    <li data-value="n_card"><a href="#" onclick="return false">Total Number of Cards Used</a></li>
-                    <li data-value="avg_sale"><a href="#" onclick="return false">Average Sales Amount</a></li>
-                    <li data-value="avg_fee"><a href="#" onclick="return false">Average Interchange Fee Amount</a></li>
-                    <li data-value="trans_pc"><a href="#" onclick="return false">Transactions Per Card</a></li>
-                    <li data-value="sale_pc"><a href="#" onclick="return false">Dollar Amount Per Card</a></li>
-                    <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
+                    <li><a href="#" data-value="n_trans" onclick="return false">Number of Transactions</a></li>
+                    <li><a href="#" data-value="amt_sale" onclick="return false">Total Amount of Sales</a></li>
+                    <li><a href="#" data-value="amt_fee" onclick="return false">Total Amount of Interchange Fee</a></li>
+                    <li><a href="#" data-value="n_card" onclick="return false">Total Number of Cards Used</a></li>
+                    <li><a href="#" data-value="avg_sale" onclick="return false">Average Sales Amount</a></li>
+                    <li><a href="#" data-value="avg_fee" onclick="return false">Average Interchange Fee Amount</a></li>
+                    <li><a href="#" data-value="trans_pc" onclick="return false">Transactions Per Card</a></li>
+                    <li><a href="#" data-value="sale_pc" onclick="return false">Dollar Amount Per Card</a></li>
+                    <li><a href="#" data-value="fee_pc" onclick="return false">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
-                <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                <div class="text-right"> 
+                  <a href="#" data-toggle="modal" data-target="#helpModal"> 
+                    <i class="fa fa-question-circle"></i> 
+                  </a>
+                </div>
               </div>
             </div>
             <div class="panel-body">
-              <div class="col-sm-12 col-md-12 col-lg-8 grouped">
+              <div class="col-sm-12 col-md-12 col-lg-7 grouped">
               </div>
-              <div class="col-sm-12 col-md-12 col-lg-4">
+              <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="tableContainer">
                 </div>
               </div>
@@ -245,7 +254,7 @@
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
               <div class="col-lg-6 col-md-12">
-                <h2>Signature Credit</h2>
+                <h2 data-value="Signature Credit">Signature Credit</h2>
               </div>
               <div class="col-lg-6 col-md-12 col-sm-12 text-left">
                 <div class="btn-group">
@@ -253,24 +262,28 @@
                       Dropdown <span class="caret"></span>
                     </button>
                   <ul class="dropdown-menu">
-                    <li data-value="n_trans"><a href="#" onclick="return false">Number of Transactions</a></li>
-                    <li data-value="amt_sale"><a href="#" onclick="return false">Total Amount of Sales</a></li>
-                    <li data-value="amt_fee"><a href="#" onclick="return false">Total Amount of Interchange Fee</a></li>
-                    <li data-value="n_card"><a href="#" onclick="return false">Total Number of Cards Used</a></li>
-                    <li data-value="avg_sale"><a href="#" onclick="return false">Average Sales Amount</a></li>
-                    <li data-value="avg_fee"><a href="#" onclick="return false">Average Interchange Fee Amount</a></li>
-                    <li data-value="trans_pc"><a href="#" onclick="return false">Transactions Per Card</a></li>
-                    <li data-value="sale_pc"><a href="#" onclick="return false">Dollar Amount Per Card</a></li>
-                    <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
+                    <li><a href="#" data-value="n_trans" onclick="return false">Number of Transactions</a></li>
+                    <li><a href="#" data-value="amt_sale" onclick="return false">Total Amount of Sales</a></li>
+                    <li><a href="#" data-value="amt_fee" onclick="return false">Total Amount of Interchange Fee</a></li>
+                    <li><a href="#" data-value="n_card" onclick="return false">Total Number of Cards Used</a></li>
+                    <li><a href="#" data-value="avg_sale" onclick="return false">Average Sales Amount</a></li>
+                    <li><a href="#" data-value="avg_fee" onclick="return false">Average Interchange Fee Amount</a></li>
+                    <li><a href="#" data-value="trans_pc" onclick="return false">Transactions Per Card</a></li>
+                    <li><a href="#" data-value="sale_pc" onclick="return false">Dollar Amount Per Card</a></li>
+                    <li><a href="#" data-value="fee_pc" onclick="return false">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
-                <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                <div class="text-right">
+                  <a href="#" data-toggle="modal" data-target="#helpModal"> 
+                    <i class="fa fa-question-circle"></i> 
+                  </a>
+                </div>
               </div>
             </div>
             <div class="panel-body">
-              <div class="col-sm-12 col-md-12 col-lg-8 grouped">
+              <div class="col-sm-12 col-md-12 col-lg-7 grouped">
               </div>
-              <div class="col-sm-12 col-md-12 col-lg-4">
+              <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="tableContainer">
                 </div>
               </div>
@@ -335,7 +348,7 @@
             <div class="panel-heading">
               <!--Title, help icon and dropdown button filters go here-->
               <div class="col-lg-6 col-md-12">
-                <h2>Signature Credit</h2>
+                <h2 data-value="Signature Credit">Signature Credit</h2>
               </div>
               <div class="col-lg-6 col-md-12 col-sm-12 text-left">
                 <div class="btn-group">
@@ -354,7 +367,11 @@
                     <li data-value="fee_pc"><a href="#" onclick="return false">Interchange Fee Per Card</a></li>
                   </ul>
                 </div>
-                <div class="text-right"><i class="fa fa-question-circle"></i></div>
+                <div class="text-right">
+                  <a href="#" data-toggle="modal" data-target="#helpModal"> 
+                    <i class="fa fa-question-circle"></i>
+                  </a>
+                </div>
               </div>
             </div>
             <div class="panel-body">
@@ -367,22 +384,22 @@
               <div class="checkboxes">
                 <ul class="list-inline text-center">
                   <li class="btn-group btn-group-xs" data-toggle="buttons">
-                    <label class="btn btn-blue active" name="transactionType" id="groupedCbox1">
-                      <input type="checkbox" autocomplete="off" value="Department Store" name="transactionType">
+                    <label class="btn btn-blue active" id="groupedCbox19">
+                      <input type="checkbox" value="Department Store" name="transactionType">
                       <i class="fa fa-check"></i>
                     </label>
                   </li>
                   <li>Pin Debit</li>
                   <li class="btn-group btn-group-xs" data-toggle="buttons">
-                    <label class="btn btn-red active" name="transactionType" id="groupedCbox2">
-                      <input type="checkbox" autocomplete="off" value="Grocery" name="transactionType">
+                    <label class="btn btn-red active" id="groupedCbox20">
+                      <input type="checkbox" value="Grocery" name="transactionType">
                       <i class="fa fa-check"></i>
                     </label>
                   </li>
                   <li>Sig Credit</li>
                   <li class="btn-group btn-group-xs" data-toggle="buttons">
-                    <label class="btn btn-gray-light active" name="transactionType" id="groupedCbox3">
-                      <input type="checkbox" autocomplete="off" value="Family Clothing" name="transactionType">
+                    <label class="btn btn-gray-light active" id="groupedCbox21">
+                      <input type="checkbox" value="Family Clothing" name="transactionType">
                       <i class="fa fa-check"></i>
                     </label>
                   </li>
@@ -394,7 +411,31 @@
         </div>
       </div>
   </div>
+</div>
 
+<div id="helpModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Help</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Sed eget eros lacus. Nulla vel nisi est. Cras vehicula purus ut ante porta, id imperdiet purus faucibus. Class aptent taciti
+                    sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent lobortis molestie eros,
+                    in facilisis magna pharetra sit amet. Vestibulum in tortor a est placerat scelerisque. Duis eu ex in
+                    nunc sollicitudin pellentesque vehicula a lacus. Donec malesuada finibus odio, sed porttitor urna convallis
+                    a. Ut ac nisi dolor. Nam hendrerit sapien nec nibh interdum, eget finibus orci lacinia. Nam turpis felis,
+                    dictum non luctus id, convallis vel libero. Integer blandit, nisi eu egestas efficitur, nisl libero interdum
+                    urna, sed mollis justo neque non lectus.
+                </p>
+            </div>
+           <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 
   <!-- /#wrapper -->
   <footer></footer>

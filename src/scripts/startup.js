@@ -168,10 +168,14 @@ var groupedStackWidth =400;
 var groupedStackHeight =150;
  
 //draw svg
-var groupedStackSvg = d3.select("#groupedStack .groupedStack")  .append("div")
+var groupedStackSvg = d3.select("#groupedStack .groupedStack") 
+  .append("div")
   .classed("svg-container", true)
   .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")     
+  .attr("class", "svg-content-responsive")
+//  .attr("width", "100vw")
+//  .attr("height", "100vh")
+  //.attr("preserveAspectRatio", "xMinYMin meet")     
   .attr("viewBox", -groupedStackMargin.left + " " + -groupedStackMargin.right + " "+ groupedStackWidth + " " + groupedStackHeight)
 ;
 
