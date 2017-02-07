@@ -13,7 +13,16 @@ export var exportObj = {
   getAllChecked: getAllChecked,
   getCheckboxValue: getCheckboxValue,
   checkAll: checkAll,
-  toggle: toggle
+  toggle: toggle,
+  setSvgSize: setSvgSize,
+  getSvgSize: getSvgSize,
+  setMargins: setMargins,
+  getMargins: getMargins,
+  getResetCount: getResetCount,
+  setData: setData,
+  getData: getData,
+  setDropdown: setDropdown,
+  getDropdown: getDropdown
 };
 
 /***** model *****/
@@ -25,20 +34,127 @@ export var exportObj = {
  */
 var charts = {};
 
-/*
-// All of these take chartname plus parameters
-addGroupedBar
-setSvgSize
-getSvgSize
-setMargins
-getMargins
-getResetCount
-setData
-getData
-setDropdown
-getDropdown
-*/
+/**
+ * @function addGroupedBar
+ */
+function addGroupedBar() {}
 
+/**
+ * @function setSvgSize
+ * @param {String} chartname
+ * @param {Object} obj - needs to have width and height property
+ */
+function setSvgSize(chartname, obj) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].svgSize = obj;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function getSvgSize
+ * @param {String} chartname
+ * @return {Object} contains width and height property
+ */
+function getSvgSize(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].svgSize;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function setMargins
+ * @param {String} chartname
+ * @param {Object} margins - object with left, right, top, bottom properties
+ */
+function setMargins(chartname, margins) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].svgMargins = margins;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function getMargins
+ * @param {String} chartname
+ * @return {Object} contains left, right, top, bottom properties
+ */
+function getMargins(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].svgMargins;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function getResetCount
+ * @param {String} chartname
+ * @return {Int}
+ */
+function getResetCount(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].resetCount;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function setData
+ * @param {String} chartname
+ * @param {Object} data
+ */
+function setData(chartname, data) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].data = data;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function getData
+ * @param {String} chartname
+ * @return {Object} 
+ */
+function getData(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].data;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function setDropdown
+ * @param {String} chartname
+ * @param {String} val 
+ */
+function setDropdown(chartname, val) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].dropdown = val;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
+
+/**
+ * @function getDropdown
+ * @param {String} chartname
+ * @return {String}
+ */
+function getDropdown(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].dropdown;
+  } else {
+    throw new GroupedChartError(chartname); 
+  }
+}
 
 /**
  * @function addCheckboxes
@@ -56,15 +172,15 @@ function addCheckboxes(chartname, valArr, defaultArr) {
 
 /**
  * @function getAllCheckboxes
-* @param {String} chartname
-* @return {Object} contains all checkbox values and checked status
-*/
+ * @param {String} chartname
+ * @return {Object} contains all checkbox values and checked status
+ */
 function getAllCheckboxes(chartname) {
-if(charts.hasOwnProperty(chartname)) {
-return charts[chartname].getAllCheckboxes();
-} else {
-  throw new GroupedChartError(chartname);
-}
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].getAllCheckboxes();
+  } else {
+    throw new GroupedChartError(chartname);
+  }
 }
 
 /**
