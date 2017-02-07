@@ -25,6 +25,11 @@ describe('Panel class:', function() {
       p.toggleCheckbox('one');
       expect(p.resetCount).toBe(resetCount);
     });
+
+    it('checking all checkboxes sets resetCount to 0', function() {
+      p.checkAll();
+      expect(p.resetCount).toBe(0);
+    });
   });
 
 });

@@ -26,12 +26,7 @@ export default class Panel {
     } 
   }
 
-  /**
-   * @return {Object} checkbox object
-   */
-  get cboxes() {
-    return this._cboxes;
-  }
+  /***** Wrap checkbox functionality *****/
 
   /**
    * @param {String[]} valArr - values that can be checked or unchecked
@@ -41,8 +36,37 @@ export default class Panel {
   createCboxes(valArr, defaultArr) {
     this._cboxes = new Checkboxes(valArr, defaultArr);
     // keep the reset count up to date
-    this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length; 
+    this._updateResetCount();
     return this;
+  }
+
+  /**
+   * @return {Object} 
+   */
+  getAllCheckboxes() {
+    return this._cboxes.getAll();
+  }
+
+  /**
+   * @return {String[]} all properties that are checked
+   */
+  getAllChecked() {
+    return this._cboxes.getAllChecked();
+  }
+
+  /**
+   * @return {Bool}
+   */
+  getCheckboxValue(name) {
+    return this._cboxes.geValue(name);
+  }
+
+  /**
+   * check all checkboxes
+   */
+  checkAll() {
+    this._cboxes.checkAll();
+    this._updateResetCount();
   }
 
   /**
@@ -52,9 +76,11 @@ export default class Panel {
   toggleCheckbox(name) {
     var arr = this._cboxes.toggle(name);
     // keep the reset count up to date
-    this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length; 
+    this._updateResetCount();
     return arr;
   }
+
+  
 
   /**
    * @return {Object} base data associated with the Panel
@@ -128,6 +154,13 @@ export default class Panel {
     return this._resetCount;
   }
 
+  /**
+   * pseudo-private helper function
+   * @private
+   */
+  _updateResetCount() {
+    this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length;
+  }
 
 
 }
