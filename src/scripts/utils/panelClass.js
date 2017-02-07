@@ -116,14 +116,14 @@ export default class Panel {
   }
 
   /**
-   * @return {Int} 
+   * @return {Object} contains width and height properties
    */
   get svgSize() {
     return this._svgSize;
   }
 
   /**
-   * @param {Int} val
+   * @param {Object} with width and height properties 
    * @return {this} for chaining calls
    */
   set svgSize(val) {
@@ -160,6 +160,16 @@ export default class Panel {
    */
   _updateResetCount() {
     this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length;
+  }
+
+  /**
+   * @private
+   * @function _validateSvgSize
+   * @param {Object} val - contains width and height property
+   * @desc return true if val is not an object or is missing the width or height property
+   */
+  _validateSvgSize(val) {
+    return true;
   }
 
 
