@@ -5,7 +5,7 @@
 
 /***** local packages *****/
 import {Panel} from 'panelClass';
-import {GroupedChartError, DuplicateChartError} from 'errorObjects';
+import {InvalidChartError, DuplicateChartError} from 'errorObjects';
 /***** export *****/
 export var exportObj = {
   charts: charts,
@@ -59,7 +59,7 @@ function setSvgSize(chartname, obj) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].svgSize = obj;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -72,7 +72,7 @@ function getSvgSize(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].svgSize;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -85,7 +85,7 @@ function setMargins(chartname, margins) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].svgMargins = margins;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -98,7 +98,7 @@ function getMargins(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].svgMargins;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -111,7 +111,7 @@ function getResetCount(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].resetCount;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -124,7 +124,7 @@ function setData(chartname, data) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].data = data;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -137,7 +137,7 @@ function getData(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].data;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -150,7 +150,7 @@ function setDropdown(chartname, val) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].dropdown = val;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -163,7 +163,7 @@ function getDropdown(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].dropdown;
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -177,7 +177,7 @@ function addCheckboxes(chartname, valArr, defaultArr) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].createCboxes(valArr, defaultArr);
   } else {
-    throw new GroupedChartError(chartname);
+    throw new InvalidChartError(chartname);
   }
 }
 
@@ -190,7 +190,7 @@ function getAllCheckboxes(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].getAllCheckboxes();
   } else {
-    throw new GroupedChartError(chartname);
+    throw new InvalidChartError(chartname);
   }
 }
 
@@ -203,7 +203,7 @@ function getAllChecked(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].getAllChecked();
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -217,7 +217,7 @@ function getCheckboxValue(chartname, name) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].getCheckboxValue(name);
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -230,7 +230,7 @@ function checkAll(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].checkAll();
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }
 
@@ -245,6 +245,6 @@ function toggle(chartname, name) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].toggleCheckbox(name);
   } else {
-    throw new GroupedChartError(chartname); 
+    throw new InvalidChartError(chartname); 
   }
 }

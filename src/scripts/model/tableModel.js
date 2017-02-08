@@ -5,6 +5,7 @@
 
 /***** local packages *****/
 import {Panel} from 'panelClass';
+import {DuplicateChartError, InvalidChartError} from 'errorObjects';
 
 /***** export *****/
 export var tableModel = {
@@ -32,7 +33,7 @@ function addTable(chartname) {
     let p = new Panel();
     tables[chartname] = p;
   } else {
-    throw new Error(" call to addTable: " + chartname + " already exists");
+    throw new DuplicateChartError(chartname);
   }
 }
 
@@ -47,7 +48,7 @@ function setData(chartname, data) {
   if(tables.hasOwnProperty(chartname)){
     tables[chartname].data(data);
   } else {
-    throw new Error("call to setData: " + chartname + " does not exist");
+    throw new InvalidChartError(chartname);
   }
 }
 
@@ -72,7 +73,7 @@ function setDropdown(chartname, val) {
   if(tables.hasOwnProperty(chartname)){
     tables[chartname].dropdown(val);
   } else {
-    throw new Error("call to setDropdown: " + chartname + " does not exist");
+    throw new InvalidChartError(chartname);
   }
 }
 

@@ -1,62 +1,59 @@
 import {tableModel} from 'tableModel';
+import {DuplicateChartError, InvalidChartError} from 'errorObjects';
 
 describe('tableModel:', function() {
   describe('addTable error handling', function() {
     // setup
-    let chartname = 'testchart';
-    let err;
+    let chartname = '#testchart';
+    let re = new RegExp(chartname);
 
-    tableModel.addTable(chartname);
-    try {
+    let f = function() {
       tableModel.addTable(chartname);
     }
-    catch(e) {
-      err = e;
-    }
 
-    it('throws an error if user attempts to add an existing chartname', function() {
-      expect(err).toBeDefined();
+    // add a table so we can get a duplicate error
+    tableModel.addTable(chartname);
+
+    it('throws an DuplicateChartError if user attempts to add an existing chartname', function() {
+      expect(f).toThrowError(DuplicateChartError);
     });
 
-    it('the error message is not empty', function() {
-      expect(err.message.length).toBeGreaterThan(0);
+    it('the error message contains the chartname', function() {
+      expect(f).toThrowError(re);
     });
   });
 
   describe('setData error handling', function() {
     let chartname = "fakechart";
-    let err;
+    let re = new RegExp(chartname);
 
-    try {
+    let f = function() {
       tableModel.setData(chartname, "data");
     }
-    catch(e) {
-      err = e;
-    }
-    it('throws an error if the chartname does not exist', function() {
-      expect(err).toBeDefined();
+
+    it('throws an InvalidChartError if the chartname does not exist', function() {
+      expect(f).toThrowError(InvalidChartError);
     });
-    it('the error message is not empty', function() {
-      expect(err.message.length).toBeGreaterThan(0);
+
+    it('the error message contains the chartname', function() {
+      expect(f).toThrowError(re);
     });
+
   });
 
   describe('setDropdown error handling', function() {
     let chartname = "fakechart";
-    let err;
-
-    try {
+    let re = new RegExp(chartname);
+    let f = function() {
       tableModel.setDropdown(chartname, "data");
     }
-    catch(e) {
-      err = e;
-    }
-    it('throws an error if the chartname does not exist', function() {
-      expect(err).toBeDefined();
+
+    it('throws an InvalidChartError if the chartname does not exist', function() {
+      expect(f).toThrowError(InvalidChartError);
     });
-    it('the error message is not empty', function() {
-      expect(err.message.length).toBeGreaterThan(0);
-    });
-  });
+
+    it('the error message contains the chartname', function() {
+      expect(f).toThrowError(re);
+    });  });
   
 });

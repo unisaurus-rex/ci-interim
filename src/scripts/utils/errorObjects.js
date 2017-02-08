@@ -4,18 +4,6 @@
  */
 
 /**
- * @class GroupedChartError
- * @param {String} chartname - index for chart that was not avialable
- */
-export function GroupedChartError(chartname) {
-  this.name = "GroupedChartError";
-  this.message = `Error attempting to access ${chartname}. Chart does not exist`; 
-}
-
-GroupedChartError.prototype = Object.create(Error.prototype);
-GroupedChartError.prototype.constructor = GroupedChartError;
-
-/**
  * @class ValidationError
  * @param objectName {String} objectName - type of object that could not be validated
  */
@@ -38,4 +26,16 @@ export function DuplicateChartError(objectName) {
 
 DuplicateChartError.prototype = Object.create(Error.prototype);
 DuplicateChartError.prototype.constructor = DuplicateChartError;
+
+/**
+ * @class InvalidChartError
+ * @param {String} chartname - index for chart that was not avialable
+ */
+export function InvalidChartError(chartname) {
+  this.name = "InvalidChartError";
+  this.message = `Error attempting to access ${chartname}. Chart does not exist`; 
+}
+
+InvalidChartError.prototype = Object.create(Error.prototype);
+InvalidChartError.prototype.constructor = InvalidChartError;
 

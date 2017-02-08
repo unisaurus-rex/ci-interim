@@ -1,19 +1,19 @@
 import {exportObj as groupedModel} from 'groupedBarModel';
-import {GroupedChartError} from 'errorObjects';
+import {InvalidChartError, DuplicateChartError} from 'errorObjects';
 
 describe('Grouped Bar Model', function() {
   describe('error creation', function() {
-    var invalidName = "#blerg"; // invalid chartname
-    var re = new RegExp(invalidName); // regular expression for checking error message
+    let invalidName = "#blerg"; // invalid chartname
+    let re = new RegExp(invalidName); // regular expression for checking error message
 
     describe('add checkboxes', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.addCheckboxes(invalidName, [], [])
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -24,12 +24,12 @@ describe('Grouped Bar Model', function() {
 
     describe('get all checkboxes', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getAllCheckboxes(invalidName)
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -40,12 +40,12 @@ describe('Grouped Bar Model', function() {
 
     describe('get all checked', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getAllChecked(invalidName)
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -56,12 +56,12 @@ describe('Grouped Bar Model', function() {
 
     describe('get checkbox value', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getCheckboxValue(invalidName, "name")
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -72,12 +72,12 @@ describe('Grouped Bar Model', function() {
 
     describe('check all', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.checkAll(invalidName)
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -88,12 +88,12 @@ describe('Grouped Bar Model', function() {
 
     describe('toggle', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.toggle(invalidName, "name");
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -104,12 +104,12 @@ describe('Grouped Bar Model', function() {
 
     describe('set svg size', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.setSvgSize(invalidName, {width: 100, height: 100});
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -120,12 +120,12 @@ describe('Grouped Bar Model', function() {
 
     describe('getSvgSize', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getSvgSize(invalidName);
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -136,12 +136,12 @@ describe('Grouped Bar Model', function() {
 
     describe('setMargins', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.setMargins(invalidName, {left: 40, right: 40, top: 40, bottom: 40});
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -152,12 +152,12 @@ describe('Grouped Bar Model', function() {
 
     describe('getMargins', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getMargins(invalidName);
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -168,12 +168,12 @@ describe('Grouped Bar Model', function() {
 
     describe('getResetCount', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getResetCount(invalidName);
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -184,12 +184,12 @@ describe('Grouped Bar Model', function() {
 
     describe('setData', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.setData(invalidName, {});
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -200,12 +200,12 @@ describe('Grouped Bar Model', function() {
 
     describe('getData', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getData(invalidName);
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -216,12 +216,12 @@ describe('Grouped Bar Model', function() {
 
     describe('setDropdown', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.setDropdown(invalidName, "value");
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -232,12 +232,12 @@ describe('Grouped Bar Model', function() {
 
     describe('getDropdown', function() {
       
-      var f = function() {
+      let f = function() {
         groupedModel.getDropdown(invalidName);
       };
       
-      it('throws GroupedChartError', function() {
-        expect(f).toThrowError(GroupedChartError);
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
       });
 
       it('the error message contains the chartname', function() {
@@ -247,4 +247,24 @@ describe('Grouped Bar Model', function() {
     });
 
   });
+
+  describe('addGroupedBar', function() {
+    let chartname = "#bleh";
+    let re = new RegExp(chartname);
+    let f = function() {
+      groupedModel.addGroupedBar(chartname);
+    }
+
+    groupedModel.addGroupedBar(chartname);
+
+    it('throws DuplicateChartError', function() {
+      expect(f).toThrowError(DuplicateChartError);
+    });
+
+    it('the error message contains the chartname', function() {
+      expect(f).toThrowError(re);
+    });
+
+  });
+
 });
