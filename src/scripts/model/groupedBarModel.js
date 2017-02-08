@@ -7,8 +7,8 @@
 import {Panel} from 'panelClass';
 import {InvalidChartError, DuplicateChartError} from 'errorObjects';
 /***** export *****/
+
 export var exportObj = {
-  charts: charts,
   addGroupedBar, addGroupedBar,
   addCheckboxes: addCheckboxes,
   getAllCheckboxes: getAllCheckboxes,

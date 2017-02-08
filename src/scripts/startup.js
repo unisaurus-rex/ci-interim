@@ -12,7 +12,6 @@ import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
-import {exportObj as groupedModel} from 'groupedBarModel';
 
 //Tooltips
 toolTips();
@@ -268,7 +267,3 @@ stackExport.draw(purchaseStackName);
 
 //add dropdown event listener
 stackExport.addDropdownListener(purchaseStackName);
-
-
-// testing only
-window.groupedBar = groupedBar;

@@ -1,4 +1,4 @@
-import {tableModel} from 'tableModel';
+import {exportObj as tableModel} from 'tableModel';
 import {DuplicateChartError, InvalidChartError} from 'errorObjects';
 
 describe('tableModel:', function() {

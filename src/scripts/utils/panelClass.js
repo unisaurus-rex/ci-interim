@@ -59,7 +59,7 @@ export class Panel {
    * @return {Bool}
    */
   getCheckboxValue(name) {
-    return this._cboxes.geValue(name);
+    return this._cboxes.getValue(name);
   }
 
   /**

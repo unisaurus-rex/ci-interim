@@ -8,7 +8,7 @@ import {Panel} from 'panelClass';
 import {DuplicateChartError, InvalidChartError} from 'errorObjects';
 
 /***** export *****/
-export var tableModel = {
+export var exportObj = {
   addTable: addTable,
   setData: setData,
   getData: getData,
@@ -46,7 +46,7 @@ function addTable(chartname) {
  */
 function setData(chartname, data) {
   if(tables.hasOwnProperty(chartname)){
-    tables[chartname].data(data);
+    tables[chartname].data = data;
   } else {
     throw new InvalidChartError(chartname);
   }
@@ -71,7 +71,7 @@ function getData(chartname) {
  */
 function setDropdown(chartname, val) {
   if(tables.hasOwnProperty(chartname)){
-    tables[chartname].dropdown(val);
+    tables[chartname].dropdown = val;
   } else {
     throw new InvalidChartError(chartname);
   }
