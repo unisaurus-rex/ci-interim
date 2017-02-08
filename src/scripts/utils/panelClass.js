@@ -127,7 +127,10 @@ export default class Panel {
    * @return {this} for chaining calls
    */
   set svgSize(val) {
-    this._svgSize = val;
+    // confirm val has correct structure before setting, throw validation error if it doesn't
+    if(this._validateSvgSize(val)) {
+      this._svgSize = val;
+    }
     return this;
   }
 
@@ -169,7 +172,15 @@ export default class Panel {
    * @desc return true if val is not an object or is missing the width or height property
    */
   _validateSvgSize(val) {
-    return true;
+    var keys = ['width', 'height']; // properties that val should contain
+
+    //confirm val is an object
+    if(typeof val != 'Object') {
+      return false;
+    }
+    
+    // confirm val contains all properties in keys
+    return keys.every((prop) => {return val.hasOwnProperty(prop);});
   }
 
 
