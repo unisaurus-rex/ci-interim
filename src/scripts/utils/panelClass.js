@@ -4,6 +4,7 @@
  */
 
 import Checkboxes from 'checkboxes';
+import {ValidationError} from 'errorObjects';
 
 export default class Panel {
   /**
@@ -130,7 +131,10 @@ export default class Panel {
     // confirm val has correct structure before setting, throw validation error if it doesn't
     if(this._validateSvgSize(val)) {
       this._svgSize = val;
+    } else {
+      throw new ValidationError('svgSize');
     }
+
     return this;
   }
 
@@ -146,7 +150,12 @@ export default class Panel {
    * @return {this} for chaining calls
    */
   set svgMargins(val) {
-    this._svgMargins = val;
+    if(this._validateSvgMargins(val)) {
+      this._svgMargins = val;
+    } else {
+      throw new ValidationError('svgMargins');
+    }
+
     return this;
   }
 
@@ -169,13 +178,13 @@ export default class Panel {
    * @private
    * @function _validateSvgSize
    * @param {Object} val - contains width and height property
-   * @desc return true if val is not an object or is missing the width or height property
+   * @desc return false if val is not an object or is missing the width or height property, true otherwise
    */
   _validateSvgSize(val) {
     var keys = ['width', 'height']; // properties that val should contain
 
     //confirm val is an object
-    if(typeof val != 'Object') {
+    if(typeof val != 'object') {
       return false;
     }
     
@@ -183,5 +192,22 @@ export default class Panel {
     return keys.every((prop) => {return val.hasOwnProperty(prop);});
   }
 
+  /**
+   * @private
+   * @function _validateSvgMargins
+   * @param {Object} val - contains left, right, top and bottom properties 
+   * @desc return falseif val is not an object or is missing needed properties, true otherwise
+   */
+  _validateSvgMargins(val) {
+    var keys = ['top', 'bottom', 'left', 'right']; // properties that val should contain
+
+    //confirm val is an object
+    if(typeof val != 'object') {
+      return false;
+    }
+    
+    // confirm val contains all properties in keys
+    return keys.every((prop) => {return val.hasOwnProperty(prop);});
+  }
 
 }

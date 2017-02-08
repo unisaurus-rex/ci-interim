@@ -1,4 +1,5 @@
 import Panel from 'panelClass';
+import {ValidationError} from 'errorObjects';
 
 describe('Panel class:', function() {
 
@@ -33,12 +34,13 @@ describe('Panel class:', function() {
   });
 
   describe('setting svgSize', function() {
+    var badVal1 = "bad";
+    var badVal2 = {width: 8};
+    var badVal3 = {height: 8};
+    var goodVal = {width: 8, height: 8};
+    var p = new Panel();
+
     describe('validation', function() {
-      var badVal1 = "bad";
-      var badVal2 = {width: 8};
-      var badVal3 = {height: 8};
-      var goodVal = {width: 8, height: 8};
-      var p = new Panel();
       
       it('returns false if the value is not an object', function() {
         expect(p._validateSvgSize(badVal1)).toBe(false);
@@ -58,24 +60,70 @@ describe('Panel class:', function() {
     });
 
     describe('error handling', function() {
-      it('throws an error if the value fails validation', function() {});
-      it('the error contains a message string', function() {});
+      var f = function() {
+        p.svgSize = badVal1;
+      };
+      var re = new RegExp("svgSize");
+
+      it('throws an Validation Error if the value fails validation', function() {
+        expect(f).toThrowError(ValidationError);
+      });
+
+      it('the error contains "svgSize"', function() {
+        expect(f).toThrowError(re); 
+      });
     });
   });
 
   describe('setting svgMargins', function() {
+    var p = new Panel();
+    var notAnObj = "notAnObject"; 
+    var noTop = {left: 50, right: 50, top: 50, bottom: 50};
+    var noBottom = {left: 50, right: 50, top: 50, bottom: 50};
+    var noLeft = {left: 50, right: 50, top: 50, bottom: 50};
+    var noRight = {left: 50, right: 50, top: 50, bottom: 50};
+    var valid = {left: 50, right: 50, top: 50, bottom: 50};
+
     describe('validation', function() {
-      it('returns false if the value is not an object', function() {}); 
-      it('returns true if the value is an object with top, bottom, left and right properties', function() {});
-      it('returns false if the value is missing a top property', function() {});
-      it('returns false if the value is missing a bottom property', function() {});
-      it('returns false if the value is missing a left property', function() {});
-      it('returns false if the value is missing a right property', function() {});
+      it('returns false if the value is not an object', function() {
+        expect(p._validateSvgMargins(notAnObj)).toBe(false);
+      }); 
+
+      it('returns false if the value is missing a top property', function() {
+        expect(p._validateSvgMargins(noTop)).toBe(false);
+      });
+
+      it('returns false if the value is missing a bottom property', function() {
+        expect(p._validateSvgMargins(noBottom)).toBe(false);
+      });
+
+      it('returns false if the value is missing a left property', function() {
+        expect(p._validateSvgMargins(noLeft)).toBe(false);
+      });
+
+      it('returns false if the value is missing a right property', function() {
+        expect(p._validateSvgMargins(noRight)).toBe(false);
+      });
+
+      it('returns true if the value is an object with top, bottom, left and right properties', function() {
+        expect(p._validateSvgMargins(valid)).toBe(true);
+      });
     });
 
     describe('error handling', function() {
-      it('throws an error if the value fails validation', function() {});
-      it('the error contains a message string', function() {});
+      var f = function() {
+        p.svgMargins = notAnObj; 
+      };
+      var re = new RegExp('svgMargins');
+
+      it('throws an error if the value fails validation', function() {
+        expect(f).toThrowError(ValidationError);
+      });
+
+      it('the error contains a message string', function() {
+        expect(f).toThrowError(re); 
+      });
+
     });
 
   });
