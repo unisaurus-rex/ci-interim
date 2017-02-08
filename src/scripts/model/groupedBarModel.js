@@ -8,12 +8,14 @@ import Panel from 'panelClass';
 import {GroupedChartError} from 'errorObjects';
 /***** export *****/
 export var exportObj = {
+  charts: charts,
+  addGroupedBar, addGroupedBar,
   addCheckboxes: addCheckboxes,
   getAllCheckboxes: getAllCheckboxes,
   getAllChecked: getAllChecked,
   getCheckboxValue: getCheckboxValue,
   checkAll: checkAll,
-  toggle: toggle,
+  toggle: toggle, 
   setSvgSize: setSvgSize,
   getSvgSize: getSvgSize,
   setMargins: setMargins,
@@ -35,9 +37,16 @@ export var exportObj = {
 var charts = {};
 
 /**
+ * create a new Panel object in charts if charts does not contain the matching chartname
  * @function addGroupedBar
+ * @param {String} chartname
  */
-function addGroupedBar() {}
+function addGroupedBar(chartname) {
+  // add a new chart to charts if the name doesn't already exist
+  if(!charts.hasOwnProperty(chartname)) {
+    charts[chartname] = new Panel();
+  }
+}
 
 /**
  * @function setSvgSize
