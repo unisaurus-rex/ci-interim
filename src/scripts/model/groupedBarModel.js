@@ -4,8 +4,8 @@
  */
 
 /***** local packages *****/
-import Panel from 'panelClass';
-import {GroupedChartError} from 'errorObjects';
+import {Panel} from 'panelClass';
+import {GroupedChartError, DuplicateChartError} from 'errorObjects';
 /***** export *****/
 export var exportObj = {
   charts: charts,
@@ -45,6 +45,8 @@ function addGroupedBar(chartname) {
   // add a new chart to charts if the name doesn't already exist
   if(!charts.hasOwnProperty(chartname)) {
     charts[chartname] = new Panel();
+  } else {
+    throw new DuplicateChartError(chartname); 
   }
 }
 

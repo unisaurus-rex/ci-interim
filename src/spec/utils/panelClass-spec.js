@@ -1,4 +1,4 @@
-import Panel from 'panelClass';
+import {Panel, testing} from 'panelClass';
 import {ValidationError} from 'errorObjects';
 
 describe('Panel class:', function() {
@@ -14,7 +14,7 @@ describe('Panel class:', function() {
       p.createCboxes(valArr, defaultArr);
       resetCount = p.resetCount;
     });
-               
+    
     it('checking a box reduces the reset count', function() {
       // flip a checkbox to checked
       p.toggleCheckbox('one');
@@ -43,19 +43,19 @@ describe('Panel class:', function() {
     describe('validation', function() {
       
       it('returns false if the value is not an object', function() {
-        expect(p._validateSvgSize(badVal1)).toBe(false);
+        expect(testing.validateSvgSize(badVal1)).toBe(false);
       });
 
       it('returns false if the value is missing a height property', function() {
-        expect(p._validateSvgSize(badVal2)).toBe(false);
+        expect(testing.validateSvgSize(badVal2)).toBe(false);
       });
 
       it('return false if the value is missing a width property', function() {
-        expect(p._validateSvgSize(badVal3)).toBe(false);
+        expect(testing.validateSvgSize(badVal3)).toBe(false);
       });
 
       it('returns true if the value is an object with width and height properties', function() {
-        expect(p._validateSvgSize(goodVal)).toBe(true);
+        expect(testing.validateSvgSize(goodVal)).toBe(true);
       });
     });
 
@@ -78,35 +78,35 @@ describe('Panel class:', function() {
   describe('setting svgMargins', function() {
     var p = new Panel();
     var notAnObj = "notAnObject"; 
-    var noTop = {left: 50, right: 50, top: 50, bottom: 50};
-    var noBottom = {left: 50, right: 50, top: 50, bottom: 50};
-    var noLeft = {left: 50, right: 50, top: 50, bottom: 50};
-    var noRight = {left: 50, right: 50, top: 50, bottom: 50};
+    var noTop = {left: 50, right: 50, bottom: 50};
+    var noBottom = {left: 50, right: 50, top: 50};
+    var noLeft = {right: 50, top: 50, bottom: 50};
+    var noRight = {left: 50, top: 50, bottom: 50};
     var valid = {left: 50, right: 50, top: 50, bottom: 50};
 
     describe('validation', function() {
       it('returns false if the value is not an object', function() {
-        expect(p._validateSvgMargins(notAnObj)).toBe(false);
+        expect(testing.validateSvgMargins(notAnObj)).toBe(false);
       }); 
 
       it('returns false if the value is missing a top property', function() {
-        expect(p._validateSvgMargins(noTop)).toBe(false);
+        expect(testing.validateSvgMargins(noTop)).toBe(false);
       });
 
       it('returns false if the value is missing a bottom property', function() {
-        expect(p._validateSvgMargins(noBottom)).toBe(false);
+        expect(testing.validateSvgMargins(noBottom)).toBe(false);
       });
 
       it('returns false if the value is missing a left property', function() {
-        expect(p._validateSvgMargins(noLeft)).toBe(false);
+        expect(testing.validateSvgMargins(noLeft)).toBe(false);
       });
 
       it('returns false if the value is missing a right property', function() {
-        expect(p._validateSvgMargins(noRight)).toBe(false);
+        expect(testing.validateSvgMargins(noRight)).toBe(false);
       });
 
       it('returns true if the value is an object with top, bottom, left and right properties', function() {
-        expect(p._validateSvgMargins(valid)).toBe(true);
+        expect(testing.validateSvgMargins(valid)).toBe(true);
       });
     });
 

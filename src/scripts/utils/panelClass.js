@@ -6,7 +6,7 @@
 import Checkboxes from 'checkboxes';
 import {ValidationError} from 'errorObjects';
 
-export default class Panel {
+export class Panel {
   /**
    * Create a panel with default values. Will need to use class methods to initialize values.
    */
@@ -37,7 +37,7 @@ export default class Panel {
   createCboxes(valArr, defaultArr) {
     this._cboxes = new Checkboxes(valArr, defaultArr);
     // keep the reset count up to date
-    this._updateResetCount();
+    _updateResetCount.call(this);
     return this;
   }
 
@@ -67,7 +67,7 @@ export default class Panel {
    */
   checkAll() {
     this._cboxes.checkAll();
-    this._updateResetCount();
+    _updateResetCount.call(this);
   }
 
   /**
@@ -77,7 +77,7 @@ export default class Panel {
   toggleCheckbox(name) {
     var arr = this._cboxes.toggle(name);
     // keep the reset count up to date
-    this._updateResetCount();
+    _updateResetCount.call(this);
     return arr;
   }
 
@@ -129,7 +129,7 @@ export default class Panel {
    */
   set svgSize(val) {
     // confirm val has correct structure before setting, throw validation error if it doesn't
-    if(this._validateSvgSize(val)) {
+    if(_validateSvgSize(val)) {
       this._svgSize = val;
     } else {
       throw new ValidationError('svgSize');
@@ -150,7 +150,7 @@ export default class Panel {
    * @return {this} for chaining calls
    */
   set svgMargins(val) {
-    if(this._validateSvgMargins(val)) {
+    if(_validateSvgMargins(val)) {
       this._svgMargins = val;
     } else {
       throw new ValidationError('svgMargins');
@@ -166,48 +166,61 @@ export default class Panel {
     return this._resetCount;
   }
 
-  /**
-   * pseudo-private helper function
-   * @private
-   */
-  _updateResetCount() {
-    this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length;
+
+
+}
+
+
+/***** Private Functions *****/
+
+// export private functions for testing only
+export var testing = {
+  validateSvgSize: _validateSvgSize,
+  validateSvgMargins: _validateSvgMargins
+};
+
+/**
+ * Private function to be invoked by the panel class.  Panel class instance needs to pass its context to _updateResetCount
+ * by invoking _updateResetCount with .call(this)
+ * @private
+ * @function _updateResetCount
+ */
+function _updateResetCount() {
+  this._resetCount = Object.keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length;
+}
+
+/**
+ * @private
+ * @function _validateSvgSize
+ * @param {Object} val - contains width and height property
+ * @desc return false if val is not an object or is missing the width or height property, true otherwise
+ */
+function _validateSvgSize(val) {
+  var keys = ['width', 'height']; // properties that val should contain
+
+  //confirm val is an object
+  if(typeof val != 'object') {
+    return false;
   }
+  
+  // confirm val contains all properties in keys
+  return keys.every((prop) => {return val.hasOwnProperty(prop);});
+}
 
-  /**
-   * @private
-   * @function _validateSvgSize
-   * @param {Object} val - contains width and height property
-   * @desc return false if val is not an object or is missing the width or height property, true otherwise
-   */
-  _validateSvgSize(val) {
-    var keys = ['width', 'height']; // properties that val should contain
+/**
+ * @private
+ * @function _validateSvgMargins
+ * @param {Object} val - contains left, right, top and bottom properties 
+ * @desc return falseif val is not an object or is missing needed properties, true otherwise
+ */
+function _validateSvgMargins(val) {
+  var keys = ['top', 'bottom', 'left', 'right']; // properties that val should contain
 
-    //confirm val is an object
-    if(typeof val != 'object') {
-      return false;
-    }
-    
-    // confirm val contains all properties in keys
-    return keys.every((prop) => {return val.hasOwnProperty(prop);});
+  //confirm val is an object
+  if(typeof val != 'object') {
+    return false;
   }
-
-  /**
-   * @private
-   * @function _validateSvgMargins
-   * @param {Object} val - contains left, right, top and bottom properties 
-   * @desc return falseif val is not an object or is missing needed properties, true otherwise
-   */
-  _validateSvgMargins(val) {
-    var keys = ['top', 'bottom', 'left', 'right']; // properties that val should contain
-
-    //confirm val is an object
-    if(typeof val != 'object') {
-      return false;
-    }
-    
-    // confirm val contains all properties in keys
-    return keys.every((prop) => {return val.hasOwnProperty(prop);});
-  }
-
+  
+  // confirm val contains all properties in keys
+  return keys.every((prop) => {return val.hasOwnProperty(prop);});
 }

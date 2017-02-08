@@ -4,7 +4,7 @@
  */
 
 /***** local packages *****/
-import Panel from 'panelClass';
+import {Panel} from 'panelClass';
 
 /***** export *****/
 export var tableModel = {
