@@ -22,7 +22,7 @@ export function stacksChart(){
   }
 
   var classMap = {"pin_debit": "fill-blue", "sig_credit": "fill-red",
-"sig_debit": "fill-gray-light" };
+"sig_debit": "fill-gray-dark" };
 
   /***********************************************************************/
   function chart(svg, data){

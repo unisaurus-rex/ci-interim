@@ -107,7 +107,14 @@ font-weight: normal; font-style: normal; }
  a{
   font-size: 12px;
 }
-
+.panel-heading {
+ btn-group >  button, .btn, .fa-question-circle {
+    margin-top: 20px;
+  }
+}
+    .fa-question-circle {
+      font-size: 2rem;
+    }
 //** Panel Body **//
 // Add height to 100% to keep the panel footer
 // fixed at the bottom.

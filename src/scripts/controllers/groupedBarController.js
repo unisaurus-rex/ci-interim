@@ -287,7 +287,7 @@ function updateDropdownText( chartname, text ){
   //console.log (chartname, text);
   let selection = chartname + " button";
   let button = d3.select( selection );
-  button._groups[0][0].innerText = text;
+  button._groups[0][0].innerHTML = text +  "<span class='caret'> </span>";
 }
 
 function updatePanelTitle( chartname, text){
