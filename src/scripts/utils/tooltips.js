@@ -27,7 +27,7 @@ export function toolTips() {
 
         // Part #2 Uses a hidden tooltip with id svg-tooltip to place tooltip on mouse pointer on mouse move and leave events for selections
         $("circle, rect, path").on('mousemove', function (e) { //Elements to select for the tooltip function,as we add new ones we need to update
-            $("#svg-tooltip").css({ top: e.pageY + getScrollTop(), left: e.pageX });     //css absolute top is event y position plus the scroll postion of bodyn x is event x position
+            $("#svg-tooltip").css({ top: e.pageY + getScrollTop(), left: e.pageX + pageXOffset });     //css absolute top is event y position plus the scroll postion of bodyn x is event x position
             $('#svg-tooltip').prop('title', $(this).attr('title'));     //Sets the tilte attribute of the element the pointer is on 
             $('#svg-tooltip').tooltip('show')   //Shows the tooltip LAST to reduce flicker and jumping
         })
