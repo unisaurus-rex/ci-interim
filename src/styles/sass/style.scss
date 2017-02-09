@@ -54,11 +54,9 @@ font-weight: normal; font-style: normal; }
   font-size: 20px; 
   color: $gray-dark;
 }
-
-  .nav-logo{
-    max-width: 100px;
-    vertical-align: bottom;
-  }
+.nav-logo{
+  vertical-align: bottom;
+}
 
 
 //*navbar-default*//
@@ -75,10 +73,11 @@ font-weight: normal; font-style: normal; }
 .navbar-default {
   background-color: $white;
   box-shadow: 0px 2px 2px 0px rgba(2, 2, 2, 0.2);
-  height: 80px;
-  margin-bottom: 37px;
+  margin-bottom: 30px;
 }
-
+.nav > li > a > img {
+  max-width: 85px;
+}
 /** Page content **/
 
 //This uses CSS3's flexbox layout to make columns within the given row the samw height
