@@ -14,6 +14,13 @@ import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
 import {stacksChart} from 'groupedStack';
 
+import {getInsightsData} from 'model';
+
+
+  var insightsData = getInsightsData(); // result is object with keys for each fi and values of arrays of objects
+  var test = insightsData;
+  console.log(test);
+
 window.d3 = d3;
 //change company name
 function updateCompanyName(title){
@@ -33,9 +40,9 @@ var groupedWidth = 400;
 var groupedHeight = 150;
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
-var classMap =  {"Department Store": "fill-blue", "Grocery": "fill-red",
+var classMap =  {"Department Stores": "fill-blue", "Grocery": "fill-red",
                  "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-                 "Pharmacies": "fill-teal", "Total": "fill-gray-dark" };
+                 "Drug Store": "fill-teal", "Other": "fill-gray-dark" };
 
 // stuff to pass to config
 var classMapFunctionBar = function (d){
@@ -50,7 +57,7 @@ var groupedConfig = new groupedBarConfig()
     .setClassMapFunction(classMapFunctionBar)
     .setGroupRangeFunction(groupRangeFunction)
 ;
-var groupedVals = ['Department Store', 'Pharmacies', 'Family Clothing', 'Fast Food', "Grocery", "Total" ];
+var groupedVals = ['Department Stores', 'Drug Store', 'Family Clothing', 'Fast Food', "Grocery", "Other" ];
 var groupedDefaults = [true, true, true, true, true, true];
 
 /***********************************************************************************************************************/
