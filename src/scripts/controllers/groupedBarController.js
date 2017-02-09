@@ -8,7 +8,7 @@ import {toolTips} from 'tooltips';
 
 var charts = {};
 //used to create a global 
-var get;
+var get = {};
 
 export var groupedExport = {
   setSvgSize: setSvgSize,
@@ -263,8 +263,8 @@ function dropdownCallbackBuilder(chartname) {
       setDropdown(chartname, current);
 
       //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
-      get.column( current )
-      charts[chartname].data = get(); 
+      get [chartname].column( current )
+      charts[chartname].data = get[chartname](); 
 
 
       // set reset count
@@ -310,7 +310,7 @@ function addDropdownListener(chartname) {
  * add or update chartname.data based on txnType and fi
  */ 
 function buildData(chartname, txnType) {
-	get = groupedFilter().txnType(txnType);
+	get [ chartname ] = groupedFilter().txnType(txnType);
   
   // if chartname object doesn't exist, build new object and add data property
   //chartname is the selector for the panel
@@ -319,17 +319,17 @@ function buildData(chartname, txnType) {
     var dropDownSelect = chartname + " .dropdown-menu li a";
     p.dropdown = d3.select( dropDownSelect ).attr("data-value");
 
-    get.column(p.dropdown);
+    get[chartname].column(p.dropdown);
 
-    p.data = get();
+    p.data = get[chartname]();
     charts[chartname] = p;
 
   }
   else{
     var dropDownSelect = chartname + " .dropdown-menu li a";
     charts[chartname].dropdown = d3.select( dropDownSelect ).attr("data-value");
-    get.column(charts[chartname].dropdown);
-    charts[chartname].data = get();
+    get [chartname].column(charts[chartname].dropdown);
+    charts[chartname].data = get[chartname]();
 
   }
 
