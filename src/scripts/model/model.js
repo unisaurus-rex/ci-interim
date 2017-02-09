@@ -30,7 +30,15 @@ export function getInsightsData(txn_type, fi) {
 }
 
 /**
+ * @function getCustomerName
+ */
+export function getCustomerName() {
+  return insightsData.fi_name;
+}
+
+/**
  * reviver callback passed as second argument to JSON.parse
+ * @private
  * @function typeConverter
  * @param {string} key - key from a json string
  * @param {string} value - value belonging to key in json string
@@ -40,20 +48,26 @@ export function getInsightsData(txn_type, fi) {
 function typeConverter(key, value) {
   // reviver passes key as string
   switch (key) {
-  case "amt_fee" :
+  case "amt_int" :
     return parseFloat(value);
     break;
   case "amt_sale":
     return parseFloat(value);
     break;
-  case "avg_fee":
+  case "avg_int_per_trn":
     return parseFloat(value);
     break;
   case "avg_sale":
     return parseFloat(value);
     break;
-  case "fee_pc":
+  case "int_pc":
     return parseFloat(value);
+    break;
+  case "int_rate":
+    return parseFloa(value);
+    break;
+  case "mcc_name":
+    return value;
     break;
   case "n_card":
     return parseInt(value);
@@ -61,7 +75,7 @@ function typeConverter(key, value) {
   case "n_trans":
     return parseInt(value);
     break;
-  case "sale_pc":
+  case "spend_pc":
     return parseFloat(value);
     break;
   case "trans_pc":
