@@ -36,6 +36,7 @@ function addTable(chartname) {
         .append("table")
         .attr("class", "table");
 
+
     // table should have a head and body
     table.append("thead");
     table.append("tbody");
@@ -99,7 +100,7 @@ function addDropdownListener(chartname) {
   // don't add listener if chart doesn't exist
   if(tables.hasOwnProperty(chartname)){
     // add listener
-    let selector = chartname + " .dropdown-menu li";
+    let selector = chartname + " .dropdown-menu li a";
     let cb = dropdownCallbackBuilder(chartname);
     //"click.mine" prevents previous event listeners from being overwritten
     d3.selectAll(selector).on('click.mine', cb);
@@ -226,7 +227,7 @@ function setDropdown(chartname, val) {
 
   // if user did not pass in val, default to first dropdown list element
   if(val === undefined) {
-    let selector = chartname + ' .dropdown-menu li';
+    let selector = chartname + ' .dropdown-menu li a';
     val = d3.select(selector).attr('data-value');
   }
 

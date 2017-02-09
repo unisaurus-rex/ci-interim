@@ -5,7 +5,7 @@ export default function stackChart(){
   var width =0;// 900 - margin.left - margin.right;
   var height =0;// 300 - margin.top - margin.bottom;
 
-  var x = d3.scaleBand();
+//  var x = d3.scaleBand();
   var y = d3.scaleLinear();
   var y2 = d3.scaleLinear();
   var z = d3.scaleOrdinal(d3.schemeCategory20);
@@ -19,8 +19,8 @@ export default function stackChart(){
 
 
 function chart(svg, data){
-  x
-    .rangeRound([0,height -margin.top - margin.bottom]);
+  //x
+  //  .rangeRound([0,height -margin.top - margin.bottom]);
 	
   y
     .rangeRound([width - margin.left - margin.right, 0])
@@ -48,17 +48,19 @@ function chart(svg, data){
 	.data(stack, function(d){return d.key});
 
   //add and update all rectangles
-  var rect = rectUpdate
+  rectUpdate
 	.enter().append("rect")
-	.merge(rectUpdate)
-  .attr("title", function(d){ return d.key + ' ' +  d[0].data[ d.key ]})
-	  .attr("y", height/8 )
-	  .attr("height", height/2)
+	.attr("title", function(d){ return d.key + ' ' +  d[0].data[ d.key ]})
+    .attr("y", height/8 )
+    .attr("height", height/2)
+    .attr("class", classMapFunction)
+
+  .merge(rectUpdate)
+  
 	  .transition()
 	  .duration(1000)
   	  .attr("x", function(d) { return y2(d[0][0]); })	  
   	  .attr("width", function(d) { return y(d[0][0]) - y(d[0][1]); })  
-	  .attr("class", classMapFunction)
   	;
 
   //remove rectangles
@@ -66,22 +68,23 @@ function chart(svg, data){
 	.transition()
 	.duration(1000)
 	.attr("width", 0)
-	.remove()
+	//.remove()
   ;
 
-  //x axis
-  var newY = height -margin.top - margin.bottom;
-  svg.selectAll( "g .x-axis")
-	.remove()
-  ;
-  g.append("g")
-	.attr("class", "x-axis")
-	.attr("transform", "translate(0," + newY+ ")")
-	.call(
-	   d3.axisBottom(y2)
-	  .ticks(4, "%")
-    )
-  ;
+  if (svg.selectAll(".x-axis")._groups[0].length < 1){
+
+    var newY = height -margin.top - margin.bottom;
+    g.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + newY+ ")")
+    .call(
+       d3.axisBottom(y2)
+      .ticks(4, "%")
+      )
+    ;
+  }
+window.d3 = d3;
+window.svg =svg;
 }
 
 chart.width = function(value){

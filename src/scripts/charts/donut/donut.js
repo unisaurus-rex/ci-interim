@@ -84,8 +84,7 @@ export default function donutChart(){
       .data(pie(dataArr))
       .enter()
       .append("path")
-      .merge(sel)
-      .data(pie(dataArr))
+
       .attr("title", function(d){ return d.data.mcc_name + " " + d.value;})
       .on("mouseover", function(d) {
             d3.select(this)
@@ -102,17 +101,21 @@ export default function donutChart(){
               ;
                 
         })
+      .merge(sel)
+      .data(pie(dataArr))
+      
         .attr("class", classMapFunction)
         .attr("pointer-events", "none")
         .transition()
         .duration(700)
+        //.attr("opacity", 1)
         .attrTween('d', function(d) {
         var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
         return function(t) {
             return arc(interpolate(t));
         }})
         .on("end", function(){ d3.select(this).attr("pointer-events", null) })
-        ;
+      ;
 
         sel.exit()
           .attr("pointer-events", "none")

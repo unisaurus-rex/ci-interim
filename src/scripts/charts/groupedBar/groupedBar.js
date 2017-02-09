@@ -1,5 +1,17 @@
+/**
+ * @module groupedBar
+ * @description Grouped bar chart module 
+ * @requires d3
+ * @exports groupedBarChart
+ */
+
 import * as d3 from "d3";
 
+/**
+ * @function groupedBarChart
+ * @description Creates and configures the charting function 
+ * @returns {function} chart - Charting function that takes an svg selection and data
+ */
 export default function groupedBarChart(){
 
   var width = 500;
@@ -13,34 +25,30 @@ export default function groupedBarChart(){
   }
   //used for formatting y axis
   var column;
-    
   var groupRangeFunction;
 
   function chart(svg, data){
 
-    //create scales
-    if( x0 == null){
-      x0 = d3.scaleBand()
-        .rangeRound([0, width])
-        .domain(data.map(function(d) { return d.Issuer; }))
-      ;  
-    }
-
     var groupRangeFunction = function(d) { return "translate(" + x0(d.Issuer) + ",0)"; };
 
-    if (x1 == null){
-       x1 = d3.scaleBand()
-        .paddingOuter(1)
-        .domain(data.columns)
-        .rangeRound([0, x0.bandwidth()])
-      ;   
-    } 
+    x0 = d3.scaleBand()
+      .rangeRound([0, width])
+      .domain(data.map(function(d) { return d.Issuer; }))
+      .paddingInner(0.1)
+      .paddingOuter(0)
+    ;
 
+     x1 = d3.scaleBand()
+      .paddingOuter(0.05)        
+      .domain(data.columns)
+      .paddingInner(0.05)
+      .rangeRound([0, x0.bandwidth()])
+    ;   
+    
     y = d3.scaleLinear()
         .range([height, 0])
         .domain([0, d3.max(data, function(d) { return d3.max(d.groups, function(d) { return d.value; }); })]);
     ;
-
 
     var tickFormatFunc;
     if ( column == "n_trans" || column == "amt_sale" || column == "amt_fee" || column== "n_card"){
@@ -83,7 +91,6 @@ export default function groupedBarChart(){
       //update y axis
       var t =  svg.transition().duration(1000);
       t.selectAll(".y.axis").call(yAxis);
-
     }
 
     // group of bars
@@ -97,31 +104,32 @@ export default function groupedBarChart(){
       .attr("transform", groupRangeFunction)
     ;
 
-    // draw each individual bar
+    //each bar
     var sel = enterAndUpdate.selectAll("rect")
-    .data(function(d) { return d.groups; }, (d)=> d.name);
+      .data(function(d) { return d.groups; }, (d)=> d.name);
       
     sel
       .enter().append("rect")
-      .attr("y", height)
+        .attr("class", classMapFunction)
       .merge(sel)
-          .data(function(d) { return d.groups; })
-      .attr("title", function(d){return d.name + ": " + d.value;})
-      .attr("width", x1.bandwidth())
-      .attr("x", function(d) {  return x1(d.name); })    
-      .attr("class", classMapFunction)
-      .transition()
-      .duration(1000)
-      .attr("y", function(d) { return y(d.value); })
-      .attr("height", function(d) { return height - y( d.value); })
+        .attr("title", function(d){return d.name + ": " + d.value;})
+        .transition()
+        .duration(1000)
+          .attr("width", x1.bandwidth())
+          .attr("x", function(d) {  return x1(d.name); })
+        .transition()
+        .duration(1000)  
+          .attr("y", function(d) { return y(d.value); })
+          .attr("height", function(d) { return height - y( d.value); })
     ;
 
     sel.exit()
       .transition()
       .duration(1000)
-      .attr("height", 0)
-      .attr("y", function(d) {return height})
-      .remove();
+        .attr("height", 0)
+        .attr("y", function(d) {return height})
+      //.remove() 
+    ;
   }
 
   chart.width = function(value){
