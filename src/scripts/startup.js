@@ -15,6 +15,11 @@ import {toolTips} from 'tooltips';
 import {stacksChart} from 'groupedStack';
 import {getInsightsData, getFiName} from 'model';
 
+/**************************** Lazy Page Loader ************************************/
+window.d3=d3;
+d3.select(".loader").transition().duration(4000)
+.style("opacity", "0").remove();
+
 //change company name
 function updateCompanyName(getFiName){
 
@@ -28,7 +33,7 @@ function updateCompanyName(getFiName){
 }
 
 updateCompanyName( getFiName );
-
+ 
 //Tooltips
 toolTips();
 

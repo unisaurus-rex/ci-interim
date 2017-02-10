@@ -230,3 +230,36 @@ svg, svg:not(:root) {
 #svg-tooltip {
   position: absolute;
 }
+
+//** Loader **//
+
+.loader {
+margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0, 0.8);
+    min-height: 100%;
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+
+.fa-spin{
+  position: relative;
+  top:50%;
+  left:3%;
+  text-align: center;
+  font-size: 6rem;
+  color: white;
+}
+h3{
+  color: white;
+  position: relative;
+  top:58%;
+  left:3%;
+  text-align: center;
+}
+
+}
