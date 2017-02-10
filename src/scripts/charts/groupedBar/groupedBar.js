@@ -69,7 +69,7 @@ export default function groupedBarChart(){
     var yAxis = d3.axisLeft()
         .scale(y)
         .tickFormat(tickFormatFunc)
-        .ticks(5)
+        //.ticks(5)
         .tickSizeInner(-width)
     ;
 

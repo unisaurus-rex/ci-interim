@@ -15,20 +15,17 @@ import {toolTips} from 'tooltips';
 import {stacksChart} from 'groupedStack';
 import {getInsightsData, getFiName} from 'model';
 
-/**************************** Lazy Page Loader ************************************/
-window.d3=d3;
+/***************************** Page Loading ************************************/
 d3.select(".loader").transition().duration(4000)
-.style("opacity", "0").remove();
+  .style("opacity", "0").remove();
 
 //change company name
 function updateCompanyName(getFiName){
-
   var sel = d3.select("#navbar li");
   sel.style("opacity", "0");
 
   sel._groups[0][0].innerHTML = 
   "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
-  //d3.select("#navbar li")[0][0].textContent
   sel.transition().duration(1000).style("opacity", "1")
 }
 
