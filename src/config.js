@@ -25,7 +25,7 @@ System.config({
     "checkboxes": "scripts/utils/checkboxes.js",
     "core-js": "npm:core-js@1.2.7",
     "d3": "npm:d3@4.4.0",
-    "data": "scripts/newdata.js",
+    "data": "scripts/data.js",
     "donut": "scripts/charts/donut/donut.js",
     "donutConfig": "scripts/charts/donut/donutConfig.js",
     "donutController": "scripts/controllers/donutController.js",
