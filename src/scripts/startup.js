@@ -13,23 +13,22 @@ import {stackExport} from 'stackedController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
 import {stacksChart} from 'groupedStack';
+import {getInsightsData, getFiName} from 'model';
 
-import {getInsightsData} from 'model';
-
-
-  var insightsData = getInsightsData(); // result is object with keys for each fi and values of arrays of objects
-  var test = insightsData;
-  console.log(test);
-
-window.d3 = d3;
 //change company name
-function updateCompanyName(title){
-  d3.select("#navbar li")._groups[0][0].innerHTML = 
-  "<a>" + title+ " |" + "<strong> 2017 </string> </a>" 
+function updateCompanyName(getFiName){
+
+  var sel = d3.select("#navbar li");
+  sel.style("opacity", "0");
+
+  sel._groups[0][0].innerHTML = 
+  "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
   //d3.select("#navbar li")[0][0].textContent
+  sel.transition().duration(1000).style("opacity", "1")
 }
 
-updateCompanyName( " something else");
+updateCompanyName( getFiName );
+
 //Tooltips
 toolTips();
 

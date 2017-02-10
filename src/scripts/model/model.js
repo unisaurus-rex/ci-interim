@@ -30,6 +30,18 @@ export function getInsightsData(txn_type, fi) {
 }
 
 /**
+ * public interface for retrieving fi name
+ * @function getFiName
+ *  
+ * @returns {String}
+ * @description retrieve fi name 
+ */
+export function getFiName(){
+  var o = insightsData["fi_name"];
+  return o;
+}
+
+/**
  * reviver callback passed as second argument to JSON.parse
  * @function typeConverter
  * @param {string} key - key from a json string
