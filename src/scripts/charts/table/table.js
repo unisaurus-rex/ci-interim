@@ -31,12 +31,36 @@ export default function tableChart() {
       .delay(1500)
       .style("opacity", 1);
 
+     var formatFloat = d3.format(',.3f');
+     var formatInt = d3.format(',')
+     function isInt(n){
+      return Number(n) === n && n % 1 === 0;
+     }
+
+     function format(x){
+      if (typeof x != "string"){
+        if (isInt (x)){
+          console.log("int");
+          var formattedValue = formatInt(x);            
+        }else{
+          console.log("else");
+          var formattedValue = formatFloat ( x);
+        } 
+      }else { console.log("string"); var formattedValue =x}
+      return formattedValue;
+     }
+
     /***** create a row for each object in the data *****/
     // mapping function from data ro td based on columns
     // row is an object with keys = data.columns
     // build array of objects for each key in row
     function rowData(row) {
       return data.columns.map(function (column) {
+        
+        
+        
+        //console.log( formattedValue );
+        //console.log(row[column], formattedValue, typeof formattedValue);
         return { column: column, value: row[column] }; }); }
 
     var bodyRowsUpdate = tbody.selectAll("tr")
@@ -54,7 +78,7 @@ export default function tableChart() {
     bodyCells.enter()
       .append("td")
       .merge(bodyCells)
-      .text( (d) => {return d.value;} )
+      .text( (d) => {  return format(d.value) ;} )
       .style("opacity", 0)
       .transition()
       .delay(1500)
