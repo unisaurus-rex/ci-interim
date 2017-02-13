@@ -335,55 +335,59 @@ function addDropdownListener(chartname) {
   d3.selectAll(selector).on('click', cb);
 }
 
+//pass in column
 export function getData( col ){
-
-  //var col = "n_trans";
   function add(a, b) {
     return a + b;
-}
+  }
+
+  //get data for all txn types
+  var pinDebitInsightsData = getInsightsData("pin_debit");
+  var sigDebitInsightsData = getInsightsData("sig_debit");
+  var sigCreditInsightsData = getInsightsData("sig_credit");
+
+  //get all FI's
+  var issuers = Object.keys(pinDebitInsightsData);
+  issuers = issuers.map( function(d) { return {key: d}})
+
+  //loop through FIs
+  for ( var i = 0; i< issuers.length; i++){
+    issuers[i] ["groups"] = [];
+    issuers[i] ["groups"] [0] = {};
+
+    //add up pin debit for an FI (all mcc types)
+    var pinDebArr = pinDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    var pinDebitTotal = pinDebArr.reduce(add, 0);
+    issuers[i].groups[0] [ "pin_debit"] = pinDebitTotal;
 
 
-    var pinDebitInsightsData = getInsightsData("pin_debit");
-    var sigDebitInsightsData = getInsightsData("sig_debit");
-    var sigCreditInsightsData = getInsightsData("sig_credit");
+    //add up sig debit for an FI (all mcc types)
+    var sigDebArr = sigDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    var sigDebitTotal = sigDebArr.reduce(add, 0);
+    issuers[i].groups[0] [ "sig_debit"] = sigDebitTotal;
 
-    var issuers = Object.keys(pinDebitInsightsData);
-    var issuers = issuers.map( function(d) { return {key: d}})
+    //add up sig credit for an FI (all mcc types)
+    var sigCreditArr = sigCreditInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    var sigCreditTotal = sigCreditArr.reduce(add, 0);
+    issuers[i].groups[0] [ "sig_credit"] = sigCreditTotal;   
 
+    //add total and columns attributes 
+    issuers[i].groups[0] [ "total"] = 1;
+    issuers[i].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
+  }
 
-    for ( var i = 0; i< issuers.length; i++){
-      issuers[i] ["groups"] = [];
-      issuers[i] ["groups"] [0] = {};
- 
-      var pinDebArr = pinDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-      var pinDebitTotal = pinDebArr.reduce(add, 0);
-      issuers[i].groups[0] [ "pin_debit"] = pinDebitTotal;
+  for ( var i = 0; i< issuers.length; i++){
+    //get total for percentage
+    var total = 0;
+    total = total + issuers[i].groups[0] ["sig_debit"];
+    total = total + issuers[i].groups[0] ["pin_debit"];
+    total = total +issuers[i].groups[0] ["sig_credit"];
+    
+    //get percentages
+    issuers[i].groups[0] ["sig_debit"] = issuers[i].groups[0] ["sig_debit"] / total;
+    issuers[i].groups[0] ["pin_debit"] = issuers[i].groups[0] ["pin_debit"] / total;
+    issuers[i].groups[0] ["sig_credit"] = issuers[i].groups[0] ["sig_credit"] / total;
+  }
 
-
-      var sigDebArr = sigDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-      var sigDebitTotal = sigDebArr.reduce(add, 0);
-      issuers[i].groups[0] [ "sig_debit"] = sigDebitTotal;
-
-      var sigCreditArr = sigCreditInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-      var sigCreditTotal = sigCreditArr.reduce(add, 0);
-      issuers[i].groups[0] [ "sig_credit"] = sigCreditTotal;   
-
-      issuers[i].groups[0] [ "total"] = 1;
-      issuers[i].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-    }
-
-    //sum up issuers.groups[0]
-    for ( var i = 0; i< issuers.length; i++){
-      var total = 0;
-      total = total + issuers[i].groups[0] ["sig_debit"];
-      total = total + issuers[i].groups[0] ["pin_debit"];
-      total = total +issuers[i].groups[0] ["sig_credit"];
-      
-      issuers[i].groups[0] ["sig_debit"] = issuers[i].groups[0] ["sig_debit"] / total;
-      issuers[i].groups[0] ["pin_debit"] = issuers[i].groups[0] ["pin_debit"] / total;
-      issuers[i].groups[0] ["sig_credit"] = issuers[i].groups[0] ["sig_credit"] / total;
-
-    }
-
-    return issuers;
+  return issuers;
 }
