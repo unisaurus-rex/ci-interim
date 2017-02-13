@@ -108,9 +108,9 @@ export function stacksChart(){
     //Remove rectangles / layers if needed
     gUpdate.exit()
       .transition()
-      .duration(1000)
+      .duration(2000)
       .attr("height", 0)
-      //.attr("y", 0)
+      .attr("y", function (d ) { return y(d[0][0]); } )
       //.remove();
     ;
 
