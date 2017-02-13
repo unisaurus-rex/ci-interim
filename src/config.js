@@ -33,6 +33,7 @@ System.config({
     "groupedBar": "scripts/charts/groupedBar/groupedBar.js",
     "groupedBarConfig": "scripts/charts/groupedBar/groupedBarConfig.js",
     "groupedBarController": "scripts/controllers/groupedBarController.js",
+    "groupStackedController": "scripts/controllers/groupStackedController.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "scripts/model/model.js",
     "newCheckboxObserver": "scripts/utils/newCheckboxObserver.js",

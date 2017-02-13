@@ -40,13 +40,11 @@ export default function tableChart() {
      function format(x){
       if (typeof x != "string"){
         if (isInt (x)){
-          console.log("int");
           var formattedValue = formatInt(x);            
         }else{
-          console.log("else");
           var formattedValue = formatFloat ( x);
         } 
-      }else { console.log("string"); var formattedValue =x}
+      }else { var formattedValue =x}
       return formattedValue;
      }
 
@@ -56,11 +54,6 @@ export default function tableChart() {
     // build array of objects for each key in row
     function rowData(row) {
       return data.columns.map(function (column) {
-        
-        
-        
-        //console.log( formattedValue );
-        //console.log(row[column], formattedValue, typeof formattedValue);
         return { column: column, value: row[column] }; }); }
 
     var bodyRowsUpdate = tbody.selectAll("tr")
