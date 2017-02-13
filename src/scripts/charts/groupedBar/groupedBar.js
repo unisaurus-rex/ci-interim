@@ -55,7 +55,10 @@ export default function groupedBarChart(){
       tickFormatFunc = function(d){
         var t = d/1000000;
         return t+"m" }
-    }   
+    }
+    else if ( column == "int_rate"){
+      tickFormatFunc = d3.format(',.3f')      
+    }
     else{
       tickFormatFunc = d3.format(',.2f');
     }
