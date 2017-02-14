@@ -30,6 +30,10 @@ module.exports = function(config) {
       // note that base is how karma-jspm serves files, it adds a base folder that is the root of all folders/files server in the project
       paths: {
         'scripts/*': 'base/src/scripts/*',
+        "charts/*": "base/src/scripts/charts/*",
+        "model/*": "base/src/scripts/model/*",
+        "utils/*": "base/src/scripts/utils/*",
+        "controllers/*": "base/src/scripts/controllers/*",
         '*': 'base/*'
       },
       

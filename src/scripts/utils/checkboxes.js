@@ -52,7 +52,7 @@ export default class Checkboxes {
   }
 
   /**
-   * Return the value belonging to the checkbox associated with name
+   * Return the Boolean value belonging to the checkbox associated with name
    * @param {string} name - name of the checkbox
    */
   getValue(name) {
