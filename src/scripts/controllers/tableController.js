@@ -41,8 +41,10 @@ function addTable(chartname, txnType) {
     buildContainer(chartname);
 
     // set table data
+    setData(chartname, txnType);
 
     // set dropdown
+    setDropdown(chartname);
 
     // set draw function
 
@@ -70,3 +72,65 @@ function buildContainer(chartname) {
   table.append("thead");
   table.append("tbody");
 }
+
+/**
+ * Get the first item in chartname's dropdown list
+ * @function getDropdownDefault
+ * @param {String} chartname
+ * @return {String} value of the first dropdown item
+ */
+function getDropdownDefault(chartname) {
+  let selector = chartname + ' .dropdown-menu li a';
+  let val = d3.select(selector).attr('data-value');
+
+  return val;
+} 
+
+/**
+ * @function handleError
+ * @param {Object} err - Error object with message property
+ */
+function handleError(err) {
+  console.log(err.message);
+}
+
+/**
+ * Set the data needed for the table 
+ * @function buildData
+ * @param {String} chartname - css selector for chart
+ * @param {String} txnType
+ */
+function setData(chartname, txnType) {
+
+  let insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
+
+  try {
+    tableModel.setData(chartname, insightsData);
+  }
+  catch (e) {
+    handleError(e.message);
+  }
+}
+
+/**
+ * Set the dropdown param of the associated chart
+ * @function setDropdown
+ * @param {String} chartname - css selector for chart
+ * @param {String} [val] - optional dropdown value
+ */
+function setDropdown(chartname, val) {
+
+  // if user did not pass in val, default to first dropdown list element
+  if(val === undefined) {
+    val = getDropdownDefault(chartname);
+  }
+
+  try {
+    tableModel.setDropdown(chartname, val);
+  }
+  catch (e) {
+    handleError(e);
+  }
+}
+
+

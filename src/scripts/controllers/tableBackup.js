@@ -1,18 +1,4 @@
-/**
- * Set the data needed for the table 
- * @function buildData
- * @param {String} chartname - css selector for chart
- * @param {String} txnType
- */
-function setData(chartname, txnType) {
-  if(!tables.hasOwnProperty(chartname)) {
-    let p = new Panel();
-    tables[chartname] = p;
-  } 
 
-  let insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
-  tables[chartname].data = insightsData;
-}
 
 /**
  * Create and store the drawing function for the table
@@ -161,26 +147,7 @@ function dropdownCallbackBuilder(chartname) {
   }
 }
 
-/**
- * Set the dropdown param of the associated chart
- * @function setDropdown
- * @param {String} chartname - css selector for chart
- * @param {String} [val] - optional dropdown value
- */
-function setDropdown(chartname, val) {
-  if(!tables.hasOwnProperty(chartname)) {
-    let p = new Panel();
-    tables[chartname] = p;
-  } 
 
-  // if user did not pass in val, default to first dropdown list element
-  if(val === undefined) {
-    let selector = chartname + ' .dropdown-menu li a';
-    val = d3.select(selector).attr('data-value');
-  }
-
-  tables[chartname].dropdown = val;
-}
 
 /**
  * Find the unique mcc_name properties
