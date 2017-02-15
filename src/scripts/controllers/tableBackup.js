@@ -1,19 +1,3 @@
-
-
-/**
- * Create and store the drawing function for the table
- * @function createDrawingFunc
- * @param {String} chartname - css selector for chart
- */
-function createDrawingFunc(chartname) {
-  if(!tables.hasOwnProperty(chartname)) {
-    let p = new Panel();
-    tables[chartname] = p;
-  }
-
-  tables[chartname].drawFunc = tableChart();
-}
-
 /**
  * If it exists, call the drawing function associated with chartname
  * @function draw

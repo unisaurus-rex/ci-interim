@@ -39,3 +39,15 @@ export function InvalidChartError(chartname) {
 InvalidChartError.prototype = Object.create(Error.prototype);
 InvalidChartError.prototype.constructor = InvalidChartError;
 
+/**
+ * @class InvalidTableError
+ * @param {String} chartname - index for chart that was not avialable
+ */
+export function InvalidTableError(chartname) {
+  this.name = "InvalidTableError";
+  this.message = `Error attempting to access ${chartname} inside tableController. ${chartname} does not exist in tables`; 
+}
+
+InvalidTableError.prototype = Object.create(Error.prototype);
+InvalidTableError.prototype.constructor = InvalidTableError;
+
