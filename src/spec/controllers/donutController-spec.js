@@ -1,6 +1,6 @@
 import {getData as donutController} from 'donutController';
 
-describe("Donut Controller: ", function() {
+xdescribe("Donut Controller: ", function() {
   describe("Given a txnType and fi, the donut contoller should", function() {
 
     var data;

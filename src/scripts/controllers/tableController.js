@@ -119,7 +119,7 @@ function buildData(chartname) {
   let mccNames = uniqueMccNames(insightsData); 
 
   // shape and return the data 
-  return buildTableData(chartname, insightsData, param, mccNames);
+  return buildTableData(insightsData, param, mccNames);
 }
 
 /**
@@ -131,7 +131,7 @@ function buildData(chartname) {
  * @param {string[]} mccNames - mccNames to use for columns and headers
  * @returns {Object[]} array of objects
  */
-function buildTableData(chartname, data, param, mccNames) {
+function buildTableData(data, param, mccNames) {
   // need to build one object per fi
   var fiNames = Object.keys(data);
   // each object should have key/values = mcc_name: param
