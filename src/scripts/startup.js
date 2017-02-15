@@ -26,7 +26,7 @@ function updateCompanyName(getFiName){
   sel.style("opacity", "0");
 
   sel._groups[0][0].innerHTML = 
-  "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
+    "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
   sel.transition().duration(1000).style("opacity", "1")
 }
 
@@ -92,15 +92,7 @@ groupedExport.addDropdownListener(sigDebitSelector);
 
 /*********************** SIG DEBIT TABLE *********************/
 // add table to page
-tableExport.addTable(sigDebitSelector);
-
-// get data for drawing the table
-tableExport.setData(sigDebitSelector, "sig_debit");
-
-// draw the table
-tableExport.createDrawingFunc(sigDebitSelector);
-tableExport.draw(sigDebitSelector);
-tableExport.addDropdownListener(sigDebitSelector);
+tableExport.addTable(sigDebitSelector, "sig_debit");
 
 
 /************************************************ PIN DEBIT ************************************************/
@@ -130,16 +122,7 @@ groupedExport.addDropdownListener(pinDebitSelector);
 
 /*********************** PIN DEBIT TABLE *********************/
 // add table to page
-tableExport.addTable(pinDebitSelector);
-
-// get data for drawing the table
-tableExport.setData(pinDebitSelector, "pin_debit");
-
-// draw the table
-tableExport.createDrawingFunc(pinDebitSelector);
-tableExport.draw(pinDebitSelector);
-tableExport.addDropdownListener(pinDebitSelector);
-
+tableExport.addTable(pinDebitSelector, "pin_debit");
 
 /************************************************ SIG CREDIT ************************************************/
 
@@ -168,15 +151,7 @@ groupedExport.addDropdownListener(sigCreditSelector);
 
 /*********************** SIG CREDIT TABLE *********************/
 // add table to page
-tableExport.addTable(sigCreditSelector);
-
-// get data for drawing the table
-tableExport.setData(sigCreditSelector, "sig_credit");
-
-// draw the table
-tableExport.createDrawingFunc(sigCreditSelector);
-tableExport.draw(sigCreditSelector);
-tableExport.addDropdownListener(sigCreditSelector);
+tableExport.addTable(sigCreditSelector, "sig_credit");
 
 /************************************************ GROUPED STACK ************************************************/
 
@@ -285,13 +260,15 @@ groupStackedExport.addDropdownListener(groupedStackSelector);
 //testStacks(groupedStackSvg, groupedStackData);
 
 /*function groupedStackFilter(data, checked){
-  //loop through data array
-  for (var i=0; i< data.length; i++){
-    //update columns to contain only what was checked
-    data[i].groups.columns = data[i].groups.columns.filter( 
-      function(d){ 
-        if ( checked.indexOf(d) > -1 )
-          return d;
-      })
-  }
+//loop through data array
+for (var i=0; i< data.length; i++){
+//update columns to contain only what was checked
+data[i].groups.columns = data[i].groups.columns.filter( 
+function(d){ 
+if ( checked.indexOf(d) > -1 )
+return d;
+})
+}
 }*/
+
+window.tables = tableExport.tables;
