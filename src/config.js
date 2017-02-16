@@ -37,6 +37,7 @@ System.config({
     "groupedBarConfig": "scripts/charts/groupedBar/groupedBarConfig.js",
     "groupedBarController": "scripts/controllers/groupedBarController.js",
     "groupedBarModel": "model/groupedBarModel.js",
+    "groupStackedModel": "model/groupStackedModel.js",
     "groupedStack": "scripts/charts/groupedStack/groupedStack.js",
     "jquery": "npm:jquery@3.1.1",
     "model": "scripts/model/model.js",
