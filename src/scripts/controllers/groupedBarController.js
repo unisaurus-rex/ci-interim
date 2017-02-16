@@ -49,11 +49,15 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     setDropdown(chartname);
 
     // set checkboxes 
+    // setCheckboxes(chartname);
 
     // set draw function
     setDrawFunc(chartname, config);
 
     /*** Actions (setup container, add listeners, draw graph) ***/
+
+    // add svg container
+    buildContainer(chartname);
 
     // add dropdown listener
 
@@ -64,7 +68,37 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 
 }
 
+
+
 /***** Private Functions *****/
+
+/**
+ * add the svg container for the chart to dom
+ * @private
+ * @function buildContainer
+ * @param {String} chartname - css selector for chart
+ */
+function buildContainer(chartname){
+  // groupedModel may throw error when accessing svgSize or svgMargins
+  try{
+    let {width, height} = groupedModel.getSvgSize(chartname);
+    let {left, top} = groupedModel.getMargins(chartname);
+    let svgSelect = chartname + " .grouped";
+
+    let gBarSvg = d3.select(svgSelect)
+        .append("div")
+        .classed("svg-container", true)
+        .append("svg")  
+        .attr("viewBox", "-" + left + " -"+ top + " "+ width + " " + height)
+        .classed("svg-content-responsive", true)
+    ;
+  }
+  catch(e) {
+    handleError(e);
+  }
+
+}
+
 /**
  * Get the first item in chartname's dropdown list
  * @private
@@ -86,6 +120,31 @@ function getDropdownDefault(chartname) {
  */
 function handleError(err) {
   console.log(err.message);
+}
+
+/**
+ * add checkboxes to model state
+ * @private
+ * @function setCheckboxes
+ * @param {String} chartname - css selector for chart
+ */
+function setCheckboxes(chartname) {
+  // select all chart checkboxes
+  // let selector = ...
+  // let cboxes = d3.selectAll(selector);
+  // get ids of all checkbox elements
+  // let vals = ....
+  // get checked status of each checkbox
+  // let defaults = ...
+  // add checkboxes to groupedModel
+  /*
+    try{
+    groupedModel.addCheckboxes(chartname, vals, defaults);
+    }
+    catch(e) {
+    handleError(e);
+    }
+  */
 }
 
 /**
@@ -134,27 +193,28 @@ function setData(chartname, txnType) {
  * @param {Object} config - groupedBarConfig object
  */
 function setDrawFunc(chartname, config) {
-  // need svgSize and svgMargins for configuring the drawing function
-  let svgSize, svgMargins;
-
+  
+  // groupedModel may throw error when calling getSvgSize and getMargins
   try {
-    svgSize = groupedModel.getSvgSize(chartname);
-    svgMargins = groupedModel.getMargins(chartname);
+    // need svgSize and svgMargins for configuring the drawing function 
+    let {width, height} = groupedModel.getSvgSize(chartname);
+    let {left, right, top, bottom} = groupedModel.getMargins(chartname);
+
+    let drawFunc = groupedBarChart() 
+        .width( width - left - right)
+        .height(height - top - bottom)
+        .classMap(config.classMap)
+        .classMapFunction(config.classMapFunction)
+        .groupRangeFunction(config.groupRangeFunction)
+    ;
+
+    // add drawing function to charts
+    charts[chartname].drawFunc = drawFunc;
   }
   catch(e) {
     handleError(e);
   }
 
-  let drawFunc = groupedBarChart() 
-      .width( svgSize.width - svgMargins.left - svgMargins.right)
-      .height(svgSize.height - svgMargins.top - svgMargins.bottom)
-      .classMap(config.classMap)
-      .classMapFunction(config.classMapFunction)
-      .groupRangeFunction(config.groupRangeFunction)
-  ;
-
-  // add drawing function to charts
-  charts[chartname].drawFunc = drawFunc;
 }
 
 /**

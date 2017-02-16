@@ -27,31 +27,6 @@ function draw(chartname) {
   }  
 }
 
-
-
-
-
-/**
- * @function drawSvg
- */
-function drawSvg(chartname){
-
-  var width = charts[chartname].svg.width;
-  var height = charts[chartname].svg.height;
-  
-  var svgSelect = chartname + " .grouped";
-
-  var gBarSvg = d3.select(svgSelect)
-      .append("div")
-      .classed("svg-container", true)
-      .append("svg")  
-      .attr("viewBox", "-" + charts[chartname].svg.margins.left + " -"+ charts[chartname].svg.margins.top + " "+ width + " " + height)
-      .classed("svg-content-responsive", true)
-  ;
-
-  return gBarSvg;
-}
-
 /**
  * @function toggleCheckbox
  */
@@ -104,23 +79,6 @@ function observerCallbackBuilder(chartname) {
     }
   };
 }
-
-/*
- * @function addCheckboxes
- */
-function addCheckboxes(chartname, valArr, defaultArr) {
-  let cboxes = new Checkboxes(valArr, defaultArr);
-
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.cboxes = cboxes;
-    
-    charts[chartname] = p;
-  } else {
-    charts[chartname].cboxes = cboxes;
-  } 
-}
-
 
 /**
  * Create mutation observers and track them in the charts object
@@ -203,113 +161,4 @@ function addDropdownListener(chartname) {
   let cb = dropdownCallbackBuilder(chartname);
   d3.selectAll(selector).on('click', cb);
 }
-
-
-/**
- * add or update chartname.data based on txnType and fi
- */ 
-function buildData(chartname, txnType) {
-  get [ chartname ] = groupedFilter().txnType(txnType);
-  
-  // if chartname object doesn't exist, build new object and add data property
-  //chartname is the selector for the panel
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    var dropDownSelect = chartname + " .dropdown-menu li a";
-    p.dropdown = d3.select( dropDownSelect ).attr("data-value");
-
-    get[chartname].column(p.dropdown);
-
-    p.data = get[chartname]();
-    charts[chartname] = p;
-
-  }
-  else{
-    var dropDownSelect = chartname + " .dropdown-menu li a";
-    charts[chartname].dropdown = d3.select( dropDownSelect ).attr("data-value");
-    get [chartname].column(charts[chartname].dropdown);
-    charts[chartname].data = get[chartname]();
-
-  }
-
-  //update dropdown
-  updateDropdownText( chartname, d3.select(dropDownSelect).html());
-  updatePanelTitle( chartname, d3.select(dropDownSelect).html());
-  return charts[chartname].data;
-}
-
-
-export default function groupedFilter(){
-  
-  var txnType = null;
-  var column = null;
-
-  function updateData(){
-
-    if (txnType == null){
-      throw "txnType cannot be null";
-    }
-
-    if (column == null){
-      throw "column cannot be null";
-    }
-
-    var data = getData(txnType, column);
-    return data;
-  }
-
-  function getData(txnType, column){
-
-    var insightsData = getInsightsData(txnType);	
-    var issuers = Object.keys(insightsData) ;
-    var groupedBarData = [];
-
-    for( var i=0; i< issuers.length; i++){  
-      //map Issuer to issuer to fi for every fi
-      groupedBarData[i] = {
-	Issuer: issuers[i]
-      }
-
-      //map every mcc_name to fee_pc for every fi
-      for ( var j=0; j< insightsData[ [issuers[i] ] ].length; j++){
-	groupedBarData[i] [insightsData [issuers[i] ] [j].mcc_name] = insightsData [issuers[i] ] [j] [column];
-      }
-    }
-    var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function(key) { return key !== "Issuer"; });
-
-    groupedBarData.forEach(function(d) {
-      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-    });
-
-    groupedBarData.columns = jsonGroupNames;
-
-    return groupedBarData;	
-  }
-
-  updateData.txnType = function (value){
-    if (!arguments.length) return txnType;
-    txnType = value;
-
-    if( value == null || value == undefined){
-      throw "txnType cannot be null or undefined";
-    }
-    return updateData;
-  }
-
-  updateData.column = function (value){
-    if (!arguments.length) return column;
-    column = value;
-
-    if( value == null || value == undefined){
-      throw "column cannot be null or undefined";
-    }
-    return updateData;
-  }
-
-  return updateData;
-
-}
-
-
-
 
