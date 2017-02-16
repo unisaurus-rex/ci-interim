@@ -28,30 +28,7 @@ function draw(chartname) {
 }
 
 
-/**
- * @function createDrawingFunc
- * @param {Object} config - groupedBarConfig object
- */
-function createDrawingFunc(chartname, config) {
 
-  let func = groupedBarChart() 
-      .width( charts[chartname].svg.width - charts[chartname].svg.margins.left- charts[chartname].svg.margins.right)
-      .height(charts[chartname].svg.height - charts[chartname].svg.margins.top- charts[chartname].svg.margins.bottom)
-      .classMap(config.classMap)
-      .classMapFunction(config.classMapFunction)
-      .groupRangeFunction(config.groupRangeFunction)
-  ;
-
-  // create new object for chartname if it doesn't exisit
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.drawFunc = func;
-    charts[chartname] = p;
-  } else {
-    // update drawing function in charts
-    charts[chartname].drawFunc = func;
-  }
-}
 
 
 /**
@@ -88,37 +65,6 @@ function toggleCheckbox(chartname, value) {
   }
 } 
 
-/**
- * @function setSvgSize
- */
-function setSvgSize(chartname, width, height){
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.svg.width = width;
-    p.svg.height = height;
-
-    charts[chartname] = p;
-  }
-  else{
-    charts[chartname].svg.width = width;
-    charts[chartname].svg.height = height;
-  }
-}
-
-/**
- * @function setMargins
- */
-function setMargins(chartname, margins){
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.svg.margins = margins;
-
-    charts[chartname] = p;
-  }
-  else{
-    charts[chartname].svg.margins = margins;
-  }
-}
 /**
  * @function observerCallbackBuilder 
  */
@@ -200,28 +146,6 @@ function initObservers(chartname, idArr, valArr, defaultArr, callback){
     charts[chartname].observers = observers;
   }
   
-}
-
-function setDropdown(chartname, value) {
-  if(charts.hasOwnProperty(chartname)){
-    charts[chartname].dropdown = value; 
-  } else {
-    throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
-  }
-}
-
-function setResetCount(chartname) {
-  if(charts.hasOwnProperty(chartname)) {
-    let cboxes = charts[chartname].cboxes;
-    let count = Object.keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
-
-    charts[chartname].resetCount= count;
-
-    //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
-    if(count == 0){
-      draw(chartname);
-    }
-  }
 }
 
 function dropdownCallbackBuilder(chartname) {

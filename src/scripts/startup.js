@@ -38,8 +38,7 @@ toolTips();
 /************************************************ ALL GROUPED BAR CHARTS ************************************************/
 
 //set up SVG and margins
-var groupedWidth = 400;
-var groupedHeight = 150;
+var groupedSvgSize = {width: 400, height: 150};
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
 var classMap =  {"Department Stores": "fill-blue", "Grocery": "fill-red",
@@ -73,7 +72,7 @@ var sigDebitSelector =  "#sigDebitGrouped";
 //Setup checkboxes
 var sigDebitGroupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
 
-groupedExport.addGraph(sigDebitSelector);
+groupedExport.addGraph(sigDebitSelector, groupedSvgSize, groupedMargin, "sig_debit", groupedConfig);
 
 /*********************** SIG DEBIT TABLE *********************/
 // add table to page
@@ -88,7 +87,7 @@ var pinDebitSelector =  "#pinDebitGrouped";
 //Setup checkboxes
 var pinDebitGroupedIds = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11', "groupedCbox12"];
 
-groupedExport.addGraph(pinDebitSelector);
+groupedExport.addGraph(pinDebitSelector, groupedSvgSize, groupedMargin, "pin_debit", groupedConfig);
 
 /*********************** PIN DEBIT TABLE *********************/
 // add table to page
@@ -101,7 +100,7 @@ var sigCreditSelector =  "#sigCreditGrouped";
 //Setup checkboxes
 var sigCreditGroupedIds = ['groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16', 'groupedCbox17', "groupedCbox18"];
 
-groupedExport.addGraph(sigCreditSelector);
+groupedExport.addGraph(sigCreditSelector, groupedSvgSize, groupedMargin, "sig_credit", groupedConfig);
 
 /*********************** SIG CREDIT TABLE *********************/
 // add table to page
