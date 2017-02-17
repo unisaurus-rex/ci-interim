@@ -63,7 +63,8 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 
     // add checkbox listeners
 
-    // draw
+    // draw the chart
+    draw(chartname);
   }
 
 }
@@ -97,6 +98,108 @@ function buildContainer(chartname){
     handleError(e);
   }
 
+}
+
+/**
+ * Format the data so it can be passed to groupedBar drawing function
+ * @private
+ * @function buildData
+ * @param {String} chartname
+ * @param {String[]} mccNames - array of mcc names to filter data on
+ * @returns {Array}
+ */
+function buildData(chartname, mccNames) {
+  let data = groupedModel.getData(chartname);
+  let dropdown = groupedModel.getDropdown(chartname);
+  return filterByCheckbox( filterByDropdown(data, dropdown), mccNames);
+}
+
+/**
+ * Draw the chart associated with chartname
+ * @function draw
+ * @param {String } chartname
+ */
+function draw(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    
+    // selector for locating the drawing functions target
+    let chartSelector = `${chartname} svg`;
+
+    // determine what mcc values to display data for 
+    let mccNames = groupedModel.getAllChecked(chartname);
+    mccNames.push( "Issuer" );
+
+    // use mcc values to filter data for display
+    let data = buildData(chartname, mccNames);
+
+    // get chart drawing target as d3 selection
+    let loc = d3.select(chartSelector);
+
+    // draw chart
+    charts[chartname].drawFunc.column(groupedModel.getDropdown(chartname));
+    charts[chartname].drawFunc(loc, data);
+
+    // add tooltip
+    toolTips();
+  }  
+}
+
+/**
+ * Take insights data for a transaction type, remove all values that do no match the dropdown param and return an array
+ * @private
+ * @function filterByDropdown
+ * @function {Object} data - data to filter
+ * @function {String} dropdown - dropdown value to get data for
+ */
+function filterByDropdown(data, dropdown) {
+  let issuers = Object.keys(data) ;
+  let groupedBarData = [];
+
+  for(let i=0; i< issuers.length; i++){  
+    //map Issuer to issuer to fi for every fi
+    groupedBarData[i] = {
+      Issuer: issuers[i]
+    }
+
+    //map every mcc_name to fee_pc for every fi
+    for ( let j = 0; j < data[ [issuers[i] ] ].length; j++){
+      groupedBarData[i] [data [issuers[i] ] [j].mcc_name] = data [issuers[i] ] [j] [dropdown];
+    }
+  }
+  let jsonGroupNames = d3.keys(groupedBarData[0]).filter(function(key) { return key !== "Issuer"; });
+
+  groupedBarData.forEach(function(d) {
+    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  groupedBarData.columns = jsonGroupNames;
+
+  return groupedBarData;	
+}
+
+/**
+ * Take an array of fi's for a transaction type and drop any mcc objects not in mccNames, return the array
+ * @private
+ * @function filterByCheckbox
+ * @param {Array} data - data to filter
+ * @param {String[]} mccNames - array of mcc names checked 
+ */
+function filterByCheckbox(data, mccNames) {
+  let filteredData = data.map( (d) => {
+    return mccNames.reduce( (result, key) => {result[key] = d[key];
+                                              return result;}, {});
+  });  
+
+  //add group attribute
+  let jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
+
+  filteredData.forEach(function(d) {
+    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  filteredData.columns = jsonGroupNames;
+
+  return filteredData;
 }
 
 /**

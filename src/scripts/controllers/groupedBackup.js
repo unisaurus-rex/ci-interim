@@ -1,32 +1,3 @@
-// Call the drawing function associated with a chartname
-function draw(chartname) {
-  if(charts.hasOwnProperty(chartname)) {
-    
-    let arr = charts[chartname].cboxes.getAllChecked();
-    arr.push( "Issuer" );
-    // used returned checked value array to filter data
-    let filteredData = charts[chartname].data.map( (d) => {
-      return arr.reduce( (result, key) => {result[key] = d[key];
-                                           return result;}, {});
-    });  
-
-    //add group attribute
-    var jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
-    filteredData.forEach(function(d) {
-      d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-    });
-
-    filteredData.columns = jsonGroupNames;
-
-
-    let loc = d3.select(chartname + " svg");
-
-    charts[chartname].drawFunc.column(charts[chartname].dropdown);
-    charts[chartname].drawFunc(loc, filteredData);
-    toolTips();
-  }  
-}
-
 /**
  * @function toggleCheckbox
  */
