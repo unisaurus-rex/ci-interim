@@ -49,7 +49,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     setDropdown(chartname);
 
     // set checkboxes 
-    // setCheckboxes(chartname);
+    setCheckboxes(chartname);
 
     // set draw function
     setDrawFunc(chartname, config);
@@ -61,7 +61,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 
     // add dropdown listener
 
-    // add checkbox listners
+    // add checkbox listeners
 
     // draw
   }
@@ -130,21 +130,28 @@ function handleError(err) {
  */
 function setCheckboxes(chartname) {
   // select all chart checkboxes
-  // let selector = ...
-  // let cboxes = d3.selectAll(selector);
-  // get ids of all checkbox elements
-  // let vals = ....
-  // get checked status of each checkbox
-  // let defaults = ...
+  let vals = [];
+  let defaults = [];
+  // checkboxes use bootstrap style (input wrapped in label)
+  let selector = `${chartname} .checkboxes label`; 
+  let labels = d3.selectAll(selector);
+
+  // use labels selection to populate defaults and vals
+  labels.each(function(d) {
+    // presence of active class indicates the box is checked
+    defaults.push(d3.select(this).classed('active'));
+
+    // get checkbox value from input element
+    vals.push(d3.select(this).select('input').attr('value'));
+  });
+
   // add checkboxes to groupedModel
-  /*
-    try{
+  try{
     groupedModel.addCheckboxes(chartname, vals, defaults);
-    }
-    catch(e) {
+  }
+  catch(e) {
     handleError(e);
-    }
-  */
+  }
 }
 
 /**
