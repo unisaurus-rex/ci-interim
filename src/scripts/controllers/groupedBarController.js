@@ -59,9 +59,11 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     // add svg container
     buildContainer(chartname);
 
-    // add dropdown listener
-
     // add checkbox listeners
+    // addCheckboxListeners();
+
+    // add dropdown listener
+    
 
     // draw the chart
     draw(chartname);
@@ -72,6 +74,23 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 
 
 /***** Private Functions *****/
+
+/**
+ * @function addCheckboxListeners
+ */
+function addCheckboxListeners(chartname) {
+  // TODO: get checkbox ids, bring in observerCallbackBuilder
+  let cb = observerCallbackBuilder(chartname);
+  let checkboxIds = ?;
+  let observerFunc = addBootstrapCheckboxObservers()
+      .elementIds(idArr)
+      .callback(cb);
+
+  let observers = observerFunc();
+
+  charts[chartname].observerFunc = observerFunc;
+  charts[chartname].observers = observers;
+}
 
 /**
  * add the svg container for the chart to dom

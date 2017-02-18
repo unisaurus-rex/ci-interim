@@ -51,31 +51,6 @@ function observerCallbackBuilder(chartname) {
   };
 }
 
-/**
- * Create mutation observers and track them in the charts object
- * @function initObservers
- */
-function initObservers(chartname, idArr, valArr, defaultArr, callback){
-  
-  addCheckboxes(chartname, valArr, defaultArr); 
-
-  let observerFunc = addBootstrapCheckboxObservers()
-      .elementIds(idArr)
-      .callback(callback);
-
-  let observers = observerFunc();
-
-  // if charts.chartname does not exist, build it 
-  if(!charts.hasOwnProperty(chartname)) {
-    var p = new Panel();
-    p.observers = observers; 
-    p.observerFunc = observerFunc;
-  } else {
-    charts[chartname].observerFunc = observerFunc;
-    charts[chartname].observers = observers;
-  }
-  
-}
 
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
