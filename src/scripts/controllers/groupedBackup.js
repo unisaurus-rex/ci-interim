@@ -11,47 +11,6 @@ function toggleCheckbox(chartname, value) {
   }
 } 
 
-/**
- * @function observerCallbackBuilder 
- */
-function observerCallbackBuilder(chartname) {
-  return function(value) {
-    if(charts.hasOwnProperty(chartname)){
-
-      let chart = charts[chartname];
-      let resetCount = chart.resetCount;
-
-      // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
-      // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
-      if(resetCount == 0) {
-        // dropdown paramater has not changed, only the checkbox values
-
-        // toggle checkbox value in charts[chartname]
-        chart.cboxes.toggle(value);
-        draw(chartname);
-      } else if(resetCount > 1) {
-        chart.cboxes.toggle(value);
-        chart.resetCount -= 1;
-      } else {
-        // reset == 1
-        // dropdown parameter has changed, time to do work
-
-        // update resetCount
-        chart.resetCount -= 1;
-
-        // toggle checkbox value in charts[chartname]
-        chart.cboxes.toggle(value);
-
-        // call draw 
-        draw(chartname);
-      }
-    } else {
-      throw new Error("Attempt to reference non-existent panel object");
-    }
-  };
-}
-
-
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
   return function(d) {

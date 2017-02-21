@@ -60,7 +60,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     buildContainer(chartname);
 
     // add checkbox listeners
-    // addCheckboxListeners(chartname);
+    addCheckboxListeners(chartname);
 
     // add dropdown listener
     
@@ -77,14 +77,25 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 
 /**
  * @function addCheckboxListeners
+ * @param {String} chartname
  */
 function addCheckboxListeners(chartname) {
   let cb = observerCallbackBuilder(chartname);
-  // TODO: use chartname to pull ids for all checkboxes so we can add observers to their elements
-  // let checkboxIds = ?;
+
+  // need to observe the label element wrapping the input item because these are bootstrap checkboxes
+  // get the ids of each label item so we can pass them to addBootstrapCheckboxObserver
+  let ids = []; // holds id of each element that needs an observer
+  let selector = `${chartname} .checkboxes label`; 
+  let labels = d3.selectAll(selector);
+
+  // use labels selection to get id of each label element
+  labels.each( function(d) {
+    ids.push(d3.select(this).attr('id'));
+  });
+
   // TODO: pull in observerCallbackBuilder
   let observerFunc = addBootstrapCheckboxObservers()
-      .elementIds(idArr)
+      .elementIds(ids)
       .callback(cb);
 
   let observers = observerFunc();
@@ -243,6 +254,39 @@ function getDropdownDefault(chartname) {
  */
 function handleError(err) {
   console.log(err.message);
+}
+
+/**
+ * Return function to be called when a checkbox input changes
+ * @function observerCallbackBuilder
+ * @param {String} chartname
+ * @return {function} 
+ */
+function observerCallbackBuilder(chartname) {
+  return function(value) {
+    if(groupedModel.getDropdownChanged(chartname)){
+      // only want to redraw the graph once.  if the dropdown changed
+      // wait until there is only one checkbox left to toggle before drawing 
+      if(groupedModel.getResetCount(chartname) > 1){
+        // count greater than 1, toggle checkbox and do nothing else
+        groupedModel.toggle(chartname, value);
+      } else {
+        // count == 1, time to do work
+        // toggle checkbox
+        groupedModel.toggle(chartname, value);
+
+        // draw
+        draw(chartname);
+
+        // reset the dropdownChanged so drawing isn't messed up later
+        groupedModel.unsetDropdownChanged(chartname);
+      } 
+    } else {
+      // dropdown didn't change, toggle and draw
+      groupedModel.toggle(chartname, value);
+      draw(chartname);
+    }
+  };
 }
 
 /**
