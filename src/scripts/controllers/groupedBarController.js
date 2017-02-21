@@ -60,7 +60,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     buildContainer(chartname);
 
     // add checkbox listeners
-    // addCheckboxListeners();
+    // addCheckboxListeners(chartname);
 
     // add dropdown listener
     
@@ -79,9 +79,10 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
  * @function addCheckboxListeners
  */
 function addCheckboxListeners(chartname) {
-  // TODO: get checkbox ids, bring in observerCallbackBuilder
   let cb = observerCallbackBuilder(chartname);
+  // TODO: use chartname to pull ids for all checkboxes so we can add observers to their elements
   let checkboxIds = ?;
+  // TODO: pull in observerCallbackBuilder
   let observerFunc = addBootstrapCheckboxObservers()
       .elementIds(idArr)
       .callback(cb);
