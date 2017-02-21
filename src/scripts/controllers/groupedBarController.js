@@ -81,7 +81,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 function addCheckboxListeners(chartname) {
   let cb = observerCallbackBuilder(chartname);
   // TODO: use chartname to pull ids for all checkboxes so we can add observers to their elements
-  let checkboxIds = ?;
+  // let checkboxIds = ?;
   // TODO: pull in observerCallbackBuilder
   let observerFunc = addBootstrapCheckboxObservers()
       .elementIds(idArr)

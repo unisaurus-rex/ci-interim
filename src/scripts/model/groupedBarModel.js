@@ -24,7 +24,10 @@ export var exportObj = {
   setData: setData,
   getData: getData,
   setDropdown: setDropdown,
-  getDropdown: getDropdown
+  getDropdown: getDropdown,
+  setDropdownChanged: setDropdownChanged,
+  unsetDropdownChanged: unsetDropdownChanged,
+  getDropdownChanged: getDropdownChanged
 };
 
 /***** model *****/
@@ -166,6 +169,48 @@ function getDropdown(chartname) {
     throw new InvalidChartError(chartname); 
   }
 }
+
+/**
+ * Set dropdownChanged value to true
+ * @function setDropdownChanged
+ * @param {String} chartname
+ */
+function setDropdownChanged(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].dropdownChanged = true;
+  } else {
+    throw new InvalidChartError(chartname); 
+  }
+}
+
+/**
+ * Set dropdown changed value to false
+ * @function unsetDropdownChanged
+ * @param {String} chartname
+ */
+function unsetDropdownChanged(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].dropdownChanged = false;
+  } else {
+    throw new InvalidChartError(chartname); 
+  }
+}
+
+/**
+ * Get the value of dropdownChanged
+ * @function getDropdownChanged
+ * @param {String} chartname
+ * @return {Boolean} 
+ */
+function getDropdownChanged(chartname) {
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].dropdownChanged;
+  } else {
+    throw new InvalidChartError(chartname); 
+  }
+
+}
+
 
 /**
  * @function addCheckboxes
