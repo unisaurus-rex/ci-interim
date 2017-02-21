@@ -63,7 +63,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     addCheckboxListeners(chartname);
 
     // add dropdown listener
-    
+    addDropdownListener(chartname);
 
     // draw the chart
     draw(chartname);
@@ -102,6 +102,16 @@ function addCheckboxListeners(chartname) {
 
   charts[chartname].observerFunc = observerFunc;
   charts[chartname].observers = observers;
+}
+
+/**
+ * @function addDropdownListener
+ * @param {String} chartname
+ */
+function addDropdownListener(chartname) {
+  let selector = chartname + " .dropdown-menu li a";
+  let cb = dropdownCallbackBuilder(chartname);
+  d3.selectAll(selector).on('click', cb);
 }
 
 /**
@@ -176,7 +186,43 @@ function draw(chartname) {
 }
 
 /**
- * Take insights data for a transaction type, remove all values that do no match the dropdown param and return an array
+ * Return a function to call after the the dropdown is selected
+ * Returned function will update the dropdown selection and trigger the
+ * redraw process
+ * @function dropdownCallbackBuilder
+ * @param {String} chartname
+ * @returns {Function} 
+ */
+function dropdownCallbackBuilder(chartname) {
+  // return d3 event callback
+  return function(d) {
+
+    // get dropdown values
+    let current = d3.select(this).attr('data-value');
+
+    let old = groupedModel.getDropdown(chartname);
+
+    if( current != old) {
+      // set dropdown param
+      groupedModel.setDropdown(chartname, current);
+
+      // set dropdownChanged
+      groupedModel.setDropdownChanged(chartname);
+
+      // check all checkboxes
+      let selector = `${chartname} .checkboxes label`;
+      d3.selectAll(selector).classed('active', true);
+
+      //update dropdown text
+      //updateDropdownText( chartname, d3.select(this).html());
+      //update Panel Title
+      //updatePanelTitle( chartname, d3.select(this).html());
+    }
+  };
+}
+
+/**
+ * Take insights data for a transaction type, remove all values that do not match the dropdown param and return an array
  * @private
  * @function filterByDropdown
  * @function {Object} data - data to filter
@@ -209,206 +255,206 @@ function filterByDropdown(data, dropdown) {
 }
 
 /**
- * Take an array of fi's for a transaction type and drop any mcc objects not in mccNames, return the array
- * @private
- * @function filterByCheckbox
- * @param {Array} data - data to filter
- * @param {String[]} mccNames - array of mcc names checked 
- */
+* Take an array of fi's for a transaction type and drop any mcc objects not in mccNames, return the array
+* @private
+* @function filterByCheckbox
+* @param {Array} data - data to filter
+* @param {String[]} mccNames - array of mcc names checked 
+*/
 function filterByCheckbox(data, mccNames) {
-  let filteredData = data.map( (d) => {
-    return mccNames.reduce( (result, key) => {result[key] = d[key];
-                                              return result;}, {});
-  });  
+let filteredData = data.map( (d) => {
+return mccNames.reduce( (result, key) => {result[key] = d[key];
+return result;}, {});
+});  
 
-  //add group attribute
-  let jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
+//add group attribute
+let jsonGroupNames = d3.keys(filteredData[0]).filter(function(key) { return key !== "Issuer"; });
 
-  filteredData.forEach(function(d) {
-    d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
-  });
+filteredData.forEach(function(d) {
+d.groups = jsonGroupNames.map(function(name) { return {name: name, value: +d[name]}; });
+});
 
-  filteredData.columns = jsonGroupNames;
+filteredData.columns = jsonGroupNames;
 
-  return filteredData;
+return filteredData;
 }
 
 /**
- * Get the first item in chartname's dropdown list
- * @private
- * @function getDropdownDefault
- * @param {String} chartname
- * @return {String} value of the first dropdown item
- */
+* Get the first item in chartname's dropdown list
+* @private
+* @function getDropdownDefault
+* @param {String} chartname
+* @return {String} value of the first dropdown item
+*/
 function getDropdownDefault(chartname) {
-  let selector = chartname + ' .dropdown-menu li a';
-  let val = d3.select(selector).attr('data-value');
+let selector = chartname + ' .dropdown-menu li a';
+let val = d3.select(selector).attr('data-value');
 
-  return val;
+return val;
 }
 
 /**
- * @function handleError
- * @private
- * @param {Object} err - Error object with message property
- */
+* @function handleError
+* @private
+* @param {Object} err - Error object with message property
+*/
 function handleError(err) {
-  console.log(err.message);
+console.log(err.message);
 }
 
 /**
- * Return function to be called when a checkbox input changes
- * @function observerCallbackBuilder
- * @param {String} chartname
- * @return {function} 
- */
+* Return function to be called when a checkbox input changes
+* @function observerCallbackBuilder
+* @param {String} chartname
+* @return {function} 
+*/
 function observerCallbackBuilder(chartname) {
-  return function(value) {
-    if(groupedModel.getDropdownChanged(chartname)){
-      // only want to redraw the graph once.  if the dropdown changed
-      // wait until there is only one checkbox left to toggle before drawing 
-      if(groupedModel.getResetCount(chartname) > 1){
-        // count greater than 1, toggle checkbox and do nothing else
-        groupedModel.toggle(chartname, value);
-      } else {
-        // count == 1, time to do work
-        // toggle checkbox
-        groupedModel.toggle(chartname, value);
+return function(value) {
+if(groupedModel.getDropdownChanged(chartname)){
+// only want to redraw the graph once.  if the dropdown changed
+// wait until there is only one checkbox left to toggle before drawing 
+if(groupedModel.getResetCount(chartname) > 1){
+// count greater than 1, toggle checkbox and do nothing else
+groupedModel.toggle(chartname, value);
+} else {
+// count == 1, time to do work
+// toggle checkbox
+groupedModel.toggle(chartname, value);
 
-        // draw
-        draw(chartname);
+// draw
+draw(chartname);
 
-        // reset the dropdownChanged so drawing isn't messed up later
-        groupedModel.unsetDropdownChanged(chartname);
-      } 
-    } else {
-      // dropdown didn't change, toggle and draw
-      groupedModel.toggle(chartname, value);
-      draw(chartname);
-    }
-  };
+// reset the dropdownChanged so drawing isn't messed up later
+groupedModel.unsetDropdownChanged(chartname);
+} 
+} else {
+// dropdown didn't change, toggle and draw
+groupedModel.toggle(chartname, value);
+draw(chartname);
+}
+};
 }
 
 /**
- * add checkboxes to model state
- * @private
- * @function setCheckboxes
- * @param {String} chartname - css selector for chart
- */
+* add checkboxes to model state
+* @private
+* @function setCheckboxes
+* @param {String} chartname - css selector for chart
+*/
 function setCheckboxes(chartname) {
-  // select all chart checkboxes
-  let vals = [];
-  let defaults = [];
-  // checkboxes use bootstrap style (input wrapped in label)
-  let selector = `${chartname} .checkboxes label`; 
-  let labels = d3.selectAll(selector);
+// select all chart checkboxes
+let vals = [];
+let defaults = [];
+// checkboxes use bootstrap style (input wrapped in label)
+let selector = `${chartname} .checkboxes label`; 
+let labels = d3.selectAll(selector);
 
-  // use labels selection to populate defaults and vals
-  labels.each(function(d) {
-    // presence of active class indicates the box is checked
-    defaults.push(d3.select(this).classed('active'));
+// use labels selection to populate defaults and vals
+labels.each(function(d) {
+// presence of active class indicates the box is checked
+defaults.push(d3.select(this).classed('active'));
 
-    // get checkbox value from input element
-    vals.push(d3.select(this).select('input').attr('value'));
-  });
+// get checkbox value from input element
+vals.push(d3.select(this).select('input').attr('value'));
+});
 
-  // add checkboxes to groupedModel
-  try{
-    groupedModel.addCheckboxes(chartname, vals, defaults);
-  }
-  catch(e) {
-    handleError(e);
-  }
+// add checkboxes to groupedModel
+try{
+groupedModel.addCheckboxes(chartname, vals, defaults);
+}
+catch(e) {
+handleError(e);
+}
 }
 
 /**
- * set the svgSize and svgMargins in the model 
- * @private
- * @function setContainerBoundaries
- * @param {String} chartname - css selector for chart
- * @param {Object} svgSize - Size of svg container. Object with width and height properties
- * @param {Object} svgMargins - Margin widths of svg container. Object with top, left, bottom and right properties
- */
+* set the svgSize and svgMargins in the model 
+* @private
+* @function setContainerBoundaries
+* @param {String} chartname - css selector for chart
+* @param {Object} svgSize - Size of svg container. Object with width and height properties
+* @param {Object} svgMargins - Margin widths of svg container. Object with top, left, bottom and right properties
+*/
 function setContainerBoundaries(chartname, svgSize, svgMargins) {
-  try {
-    groupedModel.setSvgSize(chartname, svgSize);
-    groupedModel.setMargins(chartname, svgMargins);
-  }
-  catch(e) {
-    handleError(e);
-  }
+try {
+groupedModel.setSvgSize(chartname, svgSize);
+groupedModel.setMargins(chartname, svgMargins);
+}
+catch(e) {
+handleError(e);
+}
 
 }
 
 /**
- * Set the data needed for the table 
- * @function buildData
- * @private
- * @param {String} chartname - css selector for chart
- * @param {String} txnType
- */
+* Set the data needed for the table 
+* @function buildData
+* @private
+* @param {String} chartname - css selector for chart
+* @param {String} txnType
+*/
 function setData(chartname, txnType) {
 
-  let insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
+let insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
 
-  try {
-    groupedModel.setData(chartname, insightsData);
-  }
-  catch (e) {
-    handleError(e.message);
-  }
+try {
+groupedModel.setData(chartname, insightsData);
+}
+catch (e) {
+handleError(e.message);
+}
 }
 
 /**
- * Create a drawing function and store it in the charts
- * @private
- * @function setDrawFunc
- * @param {String} chartname - css selector for chart
- * @param {Object} config - groupedBarConfig object
- */
+* Create a drawing function and store it in the charts
+* @private
+* @function setDrawFunc
+* @param {String} chartname - css selector for chart
+* @param {Object} config - groupedBarConfig object
+*/
 function setDrawFunc(chartname, config) {
   
-  // groupedModel may throw error when calling getSvgSize and getMargins
-  try {
-    // need svgSize and svgMargins for configuring the drawing function 
-    let {width, height} = groupedModel.getSvgSize(chartname);
-    let {left, right, top, bottom} = groupedModel.getMargins(chartname);
+// groupedModel may throw error when calling getSvgSize and getMargins
+try {
+// need svgSize and svgMargins for configuring the drawing function 
+let {width, height} = groupedModel.getSvgSize(chartname);
+let {left, right, top, bottom} = groupedModel.getMargins(chartname);
 
-    let drawFunc = groupedBarChart() 
-        .width( width - left - right)
-        .height(height - top - bottom)
-        .classMap(config.classMap)
-        .classMapFunction(config.classMapFunction)
-        .groupRangeFunction(config.groupRangeFunction)
-    ;
+let drawFunc = groupedBarChart() 
+.width( width - left - right)
+.height(height - top - bottom)
+.classMap(config.classMap)
+.classMapFunction(config.classMapFunction)
+.groupRangeFunction(config.groupRangeFunction)
+;
 
-    // add drawing function to charts
-    charts[chartname].drawFunc = drawFunc;
-  }
-  catch(e) {
-    handleError(e);
-  }
+// add drawing function to charts
+charts[chartname].drawFunc = drawFunc;
+}
+catch(e) {
+handleError(e);
+}
 
 }
 
 /**
- * Set the dropdown param of the associated chart
- * @function setDropdown
- * @private
- * @param {String} chartname - css selector for chart
- * @param {String} [val] - optional dropdown value
- */
+* Set the dropdown param of the associated chart
+* @function setDropdown
+* @private
+* @param {String} chartname - css selector for chart
+* @param {String} [val] - optional dropdown value
+*/
 function setDropdown(chartname, val) {
 
-  // if user did not pass in val, default to first dropdown list element
-  if(val === undefined) {
-    val = getDropdownDefault(chartname);
-  }
+// if user did not pass in val, default to first dropdown list element
+if(val === undefined) {
+val = getDropdownDefault(chartname);
+}
 
-  try {
-    groupedModel.setDropdown(chartname, val);
-  }
-  catch (e) {
-    handleError(e);
-  }
+try {
+groupedModel.setDropdown(chartname, val);
+}
+catch (e) {
+handleError(e);
+}
 }

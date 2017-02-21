@@ -1,48 +1,4 @@
-/**
- * @function toggleCheckbox
- */
-function toggleCheckbox(chartname, value) {
-  if(charts.hasOwnProperty(chartname)){
-    if(charts[chartname].cboxes != null){
-      return charts[chartname].cboxes.toggle(value);
-    }
-  } else {
-    throw new Error("Attempt to reference non-existent panel object");
-  }
-} 
 
-function dropdownCallbackBuilder(chartname) {
-  // return d3 event callback
-  return function(d) {
-
-    // get dropdown values
-    let current = d3.select(this).attr('data-value');
-
-    let old = charts[chartname].dropdown;
-
-    if( current != old) {
-      // set dropdown param
-      setDropdown(chartname, current);
-
-      //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
-      get [chartname].column( current )
-      charts[chartname].data = get[chartname](); 
-
-
-      // set reset count
-      setResetCount(chartname);
-      
-      // check all checkboxes
-      let selector = chartname + " .checkboxes label";
-      d3.selectAll(selector).classed('active', true);
-
-      //update dropdown text
-      updateDropdownText( chartname, d3.select(this).html());
-      //update Panel Title
-      updatePanelTitle( chartname, d3.select(this).html());
-    }
-  };
-}
 
 //
 function updateDropdownText( chartname, text ){
@@ -61,9 +17,5 @@ function updatePanelTitle( chartname, text){
 
 }
 
-function addDropdownListener(chartname) {
-  let selector = chartname + " .dropdown-menu li a";
-  let cb = dropdownCallbackBuilder(chartname);
-  d3.selectAll(selector).on('click', cb);
-}
+
 
