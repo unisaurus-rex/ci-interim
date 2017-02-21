@@ -26,7 +26,7 @@ export function stacksChart(){
 
   /***********************************************************************/
   function chart(svg, data){
-    console.log(data);
+    //console.log(data);
 
     //set x scale
     x

@@ -9,7 +9,7 @@ import {InvalidChartError, DuplicateChartError} from 'errorObjects';
 /***** export *****/
 
 export var exportObj = {
-  addGroupStack, addGroupStack,
+  addGroupStack: addGroupStack,
   addCheckboxes: addCheckboxes,
   getAllCheckboxes: getAllCheckboxes,
   getAllChecked: getAllChecked,
@@ -24,7 +24,9 @@ export var exportObj = {
   setData: setData,
   getData: getData,
   setDropdown: setDropdown,
-  getDropdown: getDropdown
+  getDropdown: getDropdown,
+  getDropdownChanged: getDropdownChanged,
+  setDropdownChanged: setDropdownChanged
 };
 
 /***** model *****/
@@ -244,6 +246,22 @@ function checkAll(chartname) {
 function toggle(chartname, name) {
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].toggleCheckbox(name);
+  } else {
+    throw new InvalidChartError(chartname); 
+  }
+}
+
+function setDropdownChanged(chartname, val){
+  if(charts.hasOwnProperty(chartname)) {
+    charts[chartname].dropdownChanged = val;
+  } else {
+    throw new InvalidChartError(chartname); 
+  }
+}
+
+function getDropdownChanged(chartname){
+  if(charts.hasOwnProperty(chartname)) {
+    return charts[chartname].dropdownChanged;
   } else {
     throw new InvalidChartError(chartname); 
   }

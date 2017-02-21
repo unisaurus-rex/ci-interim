@@ -30,7 +30,13 @@ function addGroupStack(chartname, width, height, margins, elementIds ) {
     groupStackModel.setMargins(chartname, margins)
     buildContainer(chartname);
 
+
+
     setDropdown(chartname);
+    //set title and dropdown text
+    
+    groupStackModel.setDropdownChanged(chartname, false);
+    setData(chartname);
 
     setCheckboxes(chartname);
     setObservers(chartname, elementIds);
@@ -44,10 +50,45 @@ function addGroupStack(chartname, width, height, margins, elementIds ) {
   return;
 };
 
+
+
 function setData(chartname){
-  let col = groupStackModel.getDropdown(chartname);
-  let data = getData( col )
-  groupStackModel.setData( data );
+
+ let data = getData(chartname, groupStackModel.getDropdown(chartname));
+
+  try{
+    //console.log(data);
+    groupStackModel.setData(chartname, data);
+  }
+  catch(e){
+    handleError(e.message);
+  }
+}
+
+function buildData(chartname){
+  let data = groupStackModel.getData(chartname, groupStackModel.getDropdown(chartname));
+  //console.log(data);
+  let arr = groupStackModel.getAllChecked(chartname);
+
+  groupedStackFilter(data, arr);
+
+  return data;
+  //return data;
+}
+
+function groupedStackFilter(data, checked){
+
+  //console.log(checked);
+  //loop through data array
+  for (var i=0; i< data.length; i++){
+    //update columns to contain only what was checked
+    /*data[i].groups.columns = data[i].groups.columns.filter( 
+      function(d){ 
+        if ( checked.indexOf(d) > -1 )
+          return d;
+      })*/
+      data[i].groups.columns = checked;
+    }
 }
 
 
@@ -55,25 +96,14 @@ function setData(chartname){
 function draw(chartname) {
   if(groupStacks.hasOwnProperty(chartname)) {
     
-    let arr = groupStackModel.getAllChecked(chartname);
+    console.log("draw called");
     //console.log(arr);
-    let d = getData( groupStackModel.getDropdown(chartname) )
-     function groupedStackFilter(data, checked){
-      //loop through data array
-      for (var i=0; i< data.length; i++){
-        //update columns to contain only what was checked
-        data[i].groups.columns = data[i].groups.columns.filter( 
-          function(d){ 
-            if ( checked.indexOf(d) > -1 )
-              return d;
-          })
-      }
-  }
+    let d = buildData( chartname )
 
+    //console.log (d);
 
-    
     ////console.log(charts[chartname].data, arr)
-    groupedStackFilter( d, arr)
+    //groupedStackFilter( d, arr)
     //console.log(charts[chartname].data, arr)
 
     let loc = d3.select(chartname + " svg");
@@ -99,14 +129,29 @@ function setObservers(chartname, elementIds){
 }
 
 function setCheckboxes(chartname) {
+  // select all chart checkboxes
+  let vals = [];
+  let defaults = [];
+  // checkboxes use bootstrap style (input wrapped in label)
+  let selector = `${chartname} .checkboxes label`;
+  let labels = d3.selectAll(selector);
 
-    try{
-      groupStackModel.addCheckboxes(chartname,  ["pin_debit", "sig_credit", "sig_debit"], [true, true, true]);
-    }
-    catch(e) {
-      handleError(e);
-    }
-  
+ // use labels selection to populate defaults and vals
+  labels.each(function(d) {
+    // presence of active class indicates the box is checked
+    defaults.push(d3.select(this).classed('active'));
+
+   // get checkbox value from input element
+    vals.push(d3.select(this).select('input').attr('value'));
+  });
+
+ // add checkboxes to groupeStackModel
+  try{
+    groupStackModel.addCheckboxes(chartname, vals, defaults);
+  }
+  catch(e) {
+    handleError(e);
+  }
 }
 
 function setDropdown(chartname, val) {
@@ -164,15 +209,29 @@ function setDrawFunc(chartname) {
 // */
 function observerCallbackBuilder(chartname) {
   return function(value) {
+
+
     if(groupStacks.hasOwnProperty(chartname)){
-      let resetCount =  groupStackModel.getResetCount(chartname); 
-      //if(resetCount == 0){
+      let resetCount =  groupStackModel.getResetCount(chartname);
+      let dropdownChanged = groupStackModel.getDropdownChanged(chartname); 
+
+      console.log(dropdownChanged);
+      if (dropdownChanged === true){
+        if(resetCount == 1){
+          console.log("resetcount is 1")
+          groupStackModel.toggle(chartname, value);
+          groupStackModel.setDropdownChanged(chartname, false);
+          draw(chartname);  
+        }
+        else{
+          groupStackModel.toggle(chartname, value);  
+        }
+      } else{
+        console.log("else")
         groupStackModel.toggle(chartname, value);
         draw(chartname);
-      //}
-      //else if ( resetCount > 1 ){
-      //  groupStackModel.toggle(chartname, value);
-      //}else{
+      }
+      //else{
      //   draw(chartname);
       //}
     } else {
@@ -204,12 +263,14 @@ function dropdownCallbackBuilder(chartname) {
 
     // get dropdown values
     let current = d3.select(this).attr('data-value');
-    console.log(current);
+    //console.log(current);
     //let old = groupStacks[chartname].dropdown;
 
     //if( current != old) {
       // set dropdown param
       setDropdown(chartname, current);
+
+      groupStackModel.setDropdownChanged(chartname, true);
       //setDropdown(chartname);
 
 
@@ -235,7 +296,8 @@ function dropdownCallbackBuilder(chartname) {
       //update Panel Title
       updatePanelTitle( chartname, d3.select(this).html());
 
-      draw(chartname);
+      setData(chartname); 
+      //draw(chartname);
     //}
   };
 }
@@ -264,46 +326,43 @@ function addDropdownListener(chartname) {
 }
 
 ////pass in column
-export function getData( col ){
+export function getData( chartname, col ){
   function add(a, b) {
     return a + b;
   }
+  //let data = groupStackModel.getData(chartname);
 
+  let data = {};
   //get data for all txn types
-  var pinDebitInsightsData = getInsightsData("pin_debit");
-  var sigDebitInsightsData = getInsightsData("sig_debit");
-  var sigCreditInsightsData = getInsightsData("sig_credit");
+  let pinDebitInsightsData = getInsightsData("pin_debit");
+  let sigDebitInsightsData = getInsightsData("sig_debit");
+  let sigCreditInsightsData = getInsightsData("sig_credit");
 
   //get all FI's
-  var issuers = Object.keys(pinDebitInsightsData);
+  let issuers = Object.keys(pinDebitInsightsData);
   issuers = issuers.map( function(d) { return {key: d}})
-  issuers = issuers.filter( 
-    function(d) { 
-      if(d.key == "total"){
-        return false;} 
-      else 
-        return true;})
-  console.log(issuers)
+
+  //console.log(issuers)
 
   //loop through FIs
-  for ( var i = 0; i< issuers.length; i++){
+  for ( let i = 0; i< issuers.length; i++){
     issuers[i] ["groups"] = [];
     issuers[i] ["groups"] [0] = {};
 
     //add up pin debit for an FI (all mcc types)
-    var pinDebArr = pinDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-    var pinDebitTotal = pinDebArr.reduce(add, 0);
+    let pinDebArr = pinDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    let pinDebitTotal = pinDebArr.reduce(add, 0);
     issuers[i].groups[0] [ "pin_debit"] = pinDebitTotal;
 
 
     //add up sig debit for an FI (all mcc types)
-    var sigDebArr = sigDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-    var sigDebitTotal = sigDebArr.reduce(add, 0);
+    let sigDebArr = sigDebitInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    let sigDebitTotal = sigDebArr.reduce(add, 0);
     issuers[i].groups[0] [ "sig_debit"] = sigDebitTotal;
 
     //add up sig credit for an FI (all mcc types)
-    var sigCreditArr = sigCreditInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
-    var sigCreditTotal = sigCreditArr.reduce(add, 0);
+    let sigCreditArr = sigCreditInsightsData[ issuers[i] ["key"]].map( function (d){ return d[ col]})
+    let sigCreditTotal = sigCreditArr.reduce(add, 0);
     issuers[i].groups[0] [ "sig_credit"] = sigCreditTotal;   
 
     //add total and columns attributes 
@@ -311,9 +370,9 @@ export function getData( col ){
     issuers[i].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
   }
 
-  for ( var i = 0; i< issuers.length; i++){
+  for ( let i = 0; i< issuers.length; i++){
     //get total for percentage
-    var total = 0;
+    let total = 0;
     total = total + issuers[i].groups[0] ["sig_debit"];
     total = total + issuers[i].groups[0] ["pin_debit"];
     total = total +issuers[i].groups[0] ["sig_credit"];
