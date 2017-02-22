@@ -212,7 +212,8 @@ function getDropdownDefaultName(chartname){
   //return current dropdown selection
   let selector = chartname + ' .dropdown-menu li a';
   let val = d3.select(selector);
-  return val._groups[0][0].outerText;
+  //console.log(val, val.html(), val.text())
+  return val.html();
 }
 
 /**
@@ -406,28 +407,29 @@ function dropdownCallbackBuilder(chartname) {
 }
 
 /**
- * Update dropdown text
+ * Change the dropdown button text for a chart
  * @function updateDropdownText
  * @param {String} chartname
- * @param {String} text
+ * @param {String} text - text of selected button from dropdown
  */
 function updateDropdownText( chartname, text ){
-  let selection = chartname + " button";
+  let selection = `${chartname} button`;
   let button = d3.select( selection );
-  button._groups[0][0].innerHTML = text +  "<span class='caret'> </span>";
+  let buttonText = `${text} <span class='caret'> </span>`;
+  button.html(buttonText);
 }
 
 /**
- * Update panel title
  * @function updatePanelTitle
  * @param {String} chartname
- * @param {String} text
+ * @param {String} text - text of selected button from dropdown
  */
 function updatePanelTitle( chartname, text){
-  let selection = chartname + " h2";
+  let selection = `${chartname} h2`;
   let title = d3.select(selection);
+  let titleText = `${title.attr("data-value")}: ${text}`; 
 
-  title._groups[0][0].innerText = d3.select (title._groups[0][0]).attr("data-value") + ": "+ text;
+  title.html(titleText);
 }
 
 /**

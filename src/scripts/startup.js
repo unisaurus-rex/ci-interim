@@ -25,9 +25,9 @@ function updateCompanyName(getFiName){
   var sel = d3.select("#navbar li");
   sel.style("opacity", "0");
 
-  sel._groups[0][0].innerHTML = 
-    "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
-  sel.transition().duration(1000).style("opacity", "1")
+  let titleHtml = "<a>" + getFiName() + " |" + "<strong> 2017 </strong> </a>"; 
+  sel.html(titleHtml);
+  sel.transition().duration(1000).style("opacity", "1");
 }
 
 updateCompanyName( getFiName );
@@ -161,36 +161,5 @@ tableExport.addTable(sigCreditSelector, "sig_credit");
 var groupedStackMargin = {top: 40, right: 40, bottom: 40, left: 40};
 var groupedStackWidth =400;
 var groupedStackHeight =150;
-
 var groupedStackSelector =  "#groupStack";
-var groupStackedIds = ['groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
-groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin, groupStackedIds);
-
-//done
-//groupStackedExport.setSvgSize(groupedStackSelector, groupedStackWidth, groupedStackHeight);
-//
-//groupStackedExport.setMargins(groupedStackSelector, groupedStackMargin);
-//groupStackedExport.drawSvg(groupedStackSelector);
-//
-//groupStackedExport.buildData(groupedStackSelector);
-//
-
-
-////Setup checkboxes
-
-//
-//var groupStackedVals = ['pin_debit', 'sig_credit', 'sig_debit' ];
-//var groupStackedDefaults = [true, true, true];
-//
-//var groupStackedCb = groupStackedExport.observerCallbackBuilder(groupedStackSelector);
-//groupStackedExport.initObservers(groupedStackSelector, groupStackedIds, groupStackedVals, groupStackedDefaults, groupStackedCb);
-// 
-
-//done
-//groupStackedExport.createDrawingFunc(groupedStackSelector);
-//groupStackedExport.draw(groupedStackSelector);
-//
-
-//groupStackedExport.addDropdownListener(groupedStackSelector);
-//
-//window.tables = tableExport.tables;
+groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin);
