@@ -8435,7 +8435,316 @@ $__System.registerDynamic("5", ["4"], true, function ($__require, exports, modul
   module.exports = $__require("4");
   return module.exports;
 });
-$__System.register("6", ["7"], function (_export) {
+$__System.register('6', ['7', '8'], function (_export) {
+  /**
+   * Store state for groupedBar charts
+   * @module groupedBarModel
+   */
+
+  /***** local packages *****/
+
+  /***** export *****/
+
+  'use strict';
+
+  var Panel, InvalidChartError, DuplicateChartError, exportObj, charts;
+
+  /**
+   * create a new Panel object in charts if charts does not contain the matching chartname
+   * @function addGroupedBar
+   * @param {String} chartname
+   */
+  function addGroupedBar(chartname) {
+    // add a new chart to charts if the name doesn't already exist
+    if (!charts.hasOwnProperty(chartname)) {
+      charts[chartname] = new Panel();
+    } else {
+      throw new DuplicateChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setSvgSize
+   * @param {String} chartname
+   * @param {Object} obj - needs to have width and height property
+   */
+  function setSvgSize(chartname, obj) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].svgSize = obj;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getSvgSize
+   * @param {String} chartname
+   * @return {Object} contains width and height property
+   */
+  function getSvgSize(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].svgSize;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setMargins
+   * @param {String} chartname
+   * @param {Object} margins - object with left, right, top, bottom properties
+   */
+  function setMargins(chartname, margins) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].svgMargins = margins;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getMargins
+   * @param {String} chartname
+   * @return {Object} contains left, right, top, bottom properties
+   */
+  function getMargins(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].svgMargins;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getResetCount
+   * @param {String} chartname
+   * @return {Int}
+   */
+  function getResetCount(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].resetCount;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setData
+   * @param {String} chartname
+   * @param {Object} data
+   */
+  function setData(chartname, data) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].data = data;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getData
+   * @param {String} chartname
+   * @return {Object} 
+   */
+  function getData(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].data;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setDropdown
+   * @param {String} chartname
+   * @param {String} val 
+   */
+  function setDropdown(chartname, val) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdown = val;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getDropdown
+   * @param {String} chartname
+   * @return {String}
+   */
+  function getDropdown(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].dropdown;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Set dropdownChanged value to true
+   * @function setDropdownChanged
+   * @param {String} chartname
+   */
+  function setDropdownChanged(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdownChanged = true;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Set dropdown changed value to false
+   * @function unsetDropdownChanged
+   * @param {String} chartname
+   */
+  function unsetDropdownChanged(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdownChanged = false;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Get the value of dropdownChanged
+   * @function getDropdownChanged
+   * @param {String} chartname
+   * @return {Boolean} 
+   */
+  function getDropdownChanged(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].dropdownChanged;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function addCheckboxes
+   * @paranm {String} chartname
+   * @param {String[]} valArr - values that can be checked or unchecked
+   * @param {Bool[]} defaultArr - whether each value in valArr is checked or not
+   */
+  function addCheckboxes(chartname, valArr, defaultArr) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].createCboxes(valArr, defaultArr);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getAllCheckboxes
+   * @param {String} chartname
+   * @return {Object} contains all checkbox values and checked status
+   */
+  function getAllCheckboxes(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getAllCheckboxes();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getAllChecked
+   * @param {String} chartname
+   * @return {String[]} string names of each checked checkbox
+   */
+  function getAllChecked(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getAllChecked();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getCheckboxValue
+   * @param {String} chartname
+   * @param {String} name - checkbox name
+   * @return {Bool}
+   */
+  function getCheckboxValue(chartname, name) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getCheckboxValue(name);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Check all checkboxes
+   * @function checkAll
+   * @param {String} chartname
+   */
+  function checkAll(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].checkAll();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function toggle
+   * @param {String} chartname
+   * @param {String} name
+   * @returns {String[]} string names of all checked checkboxes
+   * toggle the checked status of a checkbox 
+   */
+  function toggle(chartname, name) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].toggleCheckbox(name);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+  return {
+    setters: [function (_) {
+      Panel = _.Panel;
+    }, function (_2) {
+      InvalidChartError = _2.InvalidChartError;
+      DuplicateChartError = _2.DuplicateChartError;
+    }],
+    execute: function () {
+      exportObj = {
+        addGroupedBar: addGroupedBar,
+        addCheckboxes: addCheckboxes,
+        getAllCheckboxes: getAllCheckboxes,
+        getAllChecked: getAllChecked,
+        getCheckboxValue: getCheckboxValue,
+        checkAll: checkAll,
+        toggle: toggle,
+        setSvgSize: setSvgSize,
+        getSvgSize: getSvgSize,
+        setMargins: setMargins,
+        getMargins: getMargins,
+        getResetCount: getResetCount,
+        setData: setData,
+        getData: getData,
+        setDropdown: setDropdown,
+        getDropdown: getDropdown,
+        setDropdownChanged: setDropdownChanged,
+        unsetDropdownChanged: unsetDropdownChanged,
+        getDropdownChanged: getDropdownChanged
+      };
+
+      _export('exportObj', exportObj);
+
+      /***** model *****/
+      /**
+       * @private
+       * @name tables
+       * @desc store a panel object for each table in the view 
+       * each panel is accessed by a key, 'chartname', which is a css selector for a chart
+       */
+      charts = {};
+    }
+  };
+});
+$__System.register("9", ["a"], function (_export) {
   /**
    * @module groupedBar
    * @description Grouped bar chart module 
@@ -8494,13 +8803,17 @@ $__System.register("6", ["7"], function (_export) {
           var t = d / 1000000;
           return t + "m";
         };
+      } else if (column == "int_rate") {
+        tickFormatFunc = d3.format(',.3f');
       } else {
         tickFormatFunc = d3.format(',.2f');
       }
 
       //create axes
       var xAxis = d3.axisBottom().scale(x0).tickSize(0).tickPadding(10);
-      var yAxis = d3.axisLeft().scale(y).tickFormat(tickFormatFunc).ticks(5).tickSizeInner(-width);
+      var yAxis = d3.axisLeft().scale(y).tickFormat(tickFormatFunc)
+      //.ticks(5)
+      .tickSizeInner(-width);
 
       if (svg.selectAll(".x.axis")._groups[0].length < 1) {
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
@@ -8595,8 +8908,8 @@ $__System.register("6", ["7"], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      d3 = _;
+    setters: [function (_a) {
+      d3 = _a;
     }],
     execute: function () {
 
@@ -8611,273 +8924,100 @@ $__System.register("6", ["7"], function (_export) {
     }
   };
 });
-$__System.register("8", ["6", "7", "9", "e", "a", "b", "c", "d"], function (_export) {
-  var groupedBarChart, d3, getInsightsData, _Object$keys, Panel, Checkboxes, addBootstrapCheckboxObservers, toolTips, charts, get, groupedExport;
+$__System.register('b', ['6', '9', '10', 'c', 'd', 'a', 'e', 'f'], function (_export) {
+  var groupedModel, groupedBarChart, _Object$keys, getInsightsData, CtrlState, d3, addBootstrapCheckboxObservers, toolTips, charts, groupedExport;
 
-  // Call the drawing function associated with a chartname
-  function draw(chartname) {
-    if (charts.hasOwnProperty(chartname)) {
-      var jsonGroupNames;
-
-      (function () {
-
-        var arr = charts[chartname].cboxes.getAllChecked();
-        arr.push("Issuer");
-        // used returned checked value array to filter data
-        var filteredData = charts[chartname].data.map(function (d) {
-          return arr.reduce(function (result, key) {
-            result[key] = d[key];
-            return result;
-          }, {});
-        });
-
-        //add group attribute
-        jsonGroupNames = d3.keys(filteredData[0]).filter(function (key) {
-          return key !== "Issuer";
-        });
-
-        filteredData.forEach(function (d) {
-          d.groups = jsonGroupNames.map(function (name) {
-            return { name: name, value: +d[name] };
-          });
-        });
-
-        filteredData.columns = jsonGroupNames;
-
-        var loc = d3.select(chartname + " svg");
-
-        charts[chartname].drawFunc.column(charts[chartname].dropdown);
-        charts[chartname].drawFunc(loc, filteredData);
-        toolTips();
-      })();
-    }
-  }
+  /***** Public Functions *****/
 
   /**
-   * @function createDrawingFunc
-   * @param {Object} config - groupedBarConfig object
+   * @function addGraph
+   * @param {String} chartname
+   * @param {Object} svgSize - Size of svg container. Object with width and height properties
+   * @param {Object} svgMargins - Margin widths of svg container. Object with top, left, bottom and right properties
+   * @param {String} txnType - transaction type of data 
+   * @param {Object} config - grouped bar config object
    */
-  function createDrawingFunc(chartname, config) {
-
-    var func = groupedBarChart().width(charts[chartname].svg.width - charts[chartname].svg.margins.left - charts[chartname].svg.margins.right).height(charts[chartname].svg.height - charts[chartname].svg.margins.top - charts[chartname].svg.margins.bottom).classMap(config.classMap).classMapFunction(config.classMapFunction).groupRangeFunction(config.groupRangeFunction);
-
-    // create new object for chartname if it doesn't exisit
+  function addGraph(chartname, svgSize, svgMargins, txnType, config) {
+    // do nothing if table already exists
     if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      p.drawFunc = func;
-      charts[chartname] = p;
-    } else {
-      // update drawing function in charts
-      charts[chartname].drawFunc = func;
+      /*** Init State ***/
+
+      // init controller state
+      var c = new CtrlState();
+      charts[chartname] = c;
+
+      // init model state
+      groupedModel.addGroupedBar(chartname);
+
+      // set svg and margin size
+      setContainerBoundaries(chartname, svgSize, svgMargins, txnType);
+
+      // set groupedBar data
+      setData(chartname, txnType);
+
+      // set dropdown
+      setDropdown(chartname);
+
+      // set checkboxes
+      setCheckboxes(chartname);
+
+      // set draw function
+      setDrawFunc(chartname, config);
+
+      /*** Actions (setup container, add listeners, draw graph) ***/
+
+      // add svg container
+      buildContainer(chartname);
+
+      // add checkbox listeners
+      addCheckboxListeners(chartname);
+
+      // add dropdown listener
+      addDropdownListener(chartname);
+
+      // initialize panel title and dropdown title
+      updateDropdownText(chartname);
+      updatePanelTitle(chartname);
+
+      // draw the chart
+      draw(chartname);
     }
   }
 
-  /**
-   * @function drawSvg
-   */
-  function drawSvg(chartname) {
-
-    var width = charts[chartname].svg.width;
-    var height = charts[chartname].svg.height;
-
-    var svgSelect = chartname + " .grouped";
-
-    var gBarSvg = d3.select(svgSelect).append("div").classed("svg-container", true).append("svg").attr("viewBox", "-" + charts[chartname].svg.margins.left + " -" + charts[chartname].svg.margins.top + " " + width + " " + height).classed("svg-content-responsive", true);
-
-    return gBarSvg;
-  }
+  /***** Private Functions *****/
 
   /**
-   * @function toggleCheckbox
+   * @private
+   * @function addCheckboxListeners
+   * @param {String} chartname
    */
-  function toggleCheckbox(chartname, value) {
-    if (charts.hasOwnProperty(chartname)) {
-      if (charts[chartname].cboxes != null) {
-        return charts[chartname].cboxes.toggle(value);
-      }
-    } else {
-      throw new Error("Attempt to reference non-existent panel object");
-    }
-  }
+  function addCheckboxListeners(chartname) {
+    var cb = observerCallbackBuilder(chartname);
 
-  /**
-   * @function setSvgSize
-   */
-  function setSvgSize(chartname, width, height) {
-    if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      p.svg.width = width;
-      p.svg.height = height;
+    // need to observe the label element wrapping the input item because these are bootstrap checkboxes
+    // get the ids of each label item so we can pass them to addBootstrapCheckboxObserver
+    var ids = []; // holds id of each element that needs an observer
+    var selector = chartname + ' .checkboxes label';
+    var labels = d3.selectAll(selector);
 
-      charts[chartname] = p;
-    } else {
-      charts[chartname].svg.width = width;
-      charts[chartname].svg.height = height;
-    }
-  }
+    // use labels selection to get id of each label element
+    labels.each(function (d) {
+      ids.push(d3.select(this).attr('id'));
+    });
 
-  /**
-   * @function setMargins
-   */
-  function setMargins(chartname, margins) {
-    if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      p.svg.margins = margins;
-
-      charts[chartname] = p;
-    } else {
-      charts[chartname].svg.margins = margins;
-    }
-  }
-  /**
-   * @function observerCallbackBuilder 
-   */
-  function observerCallbackBuilder(chartname) {
-    return function (value) {
-      if (charts.hasOwnProperty(chartname)) {
-
-        var chart = charts[chartname];
-        var resetCount = chart.resetCount;
-
-        // resetCount is used to insure that on a dropdown change, the svg is only redrawn once,
-        // if we don't use resetCount, the svg will be redrawn once for every unchecked checkbox
-        if (resetCount == 0) {
-          // dropdown paramater has not changed, only the checkbox values
-
-          // toggle checkbox value in charts[chartname]
-          chart.cboxes.toggle(value);
-          draw(chartname);
-        } else if (resetCount > 1) {
-          chart.cboxes.toggle(value);
-          chart.resetCount -= 1;
-        } else {
-          // reset == 1
-          // dropdown parameter has changed, time to do work
-
-          // update resetCount
-          chart.resetCount -= 1;
-
-          // toggle checkbox value in charts[chartname]
-          chart.cboxes.toggle(value);
-
-          // call draw
-          draw(chartname);
-        }
-      } else {
-        throw new Error("Attempt to reference non-existent panel object");
-      }
-    };
-  }
-
-  /*
-   * @function addCheckboxes
-   */
-  function addCheckboxes(chartname, valArr, defaultArr) {
-    var cboxes = new Checkboxes(valArr, defaultArr);
-
-    if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      p.cboxes = cboxes;
-
-      charts[chartname] = p;
-    } else {
-      charts[chartname].cboxes = cboxes;
-    }
-  }
-
-  /**
-   * Create mutation observers and track them in the charts object
-   * @function initObservers
-   */
-  function initObservers(chartname, idArr, valArr, defaultArr, callback) {
-
-    addCheckboxes(chartname, valArr, defaultArr);
-
-    var observerFunc = addBootstrapCheckboxObservers().elementIds(idArr).callback(callback);
+    var observerFunc = addBootstrapCheckboxObservers().elementIds(ids).callback(cb);
 
     var observers = observerFunc();
 
-    // if charts.chartname does not exist, build it
-    if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      p.observers = observers;
-      p.observerFunc = observerFunc;
-    } else {
-      charts[chartname].observerFunc = observerFunc;
-      charts[chartname].observers = observers;
-    }
+    charts[chartname].observerFunc = observerFunc;
+    charts[chartname].observers = observers;
   }
 
-  function setDropdown(chartname, value) {
-    if (charts.hasOwnProperty(chartname)) {
-      charts[chartname].dropdown = value;
-    } else {
-      throw new Error("Attempt to add dropdown parameter to non-existent panel object in charts");
-    }
-  }
-
-  function setResetCount(chartname) {
-    if (charts.hasOwnProperty(chartname)) {
-      var cboxes = charts[chartname].cboxes;
-      var count = _Object$keys(cboxes.getAll()).length - cboxes.getAllChecked().length;
-
-      charts[chartname].resetCount = count;
-
-      //if count is 0 a checkmark event never gets fired, meaning the chart does not get redrawn but it needs to be
-      if (count == 0) {
-        draw(chartname);
-      }
-    }
-  }
-
-  function dropdownCallbackBuilder(chartname) {
-    // return d3 event callback
-    return function (d) {
-
-      // get dropdown values
-      var current = d3.select(this).attr('data-value');
-
-      var old = charts[chartname].dropdown;
-
-      if (current != old) {
-        // set dropdown param
-        setDropdown(chartname, current);
-
-        //UPDATE VALUE FUNCTION, IF ALL CHECKBOXES ARE CHECKED AND A DROPDOWN CHANGES DRAW DOES NOT GET CALLED
-        get[chartname].column(current);
-        charts[chartname].data = get[chartname]();
-
-        // set reset count
-        setResetCount(chartname);
-
-        // check all checkboxes
-        var selector = chartname + " .checkboxes label";
-        d3.selectAll(selector).classed('active', true);
-
-        //update dropdown text
-        updateDropdownText(chartname, d3.select(this).html());
-        //update Panel Title
-        updatePanelTitle(chartname, d3.select(this).html());
-      }
-    };
-  }
-
-  //
-  function updateDropdownText(chartname, text) {
-    //console.log (chartname, text);
-    var selection = chartname + " button";
-    var button = d3.select(selection);
-    button._groups[0][0].innerHTML = text + "<span class='caret'> </span>";
-  }
-
-  function updatePanelTitle(chartname, text) {
-    var selection = chartname + " h2";
-    var title = d3.select(selection);
-    //console.log( d3.select (title._groups[0][0]).attr("data-value") );
-
-    title._groups[0][0].innerText = d3.select(title._groups[0][0]).attr("data-value") + ": " + text;
-  }
-
+  /**
+   * @private
+   * @function addDropdownListener
+   * @param {String} chartname
+   */
   function addDropdownListener(chartname) {
     var selector = chartname + " .dropdown-menu li a";
     var cb = dropdownCallbackBuilder(chartname);
@@ -8885,154 +9025,461 @@ $__System.register("8", ["6", "7", "9", "e", "a", "b", "c", "d"], function (_exp
   }
 
   /**
-   * add or update chartname.data based on txnType and fi
+   * add the svg container for the chart to dom
+   * @private
+   * @function buildContainer
+   * @param {String} chartname - css selector for chart
    */
-  function buildData(chartname, txnType) {
-    get[chartname] = groupedFilter().txnType(txnType);
+  function buildContainer(chartname) {
+    // groupedModel may throw error when accessing svgSize or svgMargins
+    try {
+      var _groupedModel$getSvgSize = groupedModel.getSvgSize(chartname);
 
-    // if chartname object doesn't exist, build new object and add data property
-    //chartname is the selector for the panel
-    if (!charts.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      var dropDownSelect = chartname + " .dropdown-menu li a";
-      p.dropdown = d3.select(dropDownSelect).attr("data-value");
+      var width = _groupedModel$getSvgSize.width;
+      var height = _groupedModel$getSvgSize.height;
 
-      get[chartname].column(p.dropdown);
+      var _groupedModel$getMargins = groupedModel.getMargins(chartname);
 
-      p.data = get[chartname]();
-      charts[chartname] = p;
-    } else {
-      var dropDownSelect = chartname + " .dropdown-menu li a";
-      charts[chartname].dropdown = d3.select(dropDownSelect).attr("data-value");
-      get[chartname].column(charts[chartname].dropdown);
-      charts[chartname].data = get[chartname]();
+      var left = _groupedModel$getMargins.left;
+      var _top = _groupedModel$getMargins.top;
+
+      var svgSelect = chartname + " .grouped";
+
+      var gBarSvg = d3.select(svgSelect).append("div").classed("svg-container", true).append("svg").attr("viewBox", "-" + left + " -" + _top + " " + width + " " + height).classed("svg-content-responsive", true);
+    } catch (e) {
+      handleError(e);
     }
-
-    //update dropdown
-    updateDropdownText(chartname, d3.select(dropDownSelect).html());
-    updatePanelTitle(chartname, d3.select(dropDownSelect).html());
-    return charts[chartname].data;
   }
 
-  function groupedFilter() {
-
-    var txnType = null;
-    var column = null;
-
-    function updateData() {
-
-      if (txnType == null) {
-        throw "txnType cannot be null";
-      }
-
-      if (column == null) {
-        throw "column cannot be null";
-      }
-
-      var data = getData(txnType, column);
-      return data;
+  /**
+   * Format the data so it can be passed to groupedBar drawing function
+   * @private
+   * @function buildData
+   * @param {String} chartname
+   * @param {String[]} mccNames - array of mcc names to filter data on
+   * @returns {Array}
+   */
+  function buildData(chartname, mccNames) {
+    try {
+      var data = groupedModel.getData(chartname);
+      var dropdown = groupedModel.getDropdown(chartname);
+      return filterByCheckbox(filterByDropdown(data, dropdown), mccNames);
+    } catch (e) {
+      handleError(e);
     }
+  }
 
-    function getData(txnType, column) {
+  /**
+   * Draw the chart associated with chartname
+   * @function draw
+   * @param {String } chartname
+   */
+  function draw(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
 
-      var insightsData = getInsightsData(txnType);
-      var issuers = _Object$keys(insightsData);
-      var groupedBarData = [];
+      try {
+        // selector for locating the drawing functions target
+        var chartSelector = chartname + ' svg';
 
-      for (var i = 0; i < issuers.length; i++) {
-        //map Issuer to issuer to fi for every fi
-        groupedBarData[i] = {
-          Issuer: issuers[i]
-        };
+        // determine what mcc values to display data for
+        var mccNames = groupedModel.getAllChecked(chartname);
+        mccNames.push("Issuer");
 
-        //map every mcc_name to fee_pc for every fi
-        for (var j = 0; j < insightsData[[issuers[i]]].length; j++) {
-          groupedBarData[i][insightsData[issuers[i]][j].mcc_name] = insightsData[issuers[i]][j][column];
+        // use mcc values to filter data for display
+        var data = buildData(chartname, mccNames);
+
+        // get chart drawing target as d3 selection
+        var loc = d3.select(chartSelector);
+
+        // draw chart
+        charts[chartname].drawFunc.column(groupedModel.getDropdown(chartname));
+        charts[chartname].drawFunc(loc, data);
+
+        // add tooltip
+        toolTips();
+      } catch (e) {
+        handleError(e);
+      }
+    }
+  }
+
+  /**
+   * Return a function to call after the the dropdown is selected
+   * Returned function will update the dropdown selection and trigger the
+   * redraw process
+   * @function dropdownCallbackBuilder
+   * @param {String} chartname
+   * @returns {Function} 
+   */
+  function dropdownCallbackBuilder(chartname) {
+    // return d3 event callback
+    return function (d) {
+      try {
+        // get dropdown values
+        var current = d3.select(this).attr('data-value');
+
+        var old = groupedModel.getDropdown(chartname);
+
+        if (current != old) {
+          // set dropdown param
+          groupedModel.setDropdown(chartname, current);
+
+          // set dropdownChanged
+          groupedModel.setDropdownChanged(chartname);
+
+          if (groupedModel.getResetCount(chartname) == 0) {
+            // if resetCount is 0, checkbox observers won't trigger a draw
+            draw(chartname);
+          } else {
+            // check all checkboxes and let the observers handle the drawing
+            var selector = chartname + ' .checkboxes label';
+            d3.selectAll(selector).classed('active', true);
+          }
+
+          //update dropdown text
+          updateDropdownText(chartname, d3.select(this).text());
+          //update Panel Title
+          updatePanelTitle(chartname, d3.select(this).text());
         }
+      } catch (e) {
+        handleError(e);
       }
-      var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function (key) {
-        return key !== "Issuer";
-      });
-
-      groupedBarData.forEach(function (d) {
-        d.groups = jsonGroupNames.map(function (name) {
-          return { name: name, value: +d[name] };
-        });
-      });
-
-      groupedBarData.columns = jsonGroupNames;
-
-      return groupedBarData;
-    }
-
-    updateData.txnType = function (value) {
-      if (!arguments.length) return txnType;
-      txnType = value;
-
-      if (value == null || value == undefined) {
-        throw "txnType cannot be null or undefined";
-      }
-      return updateData;
     };
-
-    updateData.column = function (value) {
-      if (!arguments.length) return column;
-      column = value;
-
-      if (value == null || value == undefined) {
-        throw "column cannot be null or undefined";
-      }
-      return updateData;
-    };
-
-    return updateData;
   }
 
-  return {
-    setters: [function (_3) {
-      groupedBarChart = _3["default"];
-    }, function (_2) {
-      d3 = _2;
-    }, function (_) {
-      getInsightsData = _.getInsightsData;
-    }, function (_e) {
-      _Object$keys = _e["default"];
-    }, function (_a) {
-      Panel = _a["default"];
-    }, function (_b) {
-      Checkboxes = _b["default"];
-    }, function (_c) {
-      addBootstrapCheckboxObservers = _c["default"];
-    }, function (_d) {
-      toolTips = _d.toolTips;
-    }],
-    execute: function () {
-      "use strict";
+  /**
+   * Take insights data for a transaction type, remove all values that do not match the dropdown param and return an array
+   * @private
+   * @function filterByDropdown
+   * @function {Object} data - data to filter
+   * @function {String} dropdown - dropdown value to get data for
+   */
+  function filterByDropdown(data, dropdown) {
+    var issuers = _Object$keys(data);
+    var groupedBarData = [];
 
-      _export("default", groupedFilter);
-
-      charts = {};
-
-      //used to create a global
-      get = {};
-      groupedExport = {
-        setSvgSize: setSvgSize,
-        setMargins: setMargins,
-        buildData: buildData,
-        drawSvg: drawSvg,
-        draw: draw,
-        createDrawingFunc: createDrawingFunc,
-        toggleCheckbox: toggleCheckbox,
-        observerCallbackBuilder: observerCallbackBuilder,
-        initObservers: initObservers,
-        addDropdownListener: addDropdownListener
+    for (var i = 0; i < issuers.length; i++) {
+      //map Issuer to issuer to fi for every fi
+      groupedBarData[i] = {
+        Issuer: issuers[i]
       };
 
-      _export("groupedExport", groupedExport);
+      //map every mcc_name to fee_pc for every fi
+      for (var j = 0; j < data[[issuers[i]]].length; j++) {
+        groupedBarData[i][data[issuers[i]][j].mcc_name] = data[issuers[i]][j][dropdown];
+      }
+    }
+    var jsonGroupNames = d3.keys(groupedBarData[0]).filter(function (key) {
+      return key !== "Issuer";
+    });
+
+    groupedBarData.forEach(function (d) {
+      d.groups = jsonGroupNames.map(function (name) {
+        return { name: name, value: +d[name] };
+      });
+    });
+
+    groupedBarData.columns = jsonGroupNames;
+
+    return groupedBarData;
+  }
+
+  /**
+   * Take an array of fi's for a transaction type and drop any mcc objects not in mccNames, return the array
+   * @private
+   * @function filterByCheckbox
+   * @param {Array} data - data to filter
+   * @param {String[]} mccNames - array of mcc names checked 
+   */
+  function filterByCheckbox(data, mccNames) {
+    var filteredData = data.map(function (d) {
+      return mccNames.reduce(function (result, key) {
+        result[key] = d[key];
+        return result;
+      }, {});
+    });
+
+    //add group attribute
+    var jsonGroupNames = d3.keys(filteredData[0]).filter(function (key) {
+      return key !== "Issuer";
+    });
+
+    filteredData.forEach(function (d) {
+      d.groups = jsonGroupNames.map(function (name) {
+        return { name: name, value: +d[name] };
+      });
+    });
+
+    filteredData.columns = jsonGroupNames;
+
+    return filteredData;
+  }
+
+  /**
+   * Get the first item in chartname's dropdown list
+   * @private
+   * @function getDropdownDefault
+   * @param {String} chartname
+   * @return {String} value of the first dropdown item
+   */
+  function getDropdownDefault(chartname) {
+    var selector = chartname + ' .dropdown-menu li a';
+    var val = d3.select(selector).attr('data-value');
+
+    return val;
+  }
+
+  /**
+   * @function handleError
+   * @private
+   * @param {Object} err - Error object with message property
+   */
+  function handleError(err) {
+    console.log(err.message);
+  }
+
+  /**
+   * Return function to be called when a checkbox input changes
+   * @private
+   * @function observerCallbackBuilder
+   * @param {String} chartname
+   * @return {function} 
+   */
+  function observerCallbackBuilder(chartname) {
+    return function (value) {
+      try {
+        if (groupedModel.getDropdownChanged(chartname)) {
+          // only want to redraw the graph once.  if the dropdown changed
+          // wait until there is only one checkbox left to toggle before drawing
+          if (groupedModel.getResetCount(chartname) > 1) {
+            // count greater than 1, toggle checkbox and do nothing else
+            groupedModel.toggle(chartname, value);
+          } else {
+            // count == 1, time to do work
+            // toggle checkbox
+            groupedModel.toggle(chartname, value);
+
+            // draw
+            draw(chartname);
+
+            // reset the dropdownChanged so drawing isn't messed up later
+            groupedModel.unsetDropdownChanged(chartname);
+          }
+        } else {
+          // dropdown didn't change, toggle and draw
+          groupedModel.toggle(chartname, value);
+          draw(chartname);
+        }
+      } catch (e) {
+        handleError(e);
+      }
+    };
+  }
+
+  /**
+   * add checkboxes to model state
+   * @private
+   * @function setCheckboxes
+   * @param {String} chartname - css selector for chart
+   */
+  function setCheckboxes(chartname) {
+    // select all chart checkboxes
+    var vals = [];
+    var defaults = [];
+    // checkboxes use bootstrap style (input wrapped in label)
+    var selector = chartname + ' .checkboxes label';
+    var labels = d3.selectAll(selector);
+
+    // use labels selection to populate defaults and vals
+    labels.each(function (d) {
+      // presence of active class indicates the box is checked
+      defaults.push(d3.select(this).classed('active'));
+
+      // get checkbox value from input element
+      vals.push(d3.select(this).select('input').attr('value'));
+    });
+
+    // add checkboxes to groupedModel
+    try {
+      groupedModel.addCheckboxes(chartname, vals, defaults);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+   * set the svgSize and svgMargins in the model 
+   * @private
+   * @function setContainerBoundaries
+   * @param {String} chartname - css selector for chart
+   * @param {Object} svgSize - Size of svg container. Object with width and height properties
+   * @param {Object} svgMargins - Margin widths of svg container. Object with top, left, bottom and right properties
+   */
+  function setContainerBoundaries(chartname, svgSize, svgMargins) {
+    try {
+      groupedModel.setSvgSize(chartname, svgSize);
+      groupedModel.setMargins(chartname, svgMargins);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+   * Set the data needed for the table 
+   * @function buildData
+   * @private
+   * @param {String} chartname - css selector for chart
+   * @param {String} txnType
+   */
+  function setData(chartname, txnType) {
+
+    var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
+
+    try {
+      groupedModel.setData(chartname, insightsData);
+    } catch (e) {
+      handleError(e.message);
+    }
+  }
+
+  /**
+   * Create a drawing function and store it in the charts
+   * @private
+   * @function setDrawFunc
+   * @param {String} chartname - css selector for chart
+   * @param {Object} config - groupedBarConfig object
+   */
+  function setDrawFunc(chartname, config) {
+
+    // groupedModel may throw error when calling getSvgSize and getMargins
+    try {
+      // need svgSize and svgMargins for configuring the drawing function
+
+      var _groupedModel$getSvgSize2 = groupedModel.getSvgSize(chartname);
+
+      var width = _groupedModel$getSvgSize2.width;
+      var height = _groupedModel$getSvgSize2.height;
+
+      var _groupedModel$getMargins2 = groupedModel.getMargins(chartname);
+
+      var left = _groupedModel$getMargins2.left;
+      var right = _groupedModel$getMargins2.right;
+      var _top2 = _groupedModel$getMargins2.top;
+      var bottom = _groupedModel$getMargins2.bottom;
+
+      var drawFunc = groupedBarChart().width(width - left - right).height(height - _top2 - bottom).classMap(config.classMap).classMapFunction(config.classMapFunction).groupRangeFunction(config.groupRangeFunction);
+
+      // add drawing function to charts
+      charts[chartname].drawFunc = drawFunc;
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+   * Set the dropdown param of the associated chart
+   * @function setDropdown
+   * @private
+   * @param {String} chartname - css selector for chart
+   * @param {String} [val] - optional dropdown value
+   */
+  function setDropdown(chartname, val) {
+
+    // if user did not pass in val, default to first dropdown list element
+    if (val === undefined) {
+      val = getDropdownDefault(chartname);
+    }
+
+    try {
+      groupedModel.setDropdown(chartname, val);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+   * Change the dropdown button text for a chart. If no text provided,
+   * uses the text from the first dropdown option
+   * @private
+   * @function updateDropdownText
+   * @param {String} chartname
+   * @param {String} [text] - text of selected button from dropdown
+   */
+  function updateDropdownText(chartname, text) {
+    // check if text was specified, if not, get default value
+    if (text === undefined) {
+      text = getDropdownDefaultName(chartname);
+    }
+
+    var selection = chartname + ' button';
+    var button = d3.select(selection);
+    var buttonText = text + ' <span class=\'caret\'> </span>';
+    button.html(buttonText);
+  }
+
+  /**
+   * @private
+   * @function updatePanelTitle
+   * @param {String} chartname
+   * @param {String} text - text of selected button from dropdown
+   */
+  function updatePanelTitle(chartname, text) {
+    // check if text was specified, if not, get default value
+    if (text === undefined) {
+      text = getDropdownDefaultName(chartname);
+    }
+
+    var selection = chartname + ' h2';
+    var title = d3.select(selection);
+    var titleText = title.attr("data-value") + ': ' + text;
+
+    title.html(titleText);
+  }
+
+  /**
+   * Get the text of the first dropdown option for a chart
+   * @private
+   * @function getDropdownDefaultName
+   * @param {String} chartname
+   * @return {String} 
+   */
+  function getDropdownDefaultName(chartname) {
+    //return first dropdown option
+    var selector = chartname + ' .dropdown-menu li a';
+    var val = d3.select(selector);
+    return val.text();;
+  }
+  return {
+    setters: [function (_2) {
+      groupedModel = _2.exportObj;
+    }, function (_3) {
+      groupedBarChart = _3['default'];
+    }, function (_) {
+      _Object$keys = _['default'];
+    }, function (_c) {
+      getInsightsData = _c.getInsightsData;
+    }, function (_d) {
+      CtrlState = _d['default'];
+    }, function (_a) {
+      d3 = _a;
+    }, function (_e) {
+      addBootstrapCheckboxObservers = _e['default'];
+    }, function (_f) {
+      toolTips = _f.toolTips;
+    }],
+    execute: function () {
+      'use strict';
+
+      charts = {};
+      groupedExport = {
+        addGraph: addGraph
+      };
+
+      _export('groupedExport', groupedExport);
     }
   };
 });
-$__System.register("f", [], function (_export) {
+$__System.register("11", [], function (_export) {
   "use strict";
 
   _export("default", groupedBarConfig);
@@ -9099,7 +9546,7 @@ $__System.register("f", [], function (_export) {
     execute: function () {}
   };
 });
-$__System.register("10", ["7"], function (_export) {
+$__System.register("12", ["a"], function (_export) {
   "use strict";
 
   var d3;
@@ -9303,14 +9750,14 @@ $__System.register("10", ["7"], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      d3 = _;
+    setters: [function (_a) {
+      d3 = _a;
     }],
     execute: function () {}
   };
 });
-$__System.register('11', ['7', '9', '10', 'e', 'c', 'a', 'b', 'd'], function (_export) {
-  var d3, getInsightsData, donutChart, _Object$keys, addBootstrapCheckboxObservers, Panel, Checkboxes, toolTips, charts, sumFunc, avgFunc, columnConfig, donutExport;
+$__System.register('13', ['10', '12', '14', '15', 'c', 'e', 'a', 'f'], function (_export) {
+  var _Object$keys, donutChart, Panel, Checkboxes, getInsightsData, addBootstrapCheckboxObservers, d3, toolTips, charts, sumFunc, avgFunc, columnConfig, donutExport;
 
   /**
    * add or update chartname.data based on txnType and fi
@@ -9582,22 +10029,22 @@ $__System.register('11', ['7', '9', '10', 'e', 'c', 'a', 'b', 'd'], function (_e
     d3.selectAll(selector).on('click', cb);
   }
   return {
-    setters: [function (_3) {
-      d3 = _3;
-    }, function (_) {
-      getInsightsData = _.getInsightsData;
+    setters: [function (_) {
+      _Object$keys = _['default'];
     }, function (_2) {
       donutChart = _2['default'];
-    }, function (_e) {
-      _Object$keys = _e['default'];
+    }, function (_3) {
+      Panel = _3['default'];
+    }, function (_4) {
+      Checkboxes = _4['default'];
     }, function (_c) {
-      addBootstrapCheckboxObservers = _c['default'];
+      getInsightsData = _c.getInsightsData;
+    }, function (_e) {
+      addBootstrapCheckboxObservers = _e['default'];
     }, function (_a) {
-      Panel = _a['default'];
-    }, function (_b) {
-      Checkboxes = _b['default'];
-    }, function (_d) {
-      toolTips = _d.toolTips;
+      d3 = _a;
+    }, function (_f) {
+      toolTips = _f.toolTips;
     }],
     execute: function () {
       'use strict';
@@ -9654,7 +10101,7 @@ $__System.register('11', ['7', '9', '10', 'e', 'c', 'a', 'b', 'd'], function (_e
     }
   };
 });
-$__System.register("12", [], function (_export) {
+$__System.register("16", [], function (_export) {
   "use strict";
 
   _export("default", donutConfig);
@@ -9739,7 +10186,7 @@ $__System.register("12", [], function (_export) {
     execute: function () {}
   };
 });
-$__System.register("13", [], function (_export) {
+$__System.register("17", [], function (_export) {
   "use strict";
 
   _export("default", stackConfig);
@@ -9797,7 +10244,33 @@ $__System.register("13", [], function (_export) {
     execute: function () {}
   };
 });
-$__System.register("14", ["7"], function (_export) {
+$__System.register("14", [], function (_export) {
+  "use strict";
+
+  _export("default", Panel);
+
+  function Panel() {
+    this.cboxes = null;
+    this.chartConfig = null;
+    this.data = null;
+    this.drawFunc = null;
+    this.dropdown = null;
+    this.observerFunc = null;
+    this.observers = null;
+    this.resetCount = 0;
+    this.svg = {
+      width: 0,
+      height: 0,
+      margins: { top: 0, left: 0, right: 0, bottom: 0 }
+    };
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+$__System.register("18", ["a"], function (_export) {
   "use strict";
 
   var d3;
@@ -9895,332 +10368,14 @@ $__System.register("14", ["7"], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      d3 = _;
+    setters: [function (_a) {
+      d3 = _a;
     }],
     execute: function () {}
   };
 });
-$__System.registerDynamic('15', ['16'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $ = $__require('16');
-  module.exports = function defineProperty(it, key, desc) {
-    return $.setDesc(it, key, desc);
-  };
-  return module.exports;
-});
-$__System.registerDynamic("17", ["15"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("15"), __esModule: true };
-  return module.exports;
-});
-$__System.registerDynamic("18", ["17"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var _Object$defineProperty = $__require("17")["default"];
-  exports["default"] = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        _Object$defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-  exports.__esModule = true;
-  return module.exports;
-});
-$__System.registerDynamic("19", [], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  exports["default"] = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  exports.__esModule = true;
-  return module.exports;
-});
-$__System.register('b', ['18', '19', 'e'], function (_export) {
-  var _createClass, _classCallCheck, _Object$keys, Checkboxes;
-
-  return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_2) {
-      _classCallCheck = _2['default'];
-    }, function (_e) {
-      _Object$keys = _e['default'];
-    }],
-    execute: function () {
-      /**
-       * @module checkboxes
-       */
-
-      /** Track a group of checkboxes and their state (checked or unchecked) */
-      'use strict';
-
-      Checkboxes = (function () {
-        /**
-         * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
-         * @param {string[]} namesArr - the name of each checkbox you want to track
-         * @param {bool[]} [valuesArr] - the starting value of each checkbox in nameArr, true means the checkbox is checked
-         */
-
-        function Checkboxes(namesArr, valuesArr) {
-          _classCallCheck(this, Checkboxes);
-
-          // Case 1: only namesArr passed as argument, initialize checkbox properties to false by default
-          if (arguments.length == 1) {
-            this.checkboxes = namesArr.reduce(function (result, val) {
-              result[val] = false;
-              return result;
-            }, {});
-          } else if (arguments.length == 2) {
-            // case 2: namesArr and valuesArr provided
-            // use valuesArr to set starting value of each checkbox
-            this.checkboxes = namesArr.reduce(function (result, val, idx) {
-              result[val] = valuesArr[idx];
-              return result;
-            }, {});
-          } else {
-            // case 3: throw an error
-            throw new Error('Attempted to instantiate Checkboxes class with no parameters');
-          }
-        }
-
-        /**
-         * Return an object containing all checkbox names and values
-         */
-
-        _createClass(Checkboxes, [{
-          key: 'getAll',
-          value: function getAll() {
-            return this.checkboxes;
-          }
-
-          /**
-           * return an array of all properties whose value is true
-           */
-        }, {
-          key: 'getAllChecked',
-          value: function getAllChecked() {
-            // get array of checkbox names
-            var keys = _Object$keys(this.checkboxes);
-            var c = this.checkboxes;
-
-            // go through each checkbox name and drop any that don't have a value of true
-            return keys.filter(function (key) {
-              return c[key];
-            });
-          }
-
-          /**
-           * Return the value belonging to the checkbox associated with name
-           * @param {string} name - name of the checkbox
-           */
-        }, {
-          key: 'getValue',
-          value: function getValue(name) {
-            return this.checkboxes[name];
-          }
-
-          /**
-           * Set all checkbox values to true
-           */
-        }, {
-          key: 'checkAll',
-          value: function checkAll() {
-            var _this = this;
-
-            var keys = _Object$keys(this.checkboxes);
-            keys.forEach(function (k) {
-              _this.checkboxes[k] = true;
-            });
-          }
-
-          /**
-           * Flip the value of the checkbox associated with name
-           * @param {string} name - name of the checkbox
-           * @returns {array}
-           */
-        }, {
-          key: 'toggle',
-          value: function toggle(name) {
-            if (this.checkboxes.hasOwnProperty(name)) {
-              this.checkboxes[name] = !this.checkboxes[name];
-            }
-            return this.getAllChecked();
-          }
-        }]);
-
-        return Checkboxes;
-      })();
-
-      _export('default', Checkboxes);
-    }
-  };
-});
-$__System.register('c', ['b'], function (_export) {
-  /**
-   * @module checkboxObserver
-   */
-
-  /**
-   * @callback changeCallback
-   * @param {string} value associated with the value attribute of input checkboxes
-   */
-
-  /**
-   * Respond to bootstrap checkboxes being checked
-   * @function addBootstrapCheckboxObservers
-   * @returns {function} configurable function a la Mike Bostock style
-   */
-  'use strict';
-
-  var Checkboxes;
-
-  /*
-   * @function addObserver
-   * @param el {DOM Node} a dom element 
-   * @param callback {function} function returned by checkboxChangeBuilder
-   * @description execute a callback function when a bootstrap checkbox is checkedi or unchecked
-   */
-
-  _export('default', addBootstrapCheckboxObservers);
-
-  function addBootstrapCheckboxObservers() {
-
-    var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style)
-    callback; // changeCallback
-
-    /**
-     * Add mutation observers for each element in elementIds
-     * @function observers
-     * @returns {Object} Checkboxes class
-     */
-    function observers() {
-      // get the DOM element tied to each id
-      var domEls = elementIds.map(function (id) {
-        return document.getElementById(id);
-      });
-
-      // add observers for each item in domEls and collect the new mutation observer objects in an array so we can return it
-      var observerArr = domEls.map(function (el) {
-        return addCheckboxObserver(el, callback);
-      });
-
-      return observerArr;
-    }
-
-    // configuration functions (getters and setters)
-    observers.elementIds = function (arr) {
-      if (!arguments.length) {
-        return elementIds;
-      }
-
-      elementIds = arr;
-      return observers;
-    };
-
-    observers.callback = function (func) {
-      if (!arguments.length) {
-        return callback;
-      }
-
-      callback = func;
-      return observers;
-    };
-
-    // take an array of mutation observers and disconnect each one
-    observers.disconnect = function (observersArr) {
-      observersArr.forEach(function (obs) {
-        obs.disconnect();
-      });
-
-      return observers;
-    };
-
-    return observers;
-  }
-
-  function addCheckboxObserver(el, callback) {
-    // wrap the callback so it can be used if the mutation alters the checkbox
-    var mutationFunc = mutationFuncBuilder(callback);
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(mutationFunc);
-    });
-
-    // mutation observer config object, use oldValue: true so we can compare current value to old value
-    // otherwise we won't be able to tell if the active value changed
-    var config = { attributes: true, attributeOldValue: true, attributeFilter: ['class'] };
-
-    // apply the observer to el
-    observer.observe(el, config);
-
-    return observer;
-  }
-
-  /**
-   * Return a function that can be called by mutation observer
-   * @function mutationFuncBuilder
-   * @param {function} changeCallback - function that takes a checkbox value
-   * @returns {function} function that accepts a mutation record
-   */
-  function mutationFuncBuilder(changeCallback) {
-    return function (mutation) {
-      /* mutation will track the old and new value, two cases that we care about
-         1) added active class to the label
-         2) removed active class from the label
-         mutation will fire anytime a class is added or removed, the class may or may
-         not be the active class that signals a checkbox click
-         so we check to see if the active class is the class that changed betwee old and new
-      */
-      var newHasActive = mutation.target.classList.contains('active');
-      var oldHasActive = mutation.oldValue.toString().indexOf('active');
-      if (oldHasActive == -1) oldHasActive = false;else oldHasActive = true;
-
-      if (newHasActive && !oldHasActive || oldHasActive && !newHasActive) {
-        // get the input element nested in the label element so we can pass its value to changeCallback
-        var elArr = mutation.target.getElementsByTagName('input');
-        if (elArr.length) {
-          var inputEl = elArr[0];
-          changeCallback(inputEl.value);
-        }
-      }
-    };
-  }
-  return {
-    setters: [function (_b) {
-      Checkboxes = _b['default'];
-    }],
-    execute: function () {}
-  };
-});
-$__System.register("1a", ["7", "9", "14", "e", "a", "b", "c", "d"], function (_export) {
-  var d3, getInsightsData, stackChart, _Object$keys, Panel, Checkboxes, addBootstrapCheckboxObservers, toolTips, charts, stackExport, getData;
+$__System.register("19", ["10", "14", "15", "18", "c", "a", "e", "f"], function (_export) {
+  var _Object$keys, Panel, Checkboxes, stackChart, getInsightsData, d3, addBootstrapCheckboxObservers, toolTips, charts, stackExport, getData;
 
   /**
    * @function createDrawingFunc
@@ -10565,22 +10720,22 @@ $__System.register("1a", ["7", "9", "14", "e", "a", "b", "c", "d"], function (_e
   }
 
   return {
-    setters: [function (_2) {
-      d3 = _2;
-    }, function (_) {
-      getInsightsData = _.getInsightsData;
+    setters: [function (_) {
+      _Object$keys = _["default"];
+    }, function (_2) {
+      Panel = _2["default"];
+    }, function (_4) {
+      Checkboxes = _4["default"];
     }, function (_3) {
       stackChart = _3["default"];
-    }, function (_e) {
-      _Object$keys = _e["default"];
-    }, function (_a) {
-      Panel = _a["default"];
-    }, function (_b) {
-      Checkboxes = _b["default"];
     }, function (_c) {
-      addBootstrapCheckboxObservers = _c["default"];
-    }, function (_d) {
-      toolTips = _d.toolTips;
+      getInsightsData = _c.getInsightsData;
+    }, function (_a) {
+      d3 = _a;
+    }, function (_e) {
+      addBootstrapCheckboxObservers = _e["default"];
+    }, function (_f) {
+      toolTips = _f.toolTips;
     }],
     execute: function () {
       "use strict";
@@ -10608,14 +10763,960 @@ $__System.register("1a", ["7", "9", "14", "e", "a", "b", "c", "d"], function (_e
     }
   };
 });
-$__System.registerDynamic("1b", ["1c"], true, function ($__require, exports, module) {
+$__System.register('1a', ['7', '8'], function (_export) {
+  /**
+   * Store state for groupStacked charts
+   * @module groupStackModel
+   */
+
+  /***** local packages *****/
+
+  /***** export *****/
+
+  'use strict';
+
+  var Panel, InvalidChartError, DuplicateChartError, exportObj, charts;
+
+  /**
+   * create a new Panel object in charts if charts does not contain the matching chartname
+   * @function addgroupStacked
+   * @param {String} chartname
+   */
+  function addGroupStack(chartname) {
+    // add a new chart to charts if the name doesn't already exist
+    if (!charts.hasOwnProperty(chartname)) {
+      charts[chartname] = new Panel();
+    } else {
+      throw new DuplicateChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setSvgSize
+   * @param {String} chartname
+   * @param {Object} obj - needs to have width and height property
+   */
+  function setSvgSize(chartname, obj) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].svgSize = obj;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getSvgSize
+   * @param {String} chartname
+   * @return {Object} contains width and height property
+   */
+  function getSvgSize(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].svgSize;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setMargins
+   * @param {String} chartname
+   * @param {Object} margins - object with left, right, top, bottom properties
+   */
+  function setMargins(chartname, margins) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].svgMargins = margins;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getMargins
+   * @param {String} chartname
+   * @return {Object} contains left, right, top, bottom properties
+   */
+  function getMargins(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].svgMargins;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getResetCount
+   * @param {String} chartname
+   * @return {Int}
+   */
+  function getResetCount(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].resetCount;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setData
+   * @param {String} chartname
+   * @param {Object} data
+   */
+  function setData(chartname, data) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].data = data;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getData
+   * @param {String} chartname
+   * @return {Object} 
+   */
+  function getData(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].data;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function setDropdown
+   * @param {String} chartname
+   * @param {String} val 
+   */
+  function setDropdown(chartname, val) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdown = val;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getDropdown
+   * @param {String} chartname
+   * @return {String}
+   */
+  function getDropdown(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].dropdown;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function addCheckboxes
+   * @paranm {String} chartname
+   * @param {String[]} valArr - values that can be checked or unchecked
+   * @param {Bool[]} defaultArr - whether each value in valArr is checked or not
+   */
+  function addCheckboxes(chartname, valArr, defaultArr) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].createCboxes(valArr, defaultArr);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getAllCheckboxes
+   * @param {String} chartname
+   * @return {Object} contains all checkbox values and checked status
+   */
+  function getAllCheckboxes(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getAllCheckboxes();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getAllChecked
+   * @param {String} chartname
+   * @return {String[]} string names of each checked checkbox
+   */
+  function getAllChecked(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getAllChecked();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getCheckboxValue
+   * @param {String} chartname
+   * @param {String} name - checkbox name
+   * @return {Bool}
+   */
+  function getCheckboxValue(chartname, name) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].getCheckboxValue(name);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Check all checkboxes
+   * @function checkAll
+   * @param {String} chartname
+   */
+  function checkAll(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].checkAll();
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function toggle
+   * @param {String} chartname
+   * @param {String} name
+   * @returns {String[]} string names of all checked checkboxes
+   * toggle the checked status of a checkbox 
+   */
+  function toggle(chartname, name) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].toggleCheckbox(name);
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+  /**
+   * @return {Boolean} current value of dropdownChanged
+   */
+  function setDropdownChanged(chartname, val) {
+    if (charts.hasOwnProperty(chartname)) {
+      charts[chartname].dropdownChanged = val;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+  /**
+    * Set dropdownChanged to val
+    * @param {Boolean} val
+    */
+  function getDropdownChanged(chartname) {
+    if (charts.hasOwnProperty(chartname)) {
+      return charts[chartname].dropdownChanged;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+  return {
+    setters: [function (_) {
+      Panel = _.Panel;
+    }, function (_2) {
+      InvalidChartError = _2.InvalidChartError;
+      DuplicateChartError = _2.DuplicateChartError;
+    }],
+    execute: function () {
+      exportObj = {
+        addGroupStack: addGroupStack,
+        addCheckboxes: addCheckboxes,
+        getAllCheckboxes: getAllCheckboxes,
+        getAllChecked: getAllChecked,
+        getCheckboxValue: getCheckboxValue,
+        checkAll: checkAll,
+        toggle: toggle,
+        setSvgSize: setSvgSize,
+        getSvgSize: getSvgSize,
+        setMargins: setMargins,
+        getMargins: getMargins,
+        getResetCount: getResetCount,
+        setData: setData,
+        getData: getData,
+        setDropdown: setDropdown,
+        getDropdown: getDropdown,
+        getDropdownChanged: getDropdownChanged,
+        setDropdownChanged: setDropdownChanged
+      };
+
+      _export('exportObj', exportObj);
+
+      /***** model *****/
+      /**
+       * @private
+       * @name groupStacked
+       * @desc store a panel object for each groupStacked in the view 
+       * each panel is accessed by a key, 'chartname', which is a css selector for a chart
+       */
+      charts = {};
+
+      window.charts = charts;
+    }
+  };
+});
+$__System.register('e', ['15'], function (_export) {
+  /**
+   * @module checkboxObserver
+   */
+
+  /**
+   * @callback changeCallback
+   * @param {string} value associated with the value attribute of input checkboxes
+   */
+
+  /**
+   * Respond to bootstrap checkboxes being checked
+   * @function addBootstrapCheckboxObservers
+   * @returns {function} configurable function a la Mike Bostock style
+   */
+  'use strict';
+
+  var Checkboxes;
+
+  /*
+   * @function addObserver
+   * @param el {DOM Node} a dom element 
+   * @param callback {function} function returned by checkboxChangeBuilder
+   * @description execute a callback function when a bootstrap checkbox is checkedi or unchecked
+   */
+
+  _export('default', addBootstrapCheckboxObservers);
+
+  function addBootstrapCheckboxObservers() {
+
+    var elementIds, // array of strings, each string is the id of a label wrapping a checkbox (bootstrap checkbox style)
+    callback; // changeCallback
+
+    /**
+     * Add mutation observers for each element in elementIds
+     * @function observers
+     * @returns {Object} Checkboxes class
+     */
+    function observers() {
+      // get the DOM element tied to each id
+      var domEls = elementIds.map(function (id) {
+        return document.getElementById(id);
+      });
+
+      // add observers for each item in domEls and collect the new mutation observer objects in an array so we can return it
+      var observerArr = domEls.map(function (el) {
+        return addCheckboxObserver(el, callback);
+      });
+
+      return observerArr;
+    }
+
+    // configuration functions (getters and setters)
+    observers.elementIds = function (arr) {
+      if (!arguments.length) {
+        return elementIds;
+      }
+
+      elementIds = arr;
+      return observers;
+    };
+
+    observers.callback = function (func) {
+      if (!arguments.length) {
+        return callback;
+      }
+
+      callback = func;
+      return observers;
+    };
+
+    // take an array of mutation observers and disconnect each one
+    observers.disconnect = function (observersArr) {
+      observersArr.forEach(function (obs) {
+        obs.disconnect();
+      });
+
+      return observers;
+    };
+
+    return observers;
+  }
+
+  function addCheckboxObserver(el, callback) {
+    // wrap the callback so it can be used if the mutation alters the checkbox
+    var mutationFunc = mutationFuncBuilder(callback);
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(mutationFunc);
+    });
+
+    // mutation observer config object, use oldValue: true so we can compare current value to old value
+    // otherwise we won't be able to tell if the active value changed
+    var config = { attributes: true, attributeOldValue: true, attributeFilter: ['class'] };
+
+    // apply the observer to el
+    observer.observe(el, config);
+
+    return observer;
+  }
+
+  /**
+   * Return a function that can be called by mutation observer
+   * @function mutationFuncBuilder
+   * @param {function} changeCallback - function that takes a checkbox value
+   * @returns {function} function that accepts a mutation record
+   */
+  function mutationFuncBuilder(changeCallback) {
+    return function (mutation) {
+      /* mutation will track the old and new value, two cases that we care about
+         1) added active class to the label
+         2) removed active class from the label
+         mutation will fire anytime a class is added or removed, the class may or may
+         not be the active class that signals a checkbox click
+         so we check to see if the active class is the class that changed betwee old and new
+      */
+      var newHasActive = mutation.target.classList.contains('active');
+      var oldHasActive = mutation.oldValue.toString().indexOf('active');
+      if (oldHasActive == -1) oldHasActive = false;else oldHasActive = true;
+
+      if (newHasActive && !oldHasActive || oldHasActive && !newHasActive) {
+        // get the input element nested in the label element so we can pass its value to changeCallback
+        var elArr = mutation.target.getElementsByTagName('input');
+        if (elArr.length) {
+          var inputEl = elArr[0];
+          changeCallback(inputEl.value);
+        }
+      }
+    };
+  }
+  return {
+    setters: [function (_) {
+      Checkboxes = _['default'];
+    }],
+    execute: function () {}
+  };
+});
+$__System.register('1b', ['10', 'c', '1a', 'd', 'a', '1c', 'e', 'f'], function (_export) {
+  var _Object$keys, getInsightsData, groupStackModel, CtrlState, d3, stacksChart, addBootstrapCheckboxObservers, toolTips, groupStacks, groupStackExport;
+
+  /***** Public Functions *****/
+
+  /**
+   * @function addGroupStack
+   * @param {String} chartname
+   * @param {Int} width - Size of svg container. Object with width and height properties
+   * @param {Int} height - Margin widths of svg container. Object with top, left, bottom and right properties
+   * @param {Object} margins - Margin containing values for top, left, right, and bottom 
+   */
+  function addGroupStack(chartname, width, height, margins) {
+
+    if (!groupStacks.hasOwnProperty(chartname)) {
+
+      try {
+        //create object to store controller state
+        var c = new CtrlState();
+        groupStacks[chartname] = c;
+
+        //Add chart to model
+        groupStackModel.addGroupStack(chartname);
+
+        //Set size, draw svg
+        groupStackModel.setSvgSize(chartname, { width: width, height: height });
+        groupStackModel.setMargins(chartname, margins);
+        buildContainer(chartname);
+
+        //Initialize dropdown in model
+        setDropdown(chartname);
+
+        //Update the panel title and text
+        initDropdownText(chartname);
+        initPanelTitle(chartname);
+
+        //init dropdownChanged in model
+        groupStackModel.setDropdownChanged(chartname, false);
+
+        //set data in model
+        setData(chartname);
+
+        //set checkboxes in model
+        setCheckboxes(chartname);
+        //set observers in ctrlState
+        setObservers(chartname);
+
+        //set dropdown event listener
+        addDropdownListener(chartname);
+
+        //init drawFunc
+        setDrawFunc(chartname);
+
+        //draw chart
+        draw(chartname);
+      } catch (e) {
+        handleError(e.message);
+      }
+    }
+
+    return;
+  }
+
+  /***** Private Functions *****/
+
+  /**
+  * Set the data needed for the chart 
+  * @function setData
+  * @private
+  * @param {String} chartname - css selector for chart
+  */
+  function setData(chartname) {
+    try {
+      //set data in model
+      var data = getData(chartname, groupStackModel.getDropdown(chartname));
+      groupStackModel.setData(chartname, data);
+    } catch (e) {
+      handleError(e.message);
+    }
+  }
+
+  /**
+  * Return the filtered data based on checkmarks
+  * @function buildData
+  * @private
+  * @param {String} chartname - css selector for chart
+  */
+  function buildData(chartname) {
+    try {
+      var dropdown = groupStackModel.getDropdown(chartname);
+      //get and filter data
+      var data = groupStackModel.getData(chartname, dropdown);
+      var arr = groupStackModel.getAllChecked(chartname);
+      groupedStackFilter(data, arr);
+
+      return data;
+    } catch (e) {
+      handleError(e.message);
+    }
+  }
+
+  /**
+  * Return the filtered data based on checkmarks
+  * @function groupedStackFilter
+  * @private
+  * @param {String} chartname - css selector for chart
+  * @returns {Object []}
+  */
+  function groupedStackFilter(data, checked) {
+    //update groups.columns on every array element
+    for (var i = 0; i < data.length; i++) {
+      data[i].groups.columns = checked;
+    }
+  }
+
+  /**
+   * Draw the chart associated with chartname
+   * @function draw
+   * @param {String} chartname
+   */
+  function draw(chartname) {
+    if (groupStacks.hasOwnProperty(chartname)) {
+      //update data   
+      var d = buildData(chartname);
+      //get selection string
+      var loc = d3.select(chartname + " svg");
+      //draw chart
+      groupStacks[chartname].drawFunc(loc, d);
+      //tooltips
+      toolTips();
+    }
+  }
+
+  /**
+   * Set the observers and observersFunc
+   * @function setObservers
+   * @param {String} chartname
+   */
+  function setObservers(chartname) {
+    var ids = []; // holds id of each element that needs an observer
+    var selector = chartname + ' .checkboxes label';
+    var labels = d3.selectAll(selector);
+
+    // use labels selection to get id of each label element
+    labels.each(function (d) {
+      ids.push(d3.select(this).attr('id'));
+    });
+
+    //set observersfunc and observers
+    var cb = observerCallbackBuilder(chartname);
+    var observerFunc = addBootstrapCheckboxObservers().elementIds(ids).callback(cb);
+
+    var observers = observerFunc();
+    groupStacks[chartname].observers = observers;
+    groupStacks[chartname].observerFunc = observerFunc;
+  }
+
+  /**
+   * Set the checkboxes in the model
+   * @function setCheckboxes
+   * @param {String} chartname
+   */
+  function setCheckboxes(chartname) {
+    // select all chart checkboxes
+    var vals = [];
+    var defaults = [];
+    // checkboxes use bootstrap style (input wrapped in label)
+    var selector = chartname + ' .checkboxes label';
+    var labels = d3.selectAll(selector);
+
+    // use labels selection to populate defaults and vals
+    labels.each(function (d) {
+      // presence of active class indicates the box is checked
+      defaults.push(d3.select(this).classed('active'));
+
+      // get checkbox value from input element
+      vals.push(d3.select(this).select('input').attr('value'));
+    });
+
+    // add checkboxes to groupeStackModel
+    try {
+      groupStackModel.addCheckboxes(chartname, vals, defaults);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+   * Get the current dropdown name
+   * @function getDropdownDefaultName
+   * @param {String} chartname
+   */
+  function getDropdownDefaultName(chartname) {
+    //return current dropdown selection
+    var selector = chartname + ' .dropdown-menu li a';
+    var val = d3.select(selector);
+    //console.log(val, val.html(), val.text())
+    return val.html();
+  }
+
+  /**
+   * Initialize panel title
+   * @function initPanelTitle
+   * @param {String} chartname
+   */
+  function initPanelTitle(chartname) {
+    //update panel title
+    var val = getDropdownDefaultName(chartname);
+    updatePanelTitle(chartname, val);
+  }
+
+  /**
+   * Initialize dropdown text
+   * @function initDropdownText
+   * @param {String} chartname
+   */
+  function initDropdownText(chartname) {
+    //update dropdown text
+    var val = getDropdownDefaultName(chartname);
+    updateDropdownText(chartname, val);
+  }
+
+  /**
+  * Set the dropdown param of the associated chart
+  * @function setDropdown
+  * @private
+  * @param {String} chartname - css selector for chart
+  * @param {String} [val] - optional dropdown value
+  */
+  function setDropdown(chartname, val) {
+    // if user did not pass in val, default to first dropdown list element
+    if (val === undefined) {
+      val = getDropdownDefaultValue(chartname);
+    }
+
+    try {
+      groupStackModel.setDropdown(chartname, val);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+  * Get the first item in chartname's dropdown list
+  * @private
+  * @function getDropdownDefaultValue
+  * @param {String} chartname
+  * @return {String} value of the first dropdown item
+  */
+  function getDropdownDefaultValue(chartname) {
+    //return column name
+    var selector = chartname + ' .dropdown-menu li a';
+    var val = d3.select(selector).attr('data-value');
+    return val;
+  }
+
+  /**
+  * @function handleError
+  * @private
+  * @param {Object} err - Error object with message property
+  */
+  function handleError(err) {
+    console.log(err.message);
+  }
+
+  /**
+   * add the svg container for the chart to dom
+   * @private
+   * @function buildContainer
+   * @param {String} chartname - css selector for chart
+   */
+  function buildContainer(chartname) {
+    try {
+      //get svg attributes from model
+      var size = groupStackModel.getSvgSize(chartname);
+      var margins = groupStackModel.getMargins(chartname);
+      //get selection string
+      var svgSelect = chartname + " .groupStack";
+
+      //draw svg
+      var groupedStackSvg = d3.select(svgSelect).append("div").classed("svg-container", true).append("svg").attr("class", "svg-content-responsive").attr("viewBox", -margins.left + " " + -margins.right + " " + size.width + " " + size.height);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  /**
+  * Create a drawing function and store it in the charts
+  * @private
+  * @function setDrawFunc
+  * @param {String} chartname - css selector for chart
+  * @param {Object} config - groupedBarConfig object
+  */
+  function setDrawFunc(chartname) {
+    //init draw function
+    if (groupStacks.hasOwnProperty(chartname)) {
+      groupStacks[chartname].drawFunc = stacksChart();
+    } else {
+      throw new InvalidTableError(chartname);
+    }
+  }
+
+  /**
+  * Return function to be called when a checkbox input changes
+  * @function observerCallbackBuilder
+  * @param {String} chartname
+  * @return {function} 
+  */
+  function observerCallbackBuilder(chartname) {
+    return function (value) {
+      try {
+        if (groupStacks.hasOwnProperty(chartname)) {
+          var resetCount = groupStackModel.getResetCount(chartname);
+          var dropdownChanged = groupStackModel.getDropdownChanged(chartname);
+
+          if (dropdownChanged === true) {
+            if (resetCount == 1) {
+              groupStackModel.toggle(chartname, value);
+              groupStackModel.setDropdownChanged(chartname, false);
+              draw(chartname);
+            } else {
+              groupStackModel.toggle(chartname, value);
+            }
+          } else {
+            groupStackModel.toggle(chartname, value);
+            draw(chartname);
+          }
+        } else {
+          throw new Error("Attempt to reference non-existent panel object");
+        }
+      } catch (e) {
+        handleError(e);
+      }
+    };
+  }
+
+  /**
+   * Return a function to call after the the dropdown is selected
+   * Returned function will update the dropdown selection and trigger the
+   * redraw process
+   * @function dropdownCallbackBuilder
+   * @param {String} chartname
+   * @returns {Function} 
+   */
+  function dropdownCallbackBuilder(chartname) {
+    // return d3 event callback
+    return function (d) {
+      try {
+        // get dropdown values
+        var current = d3.select(this).attr('data-value');
+
+        //if dropdown has changed
+        if (current != groupStackModel.getDropdown(chartname)) {
+          setDropdown(chartname, current);
+
+          groupStackModel.setDropdownChanged(chartname, true);
+
+          // check all checkboxes
+          var selector = chartname + " .checkboxes label";
+          d3.selectAll(selector).classed('active', true);
+
+          //update dropdown text
+          updateDropdownText(chartname, d3.select(this).html());
+          //update Panel Title
+          updatePanelTitle(chartname, d3.select(this).html());
+
+          setData(chartname);
+
+          if (groupStackModel.getResetCount(chartname) == 0) {
+            draw(chartname);
+            groupStackModel.setDropdownChanged(chartname, false);
+          }
+        }
+      } catch (e) {
+        handleError(e);
+      }
+    };
+  }
+
+  /**
+   * Change the dropdown button text for a chart
+   * @function updateDropdownText
+   * @param {String} chartname
+   * @param {String} text - text of selected button from dropdown
+   */
+  function updateDropdownText(chartname, text) {
+    var selection = chartname + ' button';
+    var button = d3.select(selection);
+    var buttonText = text + ' <span class=\'caret\'> </span>';
+    button.html(buttonText);
+  }
+
+  /**
+   * @function updatePanelTitle
+   * @param {String} chartname
+   * @param {String} text - text of selected button from dropdown
+   */
+  function updatePanelTitle(chartname, text) {
+    var selection = chartname + ' h2';
+    var title = d3.select(selection);
+    var titleText = title.attr("data-value") + ': ' + text;
+
+    title.html(titleText);
+  }
+
+  /**
+   * @function addDropdownListener
+   * @param {String} chartname
+   */
+  function addDropdownListener(chartname) {
+    var selector = chartname + " .dropdown-menu li a";
+    var cb = dropdownCallbackBuilder(chartname);
+    d3.selectAll(selector).on('click', cb);
+  }
+
+  /**
+   * Return data given a column name
+   * @function getData
+   * @param {String} chartname
+   * @param {String} col
+   */
+
+  function getData(chartname, col) {
+    function add(a, b) {
+      return a + b;
+    }
+
+    //get data for all txn types
+    var pinDebitInsightsData = getInsightsData("pin_debit");
+    var sigDebitInsightsData = getInsightsData("sig_debit");
+    var sigCreditInsightsData = getInsightsData("sig_credit");
+
+    //get all FI's
+    var issuers = _Object$keys(pinDebitInsightsData);
+    issuers = issuers.map(function (d) {
+      return { key: d };
+    });
+
+    //loop through FIs
+    for (var i = 0; i < issuers.length; i++) {
+      issuers[i]["groups"] = [];
+      issuers[i]["groups"][0] = {};
+
+      //add up pin debit for an FI (all mcc types)
+      var pinDebArr = pinDebitInsightsData[issuers[i]["key"]].map(function (d) {
+        return d[col];
+      });
+      var pinDebitTotal = pinDebArr.reduce(add, 0);
+      issuers[i].groups[0]["pin_debit"] = pinDebitTotal;
+
+      //add up sig debit for an FI (all mcc types)
+      var sigDebArr = sigDebitInsightsData[issuers[i]["key"]].map(function (d) {
+        return d[col];
+      });
+      var sigDebitTotal = sigDebArr.reduce(add, 0);
+      issuers[i].groups[0]["sig_debit"] = sigDebitTotal;
+
+      //add up sig credit for an FI (all mcc types)
+      var sigCreditArr = sigCreditInsightsData[issuers[i]["key"]].map(function (d) {
+        return d[col];
+      });
+      var sigCreditTotal = sigCreditArr.reduce(add, 0);
+      issuers[i].groups[0]["sig_credit"] = sigCreditTotal;
+
+      //add total and columns attributes
+      issuers[i].groups[0]["total"] = 1;
+      issuers[i].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
+    }
+
+    for (var i = 0; i < issuers.length; i++) {
+      //get total for percentage
+      var total = 0;
+      total = total + issuers[i].groups[0]["sig_debit"];
+      total = total + issuers[i].groups[0]["pin_debit"];
+      total = total + issuers[i].groups[0]["sig_credit"];
+
+      //get percentages
+      issuers[i].groups[0]["sig_debit"] = issuers[i].groups[0]["sig_debit"] / total;
+      issuers[i].groups[0]["pin_debit"] = issuers[i].groups[0]["pin_debit"] / total;
+      issuers[i].groups[0]["sig_credit"] = issuers[i].groups[0]["sig_credit"] / total;
+    }
+
+    return issuers;
+  }
+
+  return {
+    setters: [function (_) {
+      _Object$keys = _['default'];
+    }, function (_c) {
+      getInsightsData = _c.getInsightsData;
+    }, function (_a) {
+      groupStackModel = _a.exportObj;
+    }, function (_d) {
+      CtrlState = _d['default'];
+    }, function (_a2) {
+      d3 = _a2;
+    }, function (_c2) {
+      stacksChart = _c2.stacksChart;
+    }, function (_e) {
+      addBootstrapCheckboxObservers = _e['default'];
+    }, function (_f) {
+      toolTips = _f.toolTips;
+    }],
+    execute: function () {
+      'use strict';
+
+      _export('getData', getData);
+
+      groupStacks = {};
+      groupStackExport = {
+        addGroupStack: addGroupStack
+      };
+
+      _export('groupStackExport', groupStackExport);
+
+      ;
+    }
+  };
+});
+$__System.registerDynamic("1d", ["1e"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var _Array$from = $__require("1c")["default"];
+  var _Array$from = $__require("1e")["default"];
   exports["default"] = function (arr) {
     if (Array.isArray(arr)) {
       for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -10627,71 +11728,12 @@ $__System.registerDynamic("1b", ["1c"], true, function ($__require, exports, mod
   exports.__esModule = true;
   return module.exports;
 });
-$__System.registerDynamic('1d', ['1e', '1f', '20'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var $export = $__require('1e'),
-        core = $__require('1f'),
-        fails = $__require('20');
-    module.exports = function (KEY, exec) {
-        var fn = (core.Object || {})[KEY] || Object[KEY],
-            exp = {};
-        exp[KEY] = exec(fn);
-        $export($export.S + $export.F * fails(function () {
-            fn(1);
-        }), 'Object', exp);
-    };
-    return module.exports;
-});
-$__System.registerDynamic('21', ['22', '1d'], true, function ($__require, exports, module) {
+$__System.registerDynamic('1f', ['20'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var toObject = $__require('22');
-  $__require('1d')('keys', function ($keys) {
-    return function keys(it) {
-      return $keys(toObject(it));
-    };
-  });
-  return module.exports;
-});
-$__System.registerDynamic('23', ['21', '1f'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  $__require('21');
-  module.exports = $__require('1f').Object.keys;
-  return module.exports;
-});
-$__System.registerDynamic("e", ["23"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = { "default": $__require("23"), __esModule: true };
-  return module.exports;
-});
-$__System.registerDynamic('22', ['24'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var defined = $__require('24');
-  module.exports = function (it) {
-    return Object(defined(it));
-  };
-  return module.exports;
-});
-$__System.registerDynamic('25', ['26'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var ITERATOR = $__require('26')('iterator'),
+  var ITERATOR = $__require('20')('iterator'),
       SAFE_CLOSING = false;
   try {
     var riter = [7][ITERATOR]();
@@ -10720,21 +11762,21 @@ $__System.registerDynamic('25', ['26'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('27', ['28', '1e', '22', '29', '2a', '2b', '2c', '25'], true, function ($__require, exports, module) {
+$__System.registerDynamic('21', ['22', '23', '24', '25', '26', '27', '28', '1f'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var ctx = $__require('28'),
-      $export = $__require('1e'),
-      toObject = $__require('22'),
-      call = $__require('29'),
-      isArrayIter = $__require('2a'),
-      toLength = $__require('2b'),
-      getIterFn = $__require('2c');
-  $export($export.S + $export.F * !$__require('25')(function (iter) {
+  var ctx = $__require('22'),
+      $export = $__require('23'),
+      toObject = $__require('24'),
+      call = $__require('25'),
+      isArrayIter = $__require('26'),
+      toLength = $__require('27'),
+      getIterFn = $__require('28');
+  $export($export.S + $export.F * !$__require('1f')(function (iter) {
     Array.from(iter);
   }), 'Array', { from: function from(arrayLike) {
       var O = toObject(arrayLike),
@@ -10765,25 +11807,25 @@ $__System.registerDynamic('27', ['28', '1e', '22', '29', '2a', '2b', '2c', '25']
     } });
   return module.exports;
 });
-$__System.registerDynamic('2d', ['2e', '27', '1f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('29', ['2a', '21', '2b'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('2e');
-  $__require('27');
-  module.exports = $__require('1f').Array.from;
+  $__require('2a');
+  $__require('21');
+  module.exports = $__require('2b').Array.from;
   return module.exports;
 });
-$__System.registerDynamic("1c", ["2d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("1e", ["29"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("2d"), __esModule: true };
+  module.exports = { "default": $__require("29"), __esModule: true };
   return module.exports;
 });
-$__System.registerDynamic("2f", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("2c", [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -10792,13 +11834,13 @@ $__System.registerDynamic("2f", [], true, function ($__require, exports, module)
       GLOBAL = global;
   return module.exports;
 });
-$__System.registerDynamic('30', ['31', '24'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2d', ['2e', '2f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var toInteger = $__require('31'),
-      defined = $__require('24');
+  var toInteger = $__require('2e'),
+      defined = $__require('2f');
   module.exports = function (TO_STRING) {
     return function (that, pos) {
       var s = String(defined(that)),
@@ -10813,15 +11855,15 @@ $__System.registerDynamic('30', ['31', '24'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic('2e', ['30', '32'], true, function ($__require, exports, module) {
+$__System.registerDynamic('2a', ['2d', '30'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $at = $__require('30')(true);
-  $__require('32')(String, 'String', function (iterated) {
+  var $at = $__require('2d')(true);
+  $__require('30')(String, 'String', function (iterated) {
     this._t = String(iterated);
     this._i = 0;
   }, function () {
@@ -10841,7 +11883,7 @@ $__System.registerDynamic('2e', ['30', '32'], true, function ($__require, export
   });
   return module.exports;
 });
-$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -10849,41 +11891,41 @@ $__System.registerDynamic("33", [], true, function ($__require, exports, module)
   module.exports = function () {/* empty */};
   return module.exports;
 });
-$__System.registerDynamic('34', ['35'], true, function ($__require, exports, module) {
+$__System.registerDynamic('32', ['33'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var cof = $__require('35');
+  var cof = $__require('33');
   module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
     return cof(it) == 'String' ? it.split('') : Object(it);
   };
   return module.exports;
 });
-$__System.registerDynamic('36', ['34', '24'], true, function ($__require, exports, module) {
+$__System.registerDynamic('34', ['32', '2f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var IObject = $__require('34'),
-      defined = $__require('24');
+  var IObject = $__require('32'),
+      defined = $__require('2f');
   module.exports = function (it) {
     return IObject(defined(it));
   };
   return module.exports;
 });
-$__System.registerDynamic('37', ['33', '38', '39', '36', '32'], true, function ($__require, exports, module) {
+$__System.registerDynamic('35', ['31', '36', '37', '34', '30'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var addToUnscopables = $__require('33'),
-      step = $__require('38'),
-      Iterators = $__require('39'),
-      toIObject = $__require('36');
-  module.exports = $__require('32')(Array, 'Array', function (iterated, kind) {
+  var addToUnscopables = $__require('31'),
+      step = $__require('36'),
+      Iterators = $__require('37'),
+      toIObject = $__require('34');
+  module.exports = $__require('30')(Array, 'Array', function (iterated, kind) {
     this._t = toIObject(iterated);
     this._i = 0;
     this._k = kind;
@@ -10905,28 +11947,17 @@ $__System.registerDynamic('37', ['33', '38', '39', '36', '32'], true, function (
   addToUnscopables('entries');
   return module.exports;
 });
-$__System.registerDynamic('3a', ['37', '39'], true, function ($__require, exports, module) {
+$__System.registerDynamic('38', ['35', '37'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('37');
-  var Iterators = $__require('39');
+  $__require('35');
+  var Iterators = $__require('37');
   Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
   return module.exports;
 });
-$__System.registerDynamic("24", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // 7.2.1 RequireObjectCoercible(argument)
-  module.exports = function (it) {
-    if (it == undefined) throw TypeError("Can't call method on  " + it);
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -10934,18 +11965,18 @@ $__System.registerDynamic("3b", [], true, function ($__require, exports, module)
   module.exports = true;
   return module.exports;
 });
-$__System.registerDynamic('3c', ['16', '3d', '3e', '3f', '26'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3a', ['3b', '3c', '3d', '3e', '20'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('16'),
-      descriptor = $__require('3d'),
-      setToStringTag = $__require('3e'),
+  var $ = $__require('3b'),
+      descriptor = $__require('3c'),
+      setToStringTag = $__require('3d'),
       IteratorPrototype = {};
-  $__require('3f')(IteratorPrototype, $__require('26')('iterator'), function () {
+  $__require('3e')(IteratorPrototype, $__require('20')('iterator'), function () {
     return this;
   });
   module.exports = function (Constructor, NAME, next) {
@@ -10954,23 +11985,23 @@ $__System.registerDynamic('3c', ['16', '3d', '3e', '3f', '26'], true, function (
   };
   return module.exports;
 });
-$__System.registerDynamic('32', ['3b', '1e', '40', '3f', '41', '39', '3c', '3e', '16', '26'], true, function ($__require, exports, module) {
+$__System.registerDynamic('30', ['39', '23', '3f', '3e', '40', '37', '3a', '3d', '3b', '20'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var LIBRARY = $__require('3b'),
-      $export = $__require('1e'),
-      redefine = $__require('40'),
-      hide = $__require('3f'),
-      has = $__require('41'),
-      Iterators = $__require('39'),
-      $iterCreate = $__require('3c'),
-      setToStringTag = $__require('3e'),
-      getProto = $__require('16').getProto,
-      ITERATOR = $__require('26')('iterator'),
+  var LIBRARY = $__require('39'),
+      $export = $__require('23'),
+      redefine = $__require('3f'),
+      hide = $__require('3e'),
+      has = $__require('40'),
+      Iterators = $__require('37'),
+      $iterCreate = $__require('3a'),
+      setToStringTag = $__require('3d'),
+      getProto = $__require('3b').getProto,
+      ITERATOR = $__require('20')('iterator'),
       BUGGY = !([].keys && 'next' in [].keys()),
       FF_ITERATOR = '@@iterator',
       KEYS = 'keys',
@@ -11034,7 +12065,7 @@ $__System.registerDynamic('32', ['3b', '1e', '40', '3f', '41', '39', '3c', '3e',
   };
   return module.exports;
 });
-$__System.registerDynamic("38", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("36", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -11044,17 +12075,17 @@ $__System.registerDynamic("38", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('42', ['1f', '16', '43', '26'], true, function ($__require, exports, module) {
+$__System.registerDynamic('41', ['2b', '3b', '42', '20'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var core = $__require('1f'),
-      $ = $__require('16'),
-      DESCRIPTORS = $__require('43'),
-      SPECIES = $__require('26')('species');
+  var core = $__require('2b'),
+      $ = $__require('3b'),
+      DESCRIPTORS = $__require('42'),
+      SPECIES = $__require('20')('species');
   module.exports = function (KEY) {
     var C = core[KEY];
     if (DESCRIPTORS && C && !C[SPECIES]) $.setDesc(C, SPECIES, {
@@ -11066,27 +12097,27 @@ $__System.registerDynamic('42', ['1f', '16', '43', '26'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('44', ['16', '3f', '45', '28', '46', '24', '47', '32', '38', '48', '41', '49', '42', '43'], true, function ($__require, exports, module) {
+$__System.registerDynamic('43', ['3b', '3e', '44', '22', '45', '2f', '46', '30', '36', '47', '40', '48', '41', '42'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('16'),
-      hide = $__require('3f'),
-      redefineAll = $__require('45'),
-      ctx = $__require('28'),
-      strictNew = $__require('46'),
-      defined = $__require('24'),
-      forOf = $__require('47'),
-      $iterDefine = $__require('32'),
-      step = $__require('38'),
-      ID = $__require('48')('id'),
-      $has = $__require('41'),
-      isObject = $__require('49'),
-      setSpecies = $__require('42'),
-      DESCRIPTORS = $__require('43'),
+  var $ = $__require('3b'),
+      hide = $__require('3e'),
+      redefineAll = $__require('44'),
+      ctx = $__require('22'),
+      strictNew = $__require('45'),
+      defined = $__require('2f'),
+      forOf = $__require('46'),
+      $iterDefine = $__require('30'),
+      step = $__require('36'),
+      ID = $__require('47')('id'),
+      $has = $__require('40'),
+      isObject = $__require('48'),
+      setSpecies = $__require('41'),
+      DESCRIPTORS = $__require('42'),
       isExtensible = Object.isExtensible || isObject,
       SIZE = DESCRIPTORS ? '_s' : 'size',
       id = 0;
@@ -11206,7 +12237,7 @@ $__System.registerDynamic('44', ['16', '3f', '45', '28', '46', '24', '47', '32',
   };
   return module.exports;
 });
-$__System.registerDynamic("3d", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("3c", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -11221,14 +12252,14 @@ $__System.registerDynamic("3d", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('3f', ['16', '3d', '43'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3e', ['3b', '3c', '42'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var $ = $__require('16'),
-      createDesc = $__require('3d');
-  module.exports = $__require('43') ? function (object, key, value) {
+  var $ = $__require('3b'),
+      createDesc = $__require('3c');
+  module.exports = $__require('42') ? function (object, key, value) {
     return $.setDesc(object, key, createDesc(1, value));
   } : function (object, key, value) {
     object[key] = value;
@@ -11236,27 +12267,27 @@ $__System.registerDynamic('3f', ['16', '3d', '43'], true, function ($__require, 
   };
   return module.exports;
 });
-$__System.registerDynamic('40', ['3f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3f', ['3e'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = $__require('3f');
+  module.exports = $__require('3e');
   return module.exports;
 });
-$__System.registerDynamic('45', ['40'], true, function ($__require, exports, module) {
+$__System.registerDynamic('44', ['3f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var redefine = $__require('40');
+  var redefine = $__require('3f');
   module.exports = function (target, src) {
     for (var key in src) redefine(target, key, src[key]);
     return target;
   };
   return module.exports;
 });
-$__System.registerDynamic("46", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("45", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -11267,27 +12298,7 @@ $__System.registerDynamic("46", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("16", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $Object = Object;
-  module.exports = {
-    create: $Object.create,
-    getProto: $Object.getPrototypeOf,
-    isEnum: {}.propertyIsEnumerable,
-    getDesc: $Object.getOwnPropertyDescriptor,
-    setDesc: $Object.defineProperty,
-    setDescs: $Object.defineProperties,
-    getKeys: $Object.keys,
-    getNames: $Object.getOwnPropertyNames,
-    getSymbols: $Object.getOwnPropertySymbols,
-    each: [].forEach
-  };
-  return module.exports;
-});
-$__System.registerDynamic("41", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("40", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -11298,14 +12309,14 @@ $__System.registerDynamic("41", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('3e', ['16', '41', '26'], true, function ($__require, exports, module) {
+$__System.registerDynamic('3d', ['3b', '40', '20'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var def = $__require('16').setDesc,
-      has = $__require('41'),
-      TAG = $__require('26')('toStringTag');
+  var def = $__require('3b').setDesc,
+      has = $__require('40'),
+      TAG = $__require('20')('toStringTag');
   module.exports = function (it, tag, stat) {
     if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, {
       configurable: true,
@@ -11314,50 +12325,36 @@ $__System.registerDynamic('3e', ['16', '41', '26'], true, function ($__require, 
   };
   return module.exports;
 });
-$__System.registerDynamic("20", [], true, function ($__require, exports, module) {
+$__System.registerDynamic('42', ['49'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = function (exec) {
-    try {
-      return !!exec();
-    } catch (e) {
-      return true;
-    }
-  };
-  return module.exports;
-});
-$__System.registerDynamic('43', ['20'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = !$__require('20')(function () {
+  module.exports = !$__require('49')(function () {
     return Object.defineProperty({}, 'a', { get: function () {
         return 7;
       } }).a != 7;
   });
   return module.exports;
 });
-$__System.registerDynamic('4a', ['16', '4b', '1e', '20', '3f', '45', '47', '46', '49', '3e', '43'], true, function ($__require, exports, module) {
+$__System.registerDynamic('4a', ['3b', '4b', '23', '49', '3e', '44', '46', '45', '48', '3d', '42'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var $ = $__require('16'),
+  var $ = $__require('3b'),
       global = $__require('4b'),
-      $export = $__require('1e'),
-      fails = $__require('20'),
-      hide = $__require('3f'),
-      redefineAll = $__require('45'),
-      forOf = $__require('47'),
-      strictNew = $__require('46'),
-      isObject = $__require('49'),
-      setToStringTag = $__require('3e'),
-      DESCRIPTORS = $__require('43');
+      $export = $__require('23'),
+      fails = $__require('49'),
+      hide = $__require('3e'),
+      redefineAll = $__require('44'),
+      forOf = $__require('46'),
+      strictNew = $__require('45'),
+      isObject = $__require('48'),
+      setToStringTag = $__require('3d'),
+      DESCRIPTORS = $__require('42');
   module.exports = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
     var Base = global[NAME],
         C = Base,
@@ -11395,14 +12392,14 @@ $__System.registerDynamic('4a', ['16', '4b', '1e', '20', '3f', '45', '47', '46',
   };
   return module.exports;
 });
-$__System.registerDynamic('4c', ['44', '4a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('4c', ['43', '4a'], true, function ($__require, exports, module) {
   /* */
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var strong = $__require('44');
+  var strong = $__require('43');
   $__require('4a')('Set', function (get) {
     return function Set() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
@@ -11412,14 +12409,385 @@ $__System.registerDynamic('4c', ['44', '4a'], true, function ($__require, export
     } }, strong);
   return module.exports;
 });
-$__System.registerDynamic('1e', ['4b', '1f', '28'], true, function ($__require, exports, module) {
+$__System.registerDynamic('25', ['4d'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var anObject = $__require('4d');
+  module.exports = function (iterator, fn, value, entries) {
+    try {
+      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined) anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic('26', ['37', '20'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var Iterators = $__require('37'),
+        ITERATOR = $__require('20')('iterator'),
+        ArrayProto = Array.prototype;
+    module.exports = function (it) {
+        return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+    };
+    return module.exports;
+});
+$__System.registerDynamic('48', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4d', ['48'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var isObject = $__require('48');
+  module.exports = function (it) {
+    if (!isObject(it)) throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("2e", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // 7.1.4 ToInteger
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function (it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('27', ['2e'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toInteger = $__require('2e'),
+      min = Math.min;
+  module.exports = function (it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
+  };
+  return module.exports;
+});
+$__System.registerDynamic("37", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = {};
+  return module.exports;
+});
+$__System.registerDynamic('28', ['4e', '20', '37', '2b'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var classof = $__require('4e'),
+        ITERATOR = $__require('20')('iterator'),
+        Iterators = $__require('37');
+    module.exports = $__require('2b').getIteratorMethod = function (it) {
+        if (it != undefined) return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+    };
+    return module.exports;
+});
+$__System.registerDynamic('46', ['22', '25', '26', '4d', '27', '28'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var ctx = $__require('22'),
+      call = $__require('25'),
+      isArrayIter = $__require('26'),
+      anObject = $__require('4d'),
+      toLength = $__require('27'),
+      getIterFn = $__require('28');
+  module.exports = function (iterable, entries, fn, that) {
+    var iterFn = getIterFn(iterable),
+        f = ctx(fn, that, entries ? 2 : 1),
+        index = 0,
+        length,
+        step,
+        iterator;
+    if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
+    if (isArrayIter(iterFn)) for (length = toLength(iterable.length); length > index; index++) {
+      entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+    } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
+      call(iterator, f, step.value, entries);
+    }
+  };
+  return module.exports;
+});
+$__System.registerDynamic("33", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var toString = {}.toString;
+
+  module.exports = function (it) {
+    return toString.call(it).slice(8, -1);
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4f', ['4b'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var global = $__require('4b'),
+        SHARED = '__core-js_shared__',
+        store = global[SHARED] || (global[SHARED] = {});
+    module.exports = function (key) {
+        return store[key] || (store[key] = {});
+    };
+    return module.exports;
+});
+$__System.registerDynamic('47', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var id = 0,
+      px = Math.random();
+  module.exports = function (key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  return module.exports;
+});
+$__System.registerDynamic('20', ['4f', '47', '4b'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var store = $__require('4f')('wks'),
+        uid = $__require('47'),
+        Symbol = $__require('4b').Symbol;
+    module.exports = function (name) {
+        return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+    };
+    return module.exports;
+});
+$__System.registerDynamic('4e', ['33', '20'], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    /* */
+    var cof = $__require('33'),
+        TAG = $__require('20')('toStringTag'),
+        ARG = cof(function () {
+        return arguments;
+    }()) == 'Arguments';
+    module.exports = function (it) {
+        var O, T, B;
+        return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+    };
+    return module.exports;
+});
+$__System.registerDynamic('50', ['46', '4e'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var forOf = $__require('46'),
+      classof = $__require('4e');
+  module.exports = function (NAME) {
+    return function toJSON() {
+      if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
+      var arr = [];
+      forOf(this, false, arr.push, arr);
+      return arr;
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('51', ['23', '50'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $export = $__require('23');
+  $export($export.P, 'Set', { toJSON: $__require('50')('Set') });
+  return module.exports;
+});
+$__System.registerDynamic('52', ['2c', '2a', '38', '4c', '51', '2b'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  $__require('2c');
+  $__require('2a');
+  $__require('38');
+  $__require('4c');
+  $__require('51');
+  module.exports = $__require('2b').Set;
+  return module.exports;
+});
+$__System.registerDynamic("53", ["52"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("52"), __esModule: true };
+  return module.exports;
+});
+$__System.registerDynamic('54', ['3b'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $ = $__require('3b');
+  module.exports = function defineProperty(it, key, desc) {
+    return $.setDesc(it, key, desc);
+  };
+  return module.exports;
+});
+$__System.registerDynamic("55", ["54"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("54"), __esModule: true };
+  return module.exports;
+});
+$__System.registerDynamic("56", ["55"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var _Object$defineProperty = $__require("55")["default"];
+  exports["default"] = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        _Object$defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+  exports.__esModule = true;
+  return module.exports;
+});
+$__System.registerDynamic("57", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  exports["default"] = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  exports.__esModule = true;
+  return module.exports;
+});
+$__System.registerDynamic("2f", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // 7.2.1 RequireObjectCoercible(argument)
+  module.exports = function (it) {
+    if (it == undefined) throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('24', ['2f'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var defined = $__require('2f');
+  module.exports = function (it) {
+    return Object(defined(it));
+  };
+  return module.exports;
+});
+$__System.registerDynamic('4b', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+  return module.exports;
+});
+$__System.registerDynamic('58', [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = function (it) {
+    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  return module.exports;
+});
+$__System.registerDynamic('22', ['58'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var aFunction = $__require('58');
+  module.exports = function (fn, that, length) {
+    aFunction(fn);
+    if (that === undefined) return fn;
+    switch (length) {
+      case 1:
+        return function (a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function (a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function (a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function () {
+      return fn.apply(that, arguments);
+    };
+  };
+  return module.exports;
+});
+$__System.registerDynamic('23', ['4b', '2b', '22'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var global = $__require('4b'),
-      core = $__require('1f'),
-      ctx = $__require('28'),
+      core = $__require('2b'),
+      ctx = $__require('22'),
       PROTOTYPE = 'prototype';
   var $export = function (type, name, source) {
     var IS_FORCED = type & $export.F,
@@ -11457,273 +12825,52 @@ $__System.registerDynamic('1e', ['4b', '1f', '28'], true, function ($__require, 
   module.exports = $export;
   return module.exports;
 });
-$__System.registerDynamic('4d', [], true, function ($__require, exports, module) {
+$__System.registerDynamic("49", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = function (it) {
-    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic('28', ['4d'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var aFunction = $__require('4d');
-  module.exports = function (fn, that, length) {
-    aFunction(fn);
-    if (that === undefined) return fn;
-    switch (length) {
-      case 1:
-        return function (a) {
-          return fn.call(that, a);
-        };
-      case 2:
-        return function (a, b) {
-          return fn.call(that, a, b);
-        };
-      case 3:
-        return function (a, b, c) {
-          return fn.call(that, a, b, c);
-        };
-    }
-    return function () {
-      return fn.apply(that, arguments);
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('29', ['4e'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var anObject = $__require('4e');
-  module.exports = function (iterator, fn, value, entries) {
+  module.exports = function (exec) {
     try {
-      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+      return !!exec();
     } catch (e) {
-      var ret = iterator['return'];
-      if (ret !== undefined) anObject(ret.call(iterator));
-      throw e;
+      return true;
     }
   };
   return module.exports;
 });
-$__System.registerDynamic('2a', ['39', '26'], true, function ($__require, exports, module) {
+$__System.registerDynamic('59', ['23', '2b', '49'], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
     /* */
-    var Iterators = $__require('39'),
-        ITERATOR = $__require('26')('iterator'),
-        ArrayProto = Array.prototype;
-    module.exports = function (it) {
-        return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+    var $export = $__require('23'),
+        core = $__require('2b'),
+        fails = $__require('49');
+    module.exports = function (KEY, exec) {
+        var fn = (core.Object || {})[KEY] || Object[KEY],
+            exp = {};
+        exp[KEY] = exec(fn);
+        $export($export.S + $export.F * fails(function () {
+            fn(1);
+        }), 'Object', exp);
     };
     return module.exports;
 });
-$__System.registerDynamic('49', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('5a', ['24', '59'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = function (it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-  return module.exports;
-});
-$__System.registerDynamic('4e', ['49'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var isObject = $__require('49');
-  module.exports = function (it) {
-    if (!isObject(it)) throw TypeError(it + ' is not an object!');
-    return it;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("31", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // 7.1.4 ToInteger
-  var ceil = Math.ceil,
-      floor = Math.floor;
-  module.exports = function (it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('2b', ['31'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toInteger = $__require('31'),
-      min = Math.min;
-  module.exports = function (it) {
-    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
-  };
-  return module.exports;
-});
-$__System.registerDynamic("39", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = {};
-  return module.exports;
-});
-$__System.registerDynamic('2c', ['4f', '26', '39', '1f'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var classof = $__require('4f'),
-        ITERATOR = $__require('26')('iterator'),
-        Iterators = $__require('39');
-    module.exports = $__require('1f').getIteratorMethod = function (it) {
-        if (it != undefined) return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  var toObject = $__require('24');
+  $__require('59')('keys', function ($keys) {
+    return function keys(it) {
+      return $keys(toObject(it));
     };
-    return module.exports;
-});
-$__System.registerDynamic('47', ['28', '29', '2a', '4e', '2b', '2c'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var ctx = $__require('28'),
-      call = $__require('29'),
-      isArrayIter = $__require('2a'),
-      anObject = $__require('4e'),
-      toLength = $__require('2b'),
-      getIterFn = $__require('2c');
-  module.exports = function (iterable, entries, fn, that) {
-    var iterFn = getIterFn(iterable),
-        f = ctx(fn, that, entries ? 2 : 1),
-        index = 0,
-        length,
-        step,
-        iterator;
-    if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
-    if (isArrayIter(iterFn)) for (length = toLength(iterable.length); length > index; index++) {
-      entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
-    } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
-      call(iterator, f, step.value, entries);
-    }
-  };
+  });
   return module.exports;
 });
-$__System.registerDynamic("35", [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var toString = {}.toString;
-
-  module.exports = function (it) {
-    return toString.call(it).slice(8, -1);
-  };
-  return module.exports;
-});
-$__System.registerDynamic('50', ['4b'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var global = $__require('4b'),
-        SHARED = '__core-js_shared__',
-        store = global[SHARED] || (global[SHARED] = {});
-    module.exports = function (key) {
-        return store[key] || (store[key] = {});
-    };
-    return module.exports;
-});
-$__System.registerDynamic('48', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var id = 0,
-      px = Math.random();
-  module.exports = function (key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-  };
-  return module.exports;
-});
-$__System.registerDynamic('4b', [], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-  if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-
-  return module.exports;
-});
-$__System.registerDynamic('26', ['50', '48', '4b'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var store = $__require('50')('wks'),
-        uid = $__require('48'),
-        Symbol = $__require('4b').Symbol;
-    module.exports = function (name) {
-        return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
-    };
-    return module.exports;
-});
-$__System.registerDynamic('4f', ['35', '26'], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    /* */
-    var cof = $__require('35'),
-        TAG = $__require('26')('toStringTag'),
-        ARG = cof(function () {
-        return arguments;
-    }()) == 'Arguments';
-    module.exports = function (it) {
-        var O, T, B;
-        return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-    };
-    return module.exports;
-});
-$__System.registerDynamic('51', ['47', '4f'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var forOf = $__require('47'),
-      classof = $__require('4f');
-  module.exports = function (NAME) {
-    return function toJSON() {
-      if (classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
-      var arr = [];
-      forOf(this, false, arr.push, arr);
-      return arr;
-    };
-  };
-  return module.exports;
-});
-$__System.registerDynamic('52', ['1e', '51'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  var $export = $__require('1e');
-  $export($export.P, 'Set', { toJSON: $__require('51')('Set') });
-  return module.exports;
-});
-$__System.registerDynamic('1f', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('2b', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -11733,28 +12880,543 @@ $__System.registerDynamic('1f', [], true, function ($__require, exports, module)
 
   return module.exports;
 });
-$__System.registerDynamic('53', ['2f', '2e', '3a', '4c', '52', '1f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('5b', ['5a', '2b'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  $__require('2f');
-  $__require('2e');
-  $__require('3a');
-  $__require('4c');
-  $__require('52');
-  module.exports = $__require('1f').Set;
+  $__require('5a');
+  module.exports = $__require('2b').Object.keys;
   return module.exports;
 });
-$__System.registerDynamic("54", ["53"], true, function ($__require, exports, module) {
+$__System.registerDynamic("10", ["5b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = { "default": $__require("53"), __esModule: true };
+  module.exports = { "default": $__require("5b"), __esModule: true };
   return module.exports;
 });
-$__System.register("55", ["7"], function (_export) {
+$__System.register('15', ['10', '56', '57'], function (_export) {
+  var _Object$keys, _createClass, _classCallCheck, Checkboxes;
+
+  return {
+    setters: [function (_3) {
+      _Object$keys = _3['default'];
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }],
+    execute: function () {
+      /**
+       * @module checkboxes
+       */
+
+      /** Track a group of checkboxes and their state (checked or unchecked) */
+      'use strict';
+
+      Checkboxes = (function () {
+        /**
+         * Create a group of checkboxes, one for each name in namesArr. If valuesArr is not provided, each checkbox value defaults to false
+         * @param {string[]} namesArr - the name of each checkbox you want to track
+         * @param {bool[]} [valuesArr] - the starting value of each checkbox in nameArr, true means the checkbox is checked
+         */
+
+        function Checkboxes(namesArr, valuesArr) {
+          _classCallCheck(this, Checkboxes);
+
+          // Case 1: only namesArr passed as argument, initialize checkbox properties to false by default
+          if (arguments.length == 1) {
+            this.checkboxes = namesArr.reduce(function (result, val) {
+              result[val] = false;
+              return result;
+            }, {});
+          } else if (arguments.length == 2) {
+            // case 2: namesArr and valuesArr provided
+            // use valuesArr to set starting value of each checkbox
+            this.checkboxes = namesArr.reduce(function (result, val, idx) {
+              result[val] = valuesArr[idx];
+              return result;
+            }, {});
+          } else {
+            // case 3: throw an error
+            throw new Error('Attempted to instantiate Checkboxes class with no parameters');
+          }
+        }
+
+        /**
+         * Return an object containing all checkbox names and values
+         */
+
+        _createClass(Checkboxes, [{
+          key: 'getAll',
+          value: function getAll() {
+            return this.checkboxes;
+          }
+
+          /**
+           * return an array of all properties whose value is true
+           */
+        }, {
+          key: 'getAllChecked',
+          value: function getAllChecked() {
+            // get array of checkbox names
+            var keys = _Object$keys(this.checkboxes);
+            var c = this.checkboxes;
+
+            // go through each checkbox name and drop any that don't have a value of true
+            return keys.filter(function (key) {
+              return c[key];
+            });
+          }
+
+          /**
+           * Return the Boolean value belonging to the checkbox associated with name
+           * @param {string} name - name of the checkbox
+           */
+        }, {
+          key: 'getValue',
+          value: function getValue(name) {
+            return this.checkboxes[name];
+          }
+
+          /**
+           * Set all checkbox values to true
+           */
+        }, {
+          key: 'checkAll',
+          value: function checkAll() {
+            var _this = this;
+
+            var keys = _Object$keys(this.checkboxes);
+            keys.forEach(function (k) {
+              _this.checkboxes[k] = true;
+            });
+          }
+
+          /**
+           * Flip the value of the checkbox associated with name
+           * @param {string} name - name of the checkbox
+           * @returns {array}
+           */
+        }, {
+          key: 'toggle',
+          value: function toggle(name) {
+            if (this.checkboxes.hasOwnProperty(name)) {
+              this.checkboxes[name] = !this.checkboxes[name];
+            }
+            return this.getAllChecked();
+          }
+        }]);
+
+        return Checkboxes;
+      })();
+
+      _export('default', Checkboxes);
+    }
+  };
+});
+$__System.register('7', ['8', '10', '15', '56', '57'], function (_export) {
+  var ValidationError, _Object$keys, Checkboxes, _createClass, _classCallCheck, Panel, testing;
+
+  /**
+   * Private function to be invoked by the panel class.  Panel class instance needs to pass its context to _updateResetCount
+   * by invoking _updateResetCount with .call(this)
+   * @private
+   * @function _updateResetCount
+   */
+  function _updateResetCount() {
+    this._resetCount = _Object$keys(this._cboxes.getAll()).length - this._cboxes.getAllChecked().length;
+  }
+
+  /**
+   * @private
+   * @function _validateSvgSize
+   * @param {Object} val - contains width and height property
+   * @desc return false if val is not an object or is missing the width or height property, true otherwise
+   */
+  function _validateSvgSize(val) {
+    var keys = ['width', 'height']; // properties that val should contain
+
+    //confirm val is an object
+    if (typeof val != 'object') {
+      return false;
+    }
+
+    // confirm val contains all properties in keys
+    return keys.every(function (prop) {
+      return val.hasOwnProperty(prop);
+    });
+  }
+
+  /**
+   * @private
+   * @function _validateSvgMargins
+   * @param {Object} val - contains left, right, top and bottom properties 
+   * @desc return falseif val is not an object or is missing needed properties, true otherwise
+   */
+  function _validateSvgMargins(val) {
+    var keys = ['top', 'bottom', 'left', 'right']; // properties that val should contain
+
+    //confirm val is an object
+    if (typeof val != 'object') {
+      return false;
+    }
+
+    // confirm val contains all properties in keys
+    return keys.every(function (prop) {
+      return val.hasOwnProperty(prop);
+    });
+  }
+  return {
+    setters: [function (_5) {
+      ValidationError = _5.ValidationError;
+    }, function (_3) {
+      _Object$keys = _3['default'];
+    }, function (_4) {
+      Checkboxes = _4['default'];
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }],
+    execute: function () {
+      /**
+       * expose a class for storing chart state in the appropriate model file
+       * @module panelClass
+       */
+
+      'use strict';
+
+      Panel = (function () {
+        /**
+         * Create a panel with default values. Will need to use class methods to initialize values.
+         */
+
+        function Panel() {
+          _classCallCheck(this, Panel);
+
+          this._cboxes = null;
+          this._data = null;
+          this._dropdown = null;
+          this._dropdownChanged = false;
+          this._resetCount = 0;
+          this._svgSize = {
+            width: 0,
+            height: 0
+          };
+          this._svgMargins = {
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          };
+        }
+
+        /***** Private Functions *****/
+
+        // export private functions for testing only
+
+        /***** Wrap checkbox functionality *****/
+
+        /**
+         * @param {String[]} valArr - values that can be checked or unchecked
+         * @param {Bool[]} defaultArr - whether each value in valArr is checked or not
+         * @return {this} for chaining calls
+         */
+
+        _createClass(Panel, [{
+          key: 'createCboxes',
+          value: function createCboxes(valArr, defaultArr) {
+            this._cboxes = new Checkboxes(valArr, defaultArr);
+            // keep the reset count up to date
+            _updateResetCount.call(this);
+            return this;
+          }
+
+          /**
+           * @return {Object} 
+           */
+        }, {
+          key: 'getAllCheckboxes',
+          value: function getAllCheckboxes() {
+            return this._cboxes.getAll();
+          }
+
+          /**
+           * @return {String[]} all properties that are checked
+           */
+        }, {
+          key: 'getAllChecked',
+          value: function getAllChecked() {
+            return this._cboxes.getAllChecked();
+          }
+
+          /**
+           * @return {Bool}
+           */
+        }, {
+          key: 'getCheckboxValue',
+          value: function getCheckboxValue(name) {
+            return this._cboxes.getValue(name);
+          }
+
+          /**
+           * check all checkboxes
+           */
+        }, {
+          key: 'checkAll',
+          value: function checkAll() {
+            this._cboxes.checkAll();
+            _updateResetCount.call(this);
+          }
+
+          /**
+           * toggle a checkbox value
+           * @return {String[]} 
+           */
+        }, {
+          key: 'toggleCheckbox',
+          value: function toggleCheckbox(name) {
+            var arr = this._cboxes.toggle(name);
+            // keep the reset count up to date
+            _updateResetCount.call(this);
+            return arr;
+          }
+
+          /**
+           * @return {Object} base data associated with the Panel
+           */
+        }, {
+          key: 'data',
+          get: function get() {
+            return this._data;
+          },
+
+          /**
+           * Set the base data associated with the Panel instance 
+           * @param {Object} data - base data 
+           * @return {Object} this instance for chaining
+           */
+          set: function set(data) {
+            this._data = data;
+            return this;
+          }
+
+          /**
+           * @return {String} current value of the dropdown associated with the Panel instance
+           */
+        }, {
+          key: 'dropdown',
+          get: function get() {
+            return this._dropdown;
+          },
+
+          /**
+           * Set the dropdown value for the panel instance
+           * @param {String} val
+           */
+          set: function set(val) {
+            this._dropdown = val;
+            return this;
+          }
+
+          /**
+           * @return {Boolean} current value of dropdownChanged
+           */
+        }, {
+          key: 'dropdownChanged',
+          get: function get() {
+            return this._dropdownChanged;
+          },
+
+          /**
+           * origin/gStackedModelandController
+           * Set dropdownChanged to val
+           * @param {Boolean} val
+           */
+          set: function set(val) {
+            this._dropdownChanged = val;
+          }
+
+          /**
+           * @return {Object} contains width and height properties
+           */
+        }, {
+          key: 'svgSize',
+          get: function get() {
+            return this._svgSize;
+          },
+
+          /**
+           * @param {Object} with width and height properties 
+           * @return {this} for chaining calls
+           */
+          set: function set(val) {
+            // confirm val has correct structure before setting, throw validation error if it doesn't
+            if (_validateSvgSize(val)) {
+              this._svgSize = val;
+            } else {
+              throw new ValidationError('svgSize');
+            }
+
+            return this;
+          }
+
+          /**
+           * @return {Object} Margins object with left, right, top, bottom properties
+           */
+        }, {
+          key: 'svgMargins',
+          get: function get() {
+            return this._svgMargins;
+          },
+
+          /**
+           * @param {Object} Object with left, right, top and bottom properties
+           * @return {this} for chaining calls
+           */
+          set: function set(val) {
+            if (_validateSvgMargins(val)) {
+              this._svgMargins = val;
+            } else {
+              throw new ValidationError('svgMargins');
+            }
+
+            return this;
+          }
+
+          /**
+           * @return {Int} 
+           */
+        }, {
+          key: 'resetCount',
+          get: function get() {
+            return this._resetCount;
+          }
+        }]);
+
+        return Panel;
+      })();
+
+      _export('Panel', Panel);
+
+      testing = {
+        validateSvgSize: _validateSvgSize,
+        validateSvgMargins: _validateSvgMargins
+      };
+
+      _export('testing', testing);
+    }
+  };
+});
+$__System.register('5c', ['7', '8'], function (_export) {
+  /**
+   *@module tableModel 
+   *@description hold state related to each table chart
+   */
+
+  /***** local packages *****/
+
+  /***** export *****/
+  'use strict';
+
+  var Panel, DuplicateChartError, InvalidChartError, exportObj, tables;
+
+  /**
+   * @function addTable
+   * @param {String} chartname - name to store the chart as, the chartname should also be a css selector for the chart container
+   */
+  function addTable(chartname) {
+    if (!tables.hasOwnProperty(chartname)) {
+      var p = new Panel();
+      tables[chartname] = p;
+    } else {
+      throw new DuplicateChartError(chartname);
+    }
+  }
+
+  /***** Getters and Setters *****/
+
+  /**
+   * @function setData
+   * @param chartname {String} chartname - specific chart to set data on
+   * @param {Object} data - base data to use for populating the chart
+   */
+  function setData(chartname, data) {
+    if (tables.hasOwnProperty(chartname)) {
+      tables[chartname].data = data;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * @function getData
+   * @param {String} chartname - chart to get data for
+   * @return {Object} base data needed by table
+   */
+  function getData(chartname) {
+    if (tables.hasOwnProperty(chartname)) {
+      return tables[chartname].data;
+    }
+  }
+
+  /**
+   * Store the current value of the dropdown associated with the table in the html view
+   * @function setDropdown 
+   * @param {String} chartname - specific chart to set dropdown value for
+   * @param {String} val - dropdown value
+   */
+  function setDropdown(chartname, val) {
+    if (tables.hasOwnProperty(chartname)) {
+      tables[chartname].dropdown = val;
+    } else {
+      throw new InvalidChartError(chartname);
+    }
+  }
+
+  /**
+   * Get the current value of the dropdown associated with the table in the html view
+   * @function getDropdown
+   * @param {String} chartname - specific chart to get dropdown value for
+   * @return {String}
+   */
+  function getDropdown(chartname) {
+    if (tables.hasOwnProperty(chartname)) {
+      return tables[chartname].dropdown;
+    }
+  }
+  return {
+    setters: [function (_) {
+      Panel = _.Panel;
+    }, function (_2) {
+      DuplicateChartError = _2.DuplicateChartError;
+      InvalidChartError = _2.InvalidChartError;
+    }],
+    execute: function () {
+      exportObj = {
+        addTable: addTable,
+        setData: setData,
+        getData: getData,
+        setDropdown: setDropdown,
+        getDropdown: getDropdown
+      };
+
+      _export('exportObj', exportObj);
+
+      /***** model *****/
+      /**
+       * @private
+       * @name tables
+       * @dwsc store a panel object for each table in the view 
+       */
+      tables = {};
+    }
+  };
+});
+$__System.register("5d", ["a"], function (_export) {
     "use strict";
 
     var d3;
@@ -11787,6 +13449,28 @@ $__System.register("55", ["7"], function (_export) {
                 return d;
             }).style("opacity", 0).transition().delay(1500).style("opacity", 1);
 
+            //set precision of floats and add commas
+            var formatFloat = d3.format(',.3f');
+            //add commas to ints
+            var formatInt = d3.format(',');
+            //return true if type of int
+            function isInt(n) {
+                return Number(n) === n && n % 1 === 0;
+            }
+            //format table values
+            function format(x) {
+                if (typeof x != "string") {
+                    if (isInt(x)) {
+                        var formattedValue = formatInt(x);
+                    } else {
+                        var formattedValue = formatFloat(x);
+                    }
+                } else {
+                    var formattedValue = x;
+                }
+                return formattedValue;
+            }
+
             /***** create a row for each object in the data *****/
             // mapping function from data ro td based on columns
             // row is an object with keys = data.columns
@@ -11806,7 +13490,7 @@ $__System.register("55", ["7"], function (_export) {
             bodyCells.exit().remove();
 
             bodyCells.enter().append("td").merge(bodyCells).text(function (d) {
-                return d.value;
+                return format(d.value);
             }).style("opacity", 0).transition().delay(1500).style("opacity", 1);
         }
 
@@ -11814,31 +13498,26 @@ $__System.register("55", ["7"], function (_export) {
     }
 
     return {
-        setters: [function (_) {
-            d3 = _;
+        setters: [function (_a) {
+            d3 = _a;
         }],
         execute: function () {}
     };
 });
-$__System.register("a", [], function (_export) {
+$__System.register("d", [], function (_export) {
+  /**
+   * @module ctrlState
+   * @desc state container for controllers
+   */
+
   "use strict";
 
-  _export("default", Panel);
+  _export("default", CtrlState);
 
-  function Panel() {
-    this.cboxes = null;
-    this.chartConfig = null;
-    this.data = null;
+  function CtrlState() {
     this.drawFunc = null;
-    this.dropdown = null;
     this.observerFunc = null;
-    this.observers = null;
-    this.resetCount = 0;
-    this.svg = {
-      width: 0,
-      height: 0,
-      margins: { top: 0, left: 0, right: 0, bottom: 0 }
-    };
+    this.observers = [];
   }
 
   return {
@@ -11846,8 +13525,123 @@ $__System.register("a", [], function (_export) {
     execute: function () {}
   };
 });
-$__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function (_export) {
-  var d3, getInsightsData, _Set, tableChart, _toConsumableArray, _Object$keys, _Array$from, Panel, tables, tableExport, testing;
+$__System.registerDynamic("3b", [], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  return module.exports;
+});
+$__System.registerDynamic('5e', ['3b'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  var $ = $__require('3b');
+  module.exports = function create(P, D) {
+    return $.create(P, D);
+  };
+  return module.exports;
+});
+$__System.registerDynamic("5f", ["5e"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = { "default": $__require("5e"), __esModule: true };
+  return module.exports;
+});
+$__System.register("8", ["5f"], function (_export) {
+  var _Object$create;
+
+  function ValidationError(objectName) {
+    this.name = "ValidationError";
+    this.message = "Could not validate object of type " + objectName;
+  }
+
+  /**
+   * @class DuplicateChartError 
+   * @param objectName {String} objectName - type of object that could not be validated
+   */
+
+  function DuplicateChartError(objectName) {
+    this.name = "DuplicateChartError";
+    this.message = "Attempt to create chart using duplicate index: " + objectName;
+  }
+
+  /**
+   * @class InvalidChartError
+   * @param {String} chartname - index for chart that was not avialable
+   */
+
+  function InvalidChartError(chartname) {
+    this.name = "InvalidChartError";
+    this.message = "Error attempting to access " + chartname + ". Chart does not exist";
+  }
+
+  /**
+   * @class InvalidTableError
+   * @param {String} chartname - index for chart that was not avialable
+   */
+
+  function InvalidTableError(chartname) {
+    this.name = "InvalidTableError";
+    this.message = "Error attempting to access " + chartname + " inside tableController. " + chartname + " does not exist in tables";
+  }
+
+  return {
+    setters: [function (_f) {
+      _Object$create = _f["default"];
+    }],
+    execute: function () {
+      /**
+       * @module errorObjects
+       * @desc Custom error objects for use in application
+       */
+
+      /**
+       * @class ValidationError
+       * @param objectName {String} objectName - type of object that could not be validated
+       */
+      "use strict";
+
+      _export("ValidationError", ValidationError);
+
+      _export("DuplicateChartError", DuplicateChartError);
+
+      _export("InvalidChartError", InvalidChartError);
+
+      _export("InvalidTableError", InvalidTableError);
+
+      ValidationError.prototype = _Object$create(Error.prototype);
+      ValidationError.prototype.constructor = ValidationError;
+
+      DuplicateChartError.prototype = _Object$create(Error.prototype);
+      DuplicateChartError.prototype.constructor = DuplicateChartError;
+
+      InvalidChartError.prototype = _Object$create(Error.prototype);
+      InvalidChartError.prototype.constructor = InvalidChartError;
+
+      InvalidTableError.prototype = _Object$create(Error.prototype);
+      InvalidTableError.prototype.constructor = InvalidTableError;
+    }
+  };
+});
+$__System.register('60', ['8', '10', '53', '1d', '1e', '5c', 'c', 'a', '5d', 'd'], function (_export) {
+  var InvalidTableError, _Object$keys, _Set, _toConsumableArray, _Array$from, tableModel, getInsightsData, d3, tableChart, CtrlState, tables, tableExport, testing;
 
   /***** Public Functions *****/
 
@@ -11855,58 +13649,139 @@ $__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function 
    * draw a table with head and body inside the location defined by using chartname as a selector
    * @function drawTable
    * @param {String} chartname - css selector for chart
+   * @param {String} txnType - transaction type to filter table data by
    */
-  function addTable(chartname) {
+  function addTable(chartname, txnType) {
+    // do nothing if table already exists
     if (!tables.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      tables[chartname] = p;
 
-      // assume that we only draw the table if the tables does not yet have a key for chartname
+      // init controller state
+      var c = new CtrlState();
+      tables[chartname] = c;
+
+      // init model state
+      tableModel.addTable(chartname);
+
+      // add table html
       // because of how the groupedBar and table are both in panel body, we require that a div be in panel
       // body with class of tableContainer
-      var table = d3.select(chartname + ' .tableContainer').append("table").attr("class", "table");
+      buildContainer(chartname);
 
-      // table should have a head and body
-      table.append("thead");
-      table.append("tbody");
+      // set table data
+      setData(chartname, txnType);
+
+      // set dropdown
+      setDropdown(chartname);
+
+      // set draw function
+      setDrawFunc(chartname);
+
+      // add dropdown listener
+      addDropdownListener(chartname);
+
+      // draw table
+      draw(chartname);
     }
   }
 
+  /***** Private Functions *****/
+
+  // this var for exporting functions to be tested only, not intended to be used in code
+
+  /** 
+   * @function addDropdownListener
+   * @param {String} chartname - css selector for chart
+   */
+  function addDropdownListener(chartname) {
+    // build listener target
+    var selector = chartname + " .dropdown-menu li a";
+
+    // build callback function
+    var cb = dropdownCallbackBuilder(chartname);
+
+    // add listener
+    //"click.mine" prevents previous event listeners from being overwritten
+    d3.selectAll(selector).on('click.mine', cb);
+  }
+
   /**
-   * Set the data needed for the table 
+   * Add the table html structure(table, header and body) inside the table container for chartname 
+   * @private
+   * @function buildContainer
+   * @param {String} chartname
+   */
+  function buildContainer(chartname) {
+    var table = d3.select(chartname + ' .tableContainer').append("table").attr("class", "table");
+
+    // table should have a head and body
+    table.append("thead");
+    table.append("tbody");
+  }
+
+  /**
+   * Shape data for passing to draw function
+   * @private
    * @function buildData
    * @param {String} chartname - css selector for chart
-   * @param {String} txnType
+   * @return {Object[]} array of objects in proper format for passing to draw function
    */
-  function setData(chartname, txnType) {
-    if (!tables.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      tables[chartname] = p;
-    }
+  function buildData(chartname) {
+    // get raw data
+    var insightsData = tableModel.getData(chartname);;
 
-    var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
-    tables[chartname].data = insightsData;
+    // get dropdown param
+    var param = tableModel.getDropdown(chartname);
+
+    // get list of unique mcc_names
+    var mccNames = uniqueMccNames(insightsData);
+
+    // shape and return the data
+    return buildTableData(insightsData, param, mccNames);
   }
 
   /**
-   * Create and store the drawing function for the table
-   * @function createDrawingFunc
+   * Return the data structure needed by the table drawing function
+   * @private
+   * @function buildTableData
+   * @param {Object} data - object belonging to transaction type in the model
+   * @param {string} param - value to extract
+   * @param {string[]} mccNames - mccNames to use for columns and headers
+   * @returns {Object[]} array of objects
+   */
+  function buildTableData(data, param, mccNames) {
+    // need to build one object per fi
+    var fiNames = _Object$keys(data);
+    // each object should have key/values = mcc_name: param
+    // each object also needs an fi key
+    var tableData = fiNames.map(function (fi) {
+      // value of each fi key is an array of objects
+      // table is expecting array of objects, one object per row
+      // reduce array of objects to one object
+      var rowObj = data[fi].reduce(function (res, obj) {
+        // extract the requested param from the object
+        var key = obj.mcc_name;
+        res[key] = obj[param];
+        return res;
+      }, {});
+
+      // add an fi key
+      rowObj["fi"] = fi;
+
+      return rowObj;
+    });
+
+    tableData.columns = ["fi"].concat(_toConsumableArray(mccNames));
+    tableData.headers = ["FI"].concat(_toConsumableArray(mccNames));
+
+    return tableData;
+  }
+
+  /**
+   * If it exists, call the drawing function associated with chartname
+   * @private
+   * @function draw
    * @param {String} chartname - css selector for chart
    */
-  function createDrawingFunc(chartname) {
-    if (!tables.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      tables[chartname] = p;
-    }
-
-    tables[chartname].drawFunc = tableChart();
-  }
-
-  /**
-  * If it exists, call the drawing function associated with chartname
-  * @function draw
-  * @param {String} chartname - css selector for chart
-  */
   function draw(chartname) {
     // make sure chartname exists before drawing
     if (tables.hasOwnProperty(chartname)) {
@@ -11917,29 +13792,109 @@ $__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function 
 
       tables[chartname].drawFunc(selection, data);
     } else {
-      throw new Error("Attempt to call draw function for non-existent table panel object");
+      throw new Error('Attempt to call draw function for non-existent tables object. ' + chartname + ' does not exist in tables');
     }
   }
 
-  /** 
-   * @function addDropdownListener
+  /**
+   * @function dropdownCallbackBuilder
    * @param {String} chartname - css selector for chart
    */
-  function addDropdownListener(chartname) {
-    // don't add listener if chart doesn't exist
-    if (tables.hasOwnProperty(chartname)) {
-      // add listener
-      var selector = chartname + " .dropdown-menu li a";
-      var cb = dropdownCallbackBuilder(chartname);
-      //"click.mine" prevents previous event listeners from being overwritten
-      d3.selectAll(selector).on('click.mine', cb);
-    } else {
-      throw new Error("Attempt to add dropdown listener for non-existent table panel object");
+  function dropdownCallbackBuilder(chartname) {
+    return function (d) {
+      try {
+        // get selected dropdown value
+        var current = d3.select(this).attr('data-value');
+        var old = tableModel.getDropdown(chartname);
+
+        // only redraw if dropdown value changed
+        if (current != old) {
+          // set dropdown value
+          setDropdown(chartname, current);
+
+          // draw table
+          draw(chartname);
+        }
+      } catch (e) {
+        handleError(e);
+      }
+    };
+  }
+
+  /**
+   * Get the first item in chartname's dropdown list
+   * @private
+   * @function getDropdownDefault
+   * @param {String} chartname
+   * @return {String} value of the first dropdown item
+   */
+  function getDropdownDefault(chartname) {
+    var selector = chartname + ' .dropdown-menu li a';
+    var val = d3.select(selector).attr('data-value');
+
+    return val;
+  }
+
+  /**
+   * @function handleError
+   * @private
+   * @param {Object} err - Error object with message property
+   */
+  function handleError(err) {
+    console.log(err.message);
+  }
+
+  /**
+   * Set the data needed for the table 
+   * @function buildData
+   * @private
+   * @param {String} chartname - css selector for chart
+   * @param {String} txnType
+   */
+  function setData(chartname, txnType) {
+
+    var insightsData = getInsightsData(txnType); // result is object with keys for each fi and values of arrays of objects
+
+    try {
+      tableModel.setData(chartname, insightsData);
+    } catch (e) {
+      handleError(e.message);
     }
   }
 
-  /***** Private Functions *****/
-  // this var for exporting functions to be tested only, not intended to be used in code
+  /**
+   * @function setDrawFunc
+   * @private
+   * @param {String} chartname
+   */
+  function setDrawFunc(chartname) {
+    if (tables.hasOwnProperty(chartname)) {
+      tables[chartname].drawFunc = tableChart();
+    } else {
+      throw new InvalidTableError(chartname);
+    }
+  }
+
+  /**
+   * Set the dropdown param of the associated chart
+   * @function setDropdown
+   * @private
+   * @param {String} chartname - css selector for chart
+   * @param {String} [val] - optional dropdown value
+   */
+  function setDropdown(chartname, val) {
+
+    // if user did not pass in val, default to first dropdown list element
+    if (val === undefined) {
+      val = getDropdownDefault(chartname);
+    }
+
+    try {
+      tableModel.setDropdown(chartname, val);
+    } catch (e) {
+      handleError(e);
+    }
+  }
 
   /**
    * Find the unique mcc_name properties
@@ -11966,140 +13921,27 @@ $__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function 
     // remove repeated values
     return _Array$from(new _Set(allMccNames));
   }
-
-  /**
-  * Return the data structure needed by the table drawing function
-  * @private
-  * @function buildTableData
-  * @param {Object} data - object belonging to transaction type in the model
-  * @param {string} param - value to extract
-  * @param {string[]} mccNames - mccNames to use for columns and headers
-  * @returns {Object[]} array of objects
-  */
-  function buildTableData(chartname, data, mccNames) {
-    if (tables.hasOwnProperty(chartname)) {
-      var fiNames;
-      var tableData;
-
-      var _ret = (function () {
-        var param = tables[chartname].dropdown;
-
-        // need to build one object per fi
-        fiNames = _Object$keys(data);
-
-        // each object should have key/values = mcc_name: param
-        // each object also needs an fi key
-        tableData = fiNames.map(function (fi) {
-          // value of each fi key is an array of objects
-          // table is expecting array of objects, one object per row
-          // reduce array of objects to one object
-          var rowObj = data[fi].reduce(function (res, obj) {
-            // extract the requested param from the object
-            var key = obj.mcc_name;
-            res[key] = obj[param];
-            return res;
-          }, {});
-
-          // add an fi key
-          rowObj["fi"] = fi;
-
-          return rowObj;
-        });
-
-        tableData.columns = ["fi"].concat(_toConsumableArray(mccNames));
-        tableData.headers = ["FI"].concat(_toConsumableArray(mccNames));
-
-        return {
-          v: tableData
-        };
-      })();
-
-      if (typeof _ret === 'object') return _ret.v;
-    } else {
-      throw new Error("Attempt to build data for non-existent tables panel object");
-    }
-  }
-
-  /**
-   * Shape data for passing to draw function
-   * @function buildData
-   * @param {String} chartname - css selector for chart
-   */
-  function buildData(chartname) {
-    // check that chartname exists
-    if (tables.hasOwnProperty(chartname)) {
-      // make sure dropdown param is set, if param is null, dropdown wasn't set yet
-      if (tables[chartname].dropdown === null) {
-        setDropdown(chartname);
-      }
-
-      // get raw data
-      var insightsData = tables[chartname].data;
-
-      // get list of unique mcc_names
-      var mccNames = uniqueMccNames(insightsData);
-
-      // shape and return the data
-      return buildTableData(chartname, insightsData, mccNames);
-    } else {
-      throw new Error("Attempt to call data property in non-existent tables panel object");
-    }
-  }
-
-  /**
-   * Set the dropdown param of the associated chart
-   * @function setDropdown
-   * @param {String} chartname - css selector for chart
-   * @param {String} [val] - optional dropdown value
-   */
-  function setDropdown(chartname, val) {
-    if (!tables.hasOwnProperty(chartname)) {
-      var p = new Panel();
-      tables[chartname] = p;
-    }
-
-    // if user did not pass in val, default to first dropdown list element
-    if (val === undefined) {
-      var selector = chartname + ' .dropdown-menu li a';
-      val = d3.select(selector).attr('data-value');
-    }
-
-    tables[chartname].dropdown = val;
-  }
-
-  /**
-   * @function dropdownCallbackBuilder
-   * @param {String} chartname - css selector for chart
-   */
-  function dropdownCallbackBuilder(chartname) {
-    return function (d) {
-      // get selected dropdown value
-      var val = d3.select(this).attr('data-value');
-
-      // set dropdown value
-      setDropdown(chartname, val);
-
-      // draw table
-      draw(chartname);
-    };
-  }
   return {
     setters: [function (_3) {
-      d3 = _3;
-    }, function (_2) {
-      getInsightsData = _2.getInsightsData;
+      InvalidTableError = _3.InvalidTableError;
     }, function (_) {
-      _Set = _['default'];
-    }, function (_4) {
-      tableChart = _4['default'];
-    }, function (_b) {
-      _toConsumableArray = _b['default'];
+      _Object$keys = _['default'];
+    }, function (_2) {
+      _Set = _2['default'];
+    }, function (_d) {
+      _toConsumableArray = _d['default'];
     }, function (_e) {
-      _Object$keys = _e['default'];
+      _Array$from = _e['default'];
     }, function (_c) {
-      _Array$from = _c['default'];
+      tableModel = _c.exportObj;
+    }, function (_c2) {
+      getInsightsData = _c2.getInsightsData;
     }, function (_a) {
-      Panel = _a['default'];
+      d3 = _a;
+    }, function (_d2) {
+      tableChart = _d2['default'];
+    }, function (_d3) {
+      CtrlState = _d3['default'];
     }],
     execute: function () {
       /**
@@ -12111,10 +13953,7 @@ $__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function 
       tables = {};
       tableExport = {
         addTable: addTable,
-        setData: setData,
-        createDrawingFunc: createDrawingFunc,
-        draw: draw,
-        addDropdownListener: addDropdownListener
+        tables: tables
       };
 
       _export('tableExport', tableExport);
@@ -12128,7 +13967,7 @@ $__System.register('56', ['7', '9', '54', '55', '1b', 'e', '1c', 'a'], function 
     }
   };
 });
-$__System.register('d', ['7'], function (_export) {
+$__System.register('f', ['a'], function (_export) {
     'use strict';
 
     var d3;
@@ -12174,13 +14013,13 @@ $__System.register('d', ['7'], function (_export) {
     }
 
     return {
-        setters: [function (_) {
-            d3 = _;
+        setters: [function (_a) {
+            d3 = _a;
         }],
         execute: function () {}
     };
 });
-$__System.registerDynamic('57', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('61', [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -12303,14 +14142,14 @@ $__System.registerDynamic('57', [], true, function ($__require, exports, module)
 	})(typeof exports === 'undefined' ? this.base64js = {} : exports);
 	return module.exports;
 });
-$__System.registerDynamic("58", ["57"], true, function ($__require, exports, module) {
+$__System.registerDynamic("62", ["61"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("57");
+  module.exports = $__require("61");
   return module.exports;
 });
-$__System.registerDynamic("59", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("63", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -12401,14 +14240,14 @@ $__System.registerDynamic("59", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("5a", ["59"], true, function ($__require, exports, module) {
+$__System.registerDynamic("64", ["63"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("59");
+  module.exports = $__require("63");
   return module.exports;
 });
-$__System.registerDynamic('5b', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('65', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -12420,14 +14259,14 @@ $__System.registerDynamic('5b', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("5c", ["5b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("66", ["65"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("5b");
+  module.exports = $__require("65");
   return module.exports;
 });
-$__System.registerDynamic('5d', ['58', '5a', '5c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('67', ['62', '64', '66'], true, function ($__require, exports, module) {
   /*!
    * The buffer module from node.js, for the browser.
    *
@@ -12441,9 +14280,9 @@ $__System.registerDynamic('5d', ['58', '5a', '5c'], true, function ($__require, 
   var define,
       global = this || self,
       GLOBAL = global;
-  var base64 = $__require('58');
-  var ieee754 = $__require('5a');
-  var isArray = $__require('5c');
+  var base64 = $__require('62');
+  var ieee754 = $__require('64');
+  var isArray = $__require('66');
 
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
@@ -13946,29 +15785,29 @@ $__System.registerDynamic('5d', ['58', '5a', '5c'], true, function ($__require, 
   }
   return module.exports;
 });
-$__System.registerDynamic("5e", ["5d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("68", ["67"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("5d");
+  module.exports = $__require("67");
   return module.exports;
 });
-$__System.registerDynamic('5f', ['5e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('69', ['68'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('5e');
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('68');
   return module.exports;
 });
-$__System.registerDynamic("60", ["5f"], true, function ($__require, exports, module) {
+$__System.registerDynamic("6a", ["69"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("5f");
+  module.exports = $__require("69");
   return module.exports;
 });
-$__System.registerDynamic('61', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('6b', [], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
@@ -14153,28 +15992,28 @@ $__System.registerDynamic('61', [], true, function ($__require, exports, module)
     };
     return module.exports;
 });
-$__System.registerDynamic("62", ["61"], true, function ($__require, exports, module) {
+$__System.registerDynamic("6c", ["6b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("61");
+  module.exports = $__require("6b");
   return module.exports;
 });
-$__System.registerDynamic('63', ['62'], true, function ($__require, exports, module) {
+$__System.registerDynamic('6d', ['6c'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__System._nodeRequire ? process : $__require('62');
+  module.exports = $__System._nodeRequire ? process : $__require('6c');
   return module.exports;
 });
-$__System.registerDynamic("64", ["63"], true, function ($__require, exports, module) {
+$__System.registerDynamic("6e", ["6d"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("63");
+  module.exports = $__require("6d");
   return module.exports;
 });
-$__System.registerDynamic('65', ['60', '64'], true, function ($__require, exports, module) {
+$__System.registerDynamic('6f', ['6a', '6e'], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -27903,17 +29742,17 @@ $__System.registerDynamic('65', ['60', '64'], true, function ($__require, export
       exports.geoTransverseMercatorRaw = transverseMercatorRaw;
       Object.defineProperty(exports, '__esModule', { value: true });
     });
-  })($__require('60').Buffer, $__require('64'));
+  })($__require('6a').Buffer, $__require('6e'));
   return module.exports;
 });
-$__System.registerDynamic("7", ["65"], true, function ($__require, exports, module) {
+$__System.registerDynamic("a", ["6f"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("65");
+  module.exports = $__require("6f");
   return module.exports;
 });
-$__System.register("66", ["7"], function (_export) {
+$__System.register("1c", ["a"], function (_export) {
   /**
    * @module stacked
    * @description Stacked chart module 
@@ -27930,8 +29769,8 @@ $__System.register("66", ["7"], function (_export) {
   function stacksChart() {
     //Default Parameters
     var margin = { top: 30, right: 40, bottom: 50, left: 40 };
-    var width = 0; // 900 - margin.left - margin.right;
-    var height = 0; // 300 - margin.top - margin.bottom;
+    var width = 400; // 900 - margin.left - margin.right;
+    var height = 150; // 300 - margin.top - margin.bottom;
 
     var x = d3.scaleBand();
     var y = d3.scaleLinear();
@@ -28002,10 +29841,11 @@ $__System.register("66", ["7"], function (_export) {
       });
 
       //Remove rectangles / layers if needed
-      gUpdate.exit().transition().duration(1000).attr("height", 0);
+      gUpdate.exit().transition().duration(2000).attr("height", 0).attr("y", function (d) {
+        return y(d[0][0]);
+      });
     }
 
-    //.attr("y", 0)
     //.remove();
     chart.width = function (value) {
       if (!arguments.length) return width;
@@ -28037,26 +29877,26 @@ $__System.register("66", ["7"], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      d3 = _;
+    setters: [function (_a) {
+      d3 = _a;
     }],
     execute: function () {}
   };
 });
-$__System.register('67', [], function (_export) {
+$__System.register('70', [], function (_export) {
   'use strict';
 
   var dataJSON;
   return {
     setters: [],
     execute: function () {
-      dataJSON = '{"fi_name":"CPM Credit Union","pin_debit":{"CPM Credit Union":[{"amt_int":"76.546","amt_sale":"3737.96","avg_int_per_trn":"0.261249147","avg_sale":"12.75754266","int_pc":"0.349525114","int_rate":"0.020478015","mcc_name":"Fast Food","n_card":"219","n_trans":"293","spend_pc":"17.0683105","trans_pc":"1.337899543"},{"amt_int":"10093.19","amt_sale":"1117685.86","avg_int_per_trn":"0.380501772","avg_sale":"42.13548443","int_pc":"0.784180716","int_rate":"0.009030435","mcc_name":"Other","n_card":"12871","n_trans":"26526","spend_pc":"86.83753088","trans_pc":"2.060912128"},{"amt_int":"2731.41","amt_sale":"332540.65","avg_int_per_trn":"0.187378061","avg_sale":"22.81269466","int_pc":"0.350720339","int_rate":"0.008213763","mcc_name":"Drug Store","n_card":"7788","n_trans":"14577","spend_pc":"42.6991076","trans_pc":"1.871725732"},{"amt_int":"742.885","amt_sale":"65843.78","avg_int_per_trn":"0.522790289","avg_sale":"46.33622801","int_pc":"0.659170364","int_rate":"0.011282539","mcc_name":"Family Clothing","n_card":"1127","n_trans":"1421","spend_pc":"58.42393966","trans_pc":"1.260869565"},{"amt_int":"5486.28","amt_sale":"1523838.5","avg_int_per_trn":"0.158430217","avg_sale":"44.0046926","int_pc":"0.374183604","int_rate":"0.003600303","mcc_name":"Grocery","n_card":"14662","n_trans":"34629","spend_pc":"103.9311485","trans_pc":"2.36181967"},{"amt_int":"1507.377","amt_sale":"139143.83","avg_int_per_trn":"0.578203682","avg_sale":"53.37316072","int_pc":"0.756715361","int_rate":"0.010833229","mcc_name":"Department Stores","n_card":"1992","n_trans":"2607","spend_pc":"69.85132028","trans_pc":"1.30873494"}],"CUs":[{"amt_int":"16930.893","amt_sale":"1634782.37","avg_int_per_trn":"0.475346538","avg_sale":"45.89764641","int_pc":"0.62975239","int_rate":"0.010356665","mcc_name":"Family Clothing","n_card":"26885","n_trans":"35618","spend_pc":"60.80648577","trans_pc":"1.324827971"},{"amt_int":"170123.343","amt_sale":"18412800.05","avg_int_per_trn":"0.38896271","avg_sale":"42.09823573","int_pc":"0.769952628","int_rate":"0.009239406","mcc_name":"Other","n_card":"220953","n_trans":"437377","spend_pc":"83.33355985","trans_pc":"1.979502428"},{"amt_int":"51700.317","amt_sale":"6459215.54","avg_int_per_trn":"0.173328719","avg_sale":"21.65494567","int_pc":"0.335461481","int_rate":"0.008004117","mcc_name":"Drug Store","n_card":"154117","n_trans":"298279","spend_pc":"41.91111649","trans_pc":"1.935406217"},{"amt_int":"43542.927","amt_sale":"4529210.75","avg_int_per_trn":"0.553607962","avg_sale":"57.58471705","int_pc":"0.689723385","int_rate":"0.0096138","mcc_name":"Department Stores","n_card":"63131","n_trans":"78653","spend_pc":"71.74305413","trans_pc":"1.2458697"},{"amt_int":"97307.128","amt_sale":"26592879.71","avg_int_per_trn":"0.168759024","avg_sale":"46.11983217","int_pc":"0.363468754","int_rate":"0.003659142","mcc_name":"Grocery","n_card":"267718","n_trans":"576604","spend_pc":"99.33168375","trans_pc":"2.153773747"},{"amt_int":"1178.867","amt_sale":"57662.73","avg_int_per_trn":"0.203323042","avg_sale":"9.945279407","int_pc":"0.277903583","int_rate":"0.020444176","mcc_name":"Fast Food","n_card":"4242","n_trans":"5798","spend_pc":"13.59328854","trans_pc":"1.366808109"}],"Issuer 1":[{"amt_int":"474.57","amt_sale":"21478.52","avg_int_per_trn":"0.225234931","avg_sale":"10.19388704","int_pc":"0.303045977","int_rate":"0.022095098","mcc_name":"Fast Food","n_card":"1566","n_trans":"2107","spend_pc":"13.71553001","trans_pc":"1.345466156"},{"amt_int":"36771.675","amt_sale":"3304065.26","avg_int_per_trn":"0.230476947","avg_sale":"20.70917015","int_pc":"0.476842054","int_rate":"0.011129222","mcc_name":"Drug Store","n_card":"77115","n_trans":"159546","spend_pc":"42.84594774","trans_pc":"2.068936005"},{"amt_int":"4704.5","amt_sale":"919532.34","avg_int_per_trn":"0.245038804","avg_sale":"47.8948039","int_pc":"0.33495906","int_rate":"0.005116188","mcc_name":"Family Clothing","n_card":"14045","n_trans":"19199","spend_pc":"65.47044073","trans_pc":"1.366963332"},{"amt_int":"39404.908","amt_sale":"7011204.28","avg_int_per_trn":"0.243944903","avg_sale":"43.40442934","int_pc":"0.480448053","int_rate":"0.005620277","mcc_name":"Other","n_card":"82017","n_trans":"161532","spend_pc":"85.48476877","trans_pc":"1.969494129"},{"amt_int":"55771.565","amt_sale":"11155672.78","avg_int_per_trn":"0.24484301","avg_sale":"48.97457155","int_pc":"0.564044226","int_rate":"0.004999391","mcc_name":"Grocery","n_card":"98878","n_trans":"227785","spend_pc":"112.8225973","trans_pc":"2.303697486"},{"amt_int":"7469.472","amt_sale":"1747421.77","avg_int_per_trn":"0.251285854","avg_sale":"58.78626644","int_pc":"0.316409201","int_rate":"0.004274567","mcc_name":"Department Stores","n_card":"23607","n_trans":"29725","spend_pc":"74.02133986","trans_pc":"1.259160419"}],"Issuer 2":[{"amt_int":"59.08","amt_sale":"2220.19","avg_int_per_trn":"0.224638783","avg_sale":"8.441787072","int_pc":"0.30611399","int_rate":"0.026610335","mcc_name":"Fast Food","n_card":"193","n_trans":"263","spend_pc":"11.50357513","trans_pc":"1.362694301"},{"amt_int":"4939.639","amt_sale":"1125692.61","avg_int_per_trn":"0.246059228","avg_sale":"56.07435168","int_pc":"0.477860017","int_rate":"0.004388089","mcc_name":"Grocery","n_card":"10337","n_trans":"20075","spend_pc":"108.8993528","trans_pc":"1.94205282"},{"amt_int":"788.04","amt_sale":"167165.37","avg_int_per_trn":"0.252820019","avg_sale":"53.63021174","int_pc":"0.326445733","int_rate":"0.004714134","mcc_name":"Family Clothing","n_card":"2414","n_trans":"3117","spend_pc":"69.24828915","trans_pc":"1.291217896"},{"amt_int":"3306.01","amt_sale":"304208.86","avg_int_per_trn":"0.229599972","avg_sale":"21.12708244","int_pc":"0.431481336","int_rate":"0.010867566","mcc_name":"Drug Store","n_card":"7662","n_trans":"14399","spend_pc":"39.70358392","trans_pc":"1.879274341"},{"amt_int":"3974.24","amt_sale":"937406.43","avg_int_per_trn":"0.253233083","avg_sale":"59.73024277","int_pc":"0.29971644","int_rate":"0.004239612","mcc_name":"Department Stores","n_card":"13260","n_trans":"15694","spend_pc":"70.6943009","trans_pc":"1.183559578"},{"amt_int":"3302.347","amt_sale":"631863.48","avg_int_per_trn":"0.247144664","avg_sale":"47.2880916","int_pc":"0.42556018","int_rate":"0.005226362","mcc_name":"Other","n_card":"7760","n_trans":"13362","spend_pc":"81.42570619","trans_pc":"1.721907216"}],"Other FI":[{"amt_int":"40711.559","amt_sale":"5242647.01","avg_int_per_trn":"0.380172747","avg_sale":"48.95689495","int_pc":"0.502270791","int_rate":"0.007765459","mcc_name":"Family Clothing","n_card":"81055","n_trans":"107087","spend_pc":"64.68011856","trans_pc":"1.321164641"},{"amt_int":"349446.518","amt_sale":"96604472.8","avg_int_per_trn":"0.187654734","avg_sale":"51.87714214","int_pc":"0.400102266","int_rate":"0.003617291","mcc_name":"Grocery","n_card":"873393","n_trans":"1862178","spend_pc":"110.6082517","trans_pc":"2.132119218"},{"amt_int":"3108.182","amt_sale":"142956.59","avg_int_per_trn":"0.220547932","avg_sale":"10.14380118","int_pc":"0.303533398","int_rate":"0.021742139","mcc_name":"Fast Food","n_card":"10240","n_trans":"14093","spend_pc":"13.96060449","trans_pc":"1.376269531"},{"amt_int":"462191.627","amt_sale":"63681998.1","avg_int_per_trn":"0.317130668","avg_sale":"43.69511135","int_pc":"0.627397241","int_rate":"0.007257807","mcc_name":"Other","n_card":"736681","n_trans":"1457417","spend_pc":"86.44446932","trans_pc":"1.978355625"},{"amt_int":"109614.904","amt_sale":"16063628.48","avg_int_per_trn":"0.405217216","avg_sale":"59.3829724","int_pc":"0.50583712","int_rate":"0.006823795","mcc_name":"Department Stores","n_card":"216700","n_trans":"270509","spend_pc":"74.12841938","trans_pc":"1.248311029"},{"amt_int":"190367.439","amt_sale":"21888405.92","avg_int_per_trn":"0.200622034","avg_sale":"23.06747694","int_pc":"0.389112469","int_rate":"0.008697181","mcc_name":"Drug Store","n_card":"489235","n_trans":"948886","spend_pc":"44.74006545","trans_pc":"1.939530083"}],"total":[{"amt_int":"164601.543","amt_sale":"23277667.43","avg_int_per_trn":"0.417155269","avg_sale":"58.99338141","int_pc":"0.519742919","int_rate":"0.007071222","mcc_name":"Department Stores","n_card":"316698","n_trans":"394581","spend_pc":"73.50115072","trans_pc":"1.245921982"},{"amt_int":"282145.441","amt_sale":"31955895.58","avg_int_per_trn":"0.198538777","avg_sale":"22.48657428","int_pc":"0.387493756","int_rate":"0.008829214","mcc_name":"Drug Store","n_card":"728129","n_trans":"1421110","spend_pc":"43.88768416","trans_pc":"1.951728334"},{"amt_int":"63134.992","amt_sale":"7964127.09","avg_int_per_trn":"0.382587622","avg_sale":"48.26129456","int_pc":"0.507520093","int_rate":"0.007927421","mcc_name":"Family Clothing","n_card":"124399","n_trans":"165021","spend_pc":"64.02082887","trans_pc":"1.326546033"},{"amt_int":"4820.699","amt_sale":"224318.03","avg_int_per_trn":"0.216553569","avg_sale":"10.07672746","int_pc":"0.296822794","int_rate":"0.021490466","mcc_name":"Fast Food","n_card":"16241","n_trans":"22261","spend_pc":"13.81183609","trans_pc":"1.370666831"},{"amt_int":"507464.85","amt_sale":"135478717.9","avg_int_per_trn":"0.188884433","avg_sale":"50.42678477","int_pc":"0.40586603","int_rate":"0.003745716","mcc_name":"Grocery","n_card":"1250326","n_trans":"2686642","spend_pc":"108.3547154","trans_pc":"2.148753205"},{"amt_int":"675022.225","amt_sale":"89737865.91","avg_int_per_trn":"0.326146852","avg_sale":"43.35816119","int_pc":"0.644467382","int_rate":"0.007522156","mcc_name":"Other","n_card":"1047411","n_trans":"2069688","spend_pc":"85.67588646","trans_pc":"1.976003689"}]},"sig_credit":{"CPM Credit Union":[{"amt_int":"3309.45506","amt_sale":"290324.74","avg_int_per_trn":"0.602595605","avg_sale":"52.8632083","int_pc":"1.156747662","int_rate":"0.011399149","mcc_name":"Grocery","n_card":"2861","n_trans":"5492","spend_pc":"101.4766655","trans_pc":"1.919608528"},{"amt_int":"1469.78481","amt_sale":"66479.58","avg_int_per_trn":"0.186237305","avg_sale":"8.423667005","int_pc":"0.434847577","int_rate":"0.022108816","mcc_name":"Fast Food","n_card":"3380","n_trans":"7892","spend_pc":"19.66851479","trans_pc":"2.334911243"},{"amt_int":"396.14","amt_sale":"27877.95","avg_int_per_trn":"0.770700389","avg_sale":"54.23725681","int_pc":"0.99035","int_rate":"0.014209797","mcc_name":"Family Clothing","n_card":"400","n_trans":"514","spend_pc":"69.694875","trans_pc":"1.285"},{"amt_int":"1031.97","amt_sale":"74001.24","avg_int_per_trn":"0.911634276","avg_sale":"65.37212014","int_pc":"1.23146778","int_rate":"0.013945307","mcc_name":"Department Stores","n_card":"838","n_trans":"1132","spend_pc":"88.30696897","trans_pc":"1.350835322"},{"amt_int":"1289.82596","amt_sale":"93339.62","avg_int_per_trn":"0.349641084","avg_sale":"25.30214692","int_pc":"0.575301499","int_rate":"0.013818633","mcc_name":"Drug Store","n_card":"2242","n_trans":"3689","spend_pc":"41.63230152","trans_pc":"1.645405888"},{"amt_int":"10262.90162","amt_sale":"656411.17","avg_int_per_trn":"0.851763766","avg_sale":"54.47847705","int_pc":"1.60608789","int_rate":"0.015634867","mcc_name":"Other","n_card":"6390","n_trans":"12049","spend_pc":"102.7247527","trans_pc":"1.885602504"}],"CUs":[{"amt_int":"39708.02","amt_sale":"2662276.35","avg_int_per_trn":"0.985628615","avg_sale":"66.08276491","int_pc":"1.285298764","int_rate":"0.014915063","mcc_name":"Department Stores","n_card":"30894","n_trans":"40287","spend_pc":"86.1745436","trans_pc":"1.304039619"},{"amt_int":"37004.13354","amt_sale":"1688576.16","avg_int_per_trn":"0.210826939","avg_sale":"9.620475048","int_pc":"0.449450196","int_rate":"0.0219144","mcc_name":"Fast Food","n_card":"82332","n_trans":"175519","spend_pc":"20.50935432","trans_pc":"2.13184424"},{"amt_int":"2336366.04","amt_sale":"20220458.32","avg_int_per_trn":"6.889212053","avg_sale":"59.62380157","int_pc":"12.20333993","int_rate":"0.115544663","mcc_name":"Other","n_card":"191453","n_trans":"339134","spend_pc":"105.615782","trans_pc":"1.771369474"},{"amt_int":"70686.41685","amt_sale":"6077665.98","avg_int_per_trn":"0.647335222","avg_sale":"55.65832063","int_pc":"1.156707852","int_rate":"0.01163052","mcc_name":"Grocery","n_card":"61110","n_trans":"109196","spend_pc":"99.4545243","trans_pc":"1.786876125"},{"amt_int":"15143.19","amt_sale":"1033428.18","avg_int_per_trn":"0.850215597","avg_sale":"58.02190669","int_pc":"1.123548746","int_rate":"0.014653355","mcc_name":"Family Clothing","n_card":"13478","n_trans":"17811","spend_pc":"76.67518771","trans_pc":"1.321486867"},{"amt_int":"41550.91436","amt_sale":"2798642.94","avg_int_per_trn":"0.363200944","avg_sale":"24.46323438","int_pc":"0.643661343","int_rate":"0.014846808","mcc_name":"Drug Store","n_card":"64554","n_trans":"114402","spend_pc":"43.35351706","trans_pc":"1.772190724"}],"Issuer 1":[{"amt_int":"45043.29645","amt_sale":"1765821.01","avg_int_per_trn":"0.326284844","avg_sale":"12.7912626","int_pc":"0.61281729","int_rate":"0.025508416","mcc_name":"Fast Food","n_card":"73502","n_trans":"138049","spend_pc":"24.02412193","trans_pc":"1.878166581"},{"amt_int":"109634.38","amt_sale":"5915942.18","avg_int_per_trn":"1.376399884","avg_sale":"74.27142958","int_pc":"1.926113493","int_rate":"0.018532024","mcc_name":"Department Stores","n_card":"56920","n_trans":"79653","spend_pc":"103.934332","trans_pc":"1.399385102"},{"amt_int":"224346.4927","amt_sale":"13644128.73","avg_int_per_trn":"0.919132649","avg_sale":"55.89908733","int_pc":"1.901305915","int_rate":"0.016442713","mcc_name":"Grocery","n_card":"117996","n_trans":"244085","spend_pc":"115.6321293","trans_pc":"2.068587071"},{"amt_int":"9228924.156","amt_sale":"51760555.1","avg_int_per_trn":"15.56494722","avg_sale":"87.29623244","int_pc":"31.29053463","int_rate":"0.178300332","mcc_name":"Other","n_card":"294943","n_trans":"592930","spend_pc":"175.4934177","trans_pc":"2.010320638"},{"amt_int":"46813.13","amt_sale":"2491692.06","avg_int_per_trn":"1.252625763","avg_sale":"66.67269774","int_pc":"1.770140286","int_rate":"0.018787687","mcc_name":"Family Clothing","n_card":"26446","n_trans":"37372","spend_pc":"94.21810709","trans_pc":"1.413143765"},{"amt_int":"126639.704","amt_sale":"6382146.38","avg_int_per_trn":"0.582264898","avg_sale":"29.34387632","int_pc":"1.120507026","int_rate":"0.019842808","mcc_name":"Drug Store","n_card":"113020","n_trans":"217495","spend_pc":"56.46917696","trans_pc":"1.924393913"}],"Issuer 2":[{"amt_int":"2145909.914","amt_sale":"12579017.32","avg_int_per_trn":"17.59432886","avg_sale":"103.135442","int_pc":"30.85686636","int_rate":"0.1705944","mcc_name":"Other","n_card":"69544","n_trans":"121966","spend_pc":"180.8785419","trans_pc":"1.753796158"},{"amt_int":"22385.71689","amt_sale":"1082599.81","avg_int_per_trn":"0.623887765","avg_sale":"30.17195201","int_pc":"1.14317827","int_rate":"0.02067774","mcc_name":"Drug Store","n_card":"19582","n_trans":"35881","spend_pc":"55.28545654","trans_pc":"1.832346032"},{"amt_int":"27038.76","amt_sale":"1398794.79","avg_int_per_trn":"1.39908724","avg_sale":"72.37890872","int_pc":"1.805834502","int_rate":"0.019330041","mcc_name":"Department Stores","n_card":"14973","n_trans":"19326","spend_pc":"93.42114406","trans_pc":"1.290723302"},{"amt_int":"45030.46065","amt_sale":"2742687.07","avg_int_per_trn":"0.931709682","avg_sale":"56.74798928","int_pc":"1.894424091","int_rate":"0.016418373","mcc_name":"Grocery","n_card":"23770","n_trans":"48331","spend_pc":"115.384395","trans_pc":"2.03327724"},{"amt_int":"9010.68","amt_sale":"453637.39","avg_int_per_trn":"1.328029477","avg_sale":"66.85886367","int_pc":"1.791387674","int_rate":"0.019863178","mcc_name":"Family Clothing","n_card":"5030","n_trans":"6785","spend_pc":"90.18635984","trans_pc":"1.348906561"},{"amt_int":"8889.52829","amt_sale":"337457.9","avg_int_per_trn":"0.364145842","avg_sale":"13.82344339","int_pc":"0.681189907","int_rate":"0.026342629","mcc_name":"Fast Food","n_card":"13050","n_trans":"24412","spend_pc":"25.85884291","trans_pc":"1.870651341"}],"Other FI":[{"amt_int":"168547.8506","amt_sale":"7352877.96","avg_int_per_trn":"0.255285794","avg_sale":"11.13680942","int_pc":"0.497756599","int_rate":"0.022922705","mcc_name":"Fast Food","n_card":"338615","n_trans":"660232","spend_pc":"21.71456657","trans_pc":"1.949801397"},{"amt_int":"126757.16","amt_sale":"7262483.95","avg_int_per_trn":"1.148121083","avg_sale":"65.78098574","int_pc":"1.549882741","int_rate":"0.017453692","mcc_name":"Family Clothing","n_card":"81785","n_trans":"110404","spend_pc":"88.79970594","trans_pc":"1.349929694"},{"amt_int":"322256.84","amt_sale":"18141017.61","avg_int_per_trn":"1.266503855","avg_sale":"71.29613989","int_pc":"1.66963805","int_rate":"0.017763989","mcc_name":"Department Stores","n_card":"193010","n_trans":"254446","spend_pc":"93.99003995","trans_pc":"1.318304751"},{"amt_int":"559752.0828","amt_sale":"47394923.76","avg_int_per_trn":"0.681009999","avg_sale":"57.66198641","int_pc":"1.252076533","int_rate":"0.01181038","mcc_name":"Grocery","n_card":"447059","n_trans":"821944","spend_pc":"106.0149192","trans_pc":"1.838558222"},{"amt_int":"393256.5024","amt_sale":"21221182.41","avg_int_per_trn":"0.541430264","avg_sale":"29.21703857","int_pc":"0.943276052","int_rate":"0.018531319","mcc_name":"Drug Store","n_card":"416905","n_trans":"726329","spend_pc":"50.901722","trans_pc":"1.742193066"},{"amt_int":"24314859.37","amt_sale":"167338108","avg_int_per_trn":"11.44055857","avg_sale":"78.73545127","int_pc":"20.67720194","int_rate":"0.145303778","mcc_name":"Other","n_card":"1175926","n_trans":"2125321","spend_pc":"142.303264","trans_pc":"1.807359477"}],"total":[{"amt_int":"498638","amt_sale":"28118030.93","avg_int_per_trn":"1.26650445","avg_sale":"71.41776458","int_pc":"1.685743939","int_rate":"0.017733745","mcc_name":"Department Stores","n_card":"295797","n_trans":"393712","spend_pc":"95.05853991","trans_pc":"1.331020937"},{"amt_int":"583832.8377","amt_sale":"31484571.54","avg_int_per_trn":"0.533615851","avg_sale":"28.77650133","int_pc":"0.950773356","int_rate":"0.018543458","mcc_name":"Drug Store","n_card":"614061","n_trans":"1094107","spend_pc":"51.27270994","trans_pc":"1.78175621"},{"amt_int":"197724.16","amt_sale":"11241241.58","avg_int_per_trn":"1.14707818","avg_sale":"65.21500928","int_pc":"1.560089317","int_rate":"0.017589175","mcc_name":"Family Clothing","n_card":"126739","n_trans":"172372","spend_pc":"88.69599397","trans_pc":"1.360054916"},{"amt_int":"259484.8089","amt_sale":"11144733.03","avg_int_per_trn":"0.259949599","avg_sale":"11.16469551","int_pc":"0.511301124","int_rate":"0.023283179","mcc_name":"Fast Food","n_card":"507499","n_trans":"998212","spend_pc":"21.96010835","trans_pc":"1.966924073"},{"amt_int":"899815.453","amt_sale":"69859405.54","avg_int_per_trn":"0.73541011","avg_sale":"57.0953888","int_pc":"1.384469913","int_rate":"0.012880377","mcc_name":"Grocery","n_card":"649935","n_trans":"1223556","spend_pc":"107.4867572","trans_pc":"1.882582104"},{"amt_int":"38026059.48","amt_sale":"251898138.8","avg_int_per_trn":"11.9603213","avg_sale":"79.22942096","int_pc":"21.95669843","int_rate":"0.15095808","mcc_name":"Other","n_card":"1731866","n_trans":"3179351","spend_pc":"145.4489774","trans_pc":"1.835795033"}]},"sig_debit":{"CPM Credit Union":[{"amt_int":"203.52","amt_sale":"18984.86","avg_int_per_trn":"0.560661157","avg_sale":"52.29988981","int_pc":"0.745494505","int_rate":"0.010720121","mcc_name":"Family Clothing","n_card":"273","n_trans":"363","spend_pc":"69.54161172","trans_pc":"1.32967033"},{"amt_int":"887.035","amt_sale":"102253.23","avg_int_per_trn":"0.198131561","avg_sale":"22.83967612","int_pc":"0.351718874","int_rate":"0.008674885","mcc_name":"Drug Store","n_card":"2522","n_trans":"4477","spend_pc":"40.5445004","trans_pc":"1.77517843"},{"amt_int":"1007.86662","amt_sale":"235080.35","avg_int_per_trn":"0.226843714","avg_sale":"52.91027459","int_pc":"0.477661905","int_rate":"0.004287328","mcc_name":"Grocery","n_card":"2110","n_trans":"4443","spend_pc":"111.4124882","trans_pc":"2.105687204"},{"amt_int":"2252.25766","amt_sale":"103498.48","avg_int_per_trn":"0.175737957","avg_sale":"8.075724095","int_pc":"0.46209636","int_rate":"0.021761263","mcc_name":"Fast Food","n_card":"4874","n_trans":"12816","spend_pc":"21.2348133","trans_pc":"2.629462454"},{"amt_int":"7584.37191","amt_sale":"571688.22","avg_int_per_trn":"0.57141354","avg_sale":"43.07151511","int_pc":"1.03442061","int_rate":"0.013266623","mcc_name":"Other","n_card":"7332","n_trans":"13273","spend_pc":"77.97166121","trans_pc":"1.810283688"},{"amt_int":"443.99","amt_sale":"40531.5","avg_int_per_trn":"0.57511658","avg_sale":"52.50194301","int_pc":"0.785823009","int_rate":"0.010954196","mcc_name":"Department Stores","n_card":"565","n_trans":"772","spend_pc":"71.73716814","trans_pc":"1.366371681"}],"CUs":[{"amt_int":"18765.85415","amt_sale":"5170322.42","avg_int_per_trn":"0.219612102","avg_sale":"60.50699146","int_pc":"0.425182485","int_rate":"0.003629533","mcc_name":"Grocery","n_card":"44136","n_trans":"85450","spend_pc":"117.1452424","trans_pc":"1.936061265"},{"amt_int":"45422.90564","amt_sale":"2129247.73","avg_int_per_trn":"0.201364981","avg_sale":"9.439200842","int_pc":"0.461099438","int_rate":"0.021332842","mcc_name":"Fast Food","n_card":"98510","n_trans":"225575","spend_pc":"21.61453385","trans_pc":"2.289869049"},{"amt_int":"18513.74","amt_sale":"1747148.47","avg_int_per_trn":"0.597641552","avg_sale":"56.39965363","int_pc":"0.794751663","int_rate":"0.010596546","mcc_name":"Department Stores","n_card":"23295","n_trans":"30978","spend_pc":"75.00100751","trans_pc":"1.329813265"},{"amt_int":"7279.09","amt_sale":"662617.05","avg_int_per_trn":"0.544638234","avg_sale":"49.57852974","int_pc":"0.74004575","int_rate":"0.010985365","mcc_name":"Family Clothing","n_card":"9836","n_trans":"13365","spend_pc":"67.36651586","trans_pc":"1.358784059"},{"amt_int":"22589.76168","amt_sale":"2596539.01","avg_int_per_trn":"0.196884689","avg_sale":"22.63055196","int_pc":"0.361789293","int_rate":"0.008699951","mcc_name":"Drug Store","n_card":"62439","n_trans":"114736","spend_pc":"41.58521133","trans_pc":"1.837569468"},{"amt_int":"1085047.519","amt_sale":"15973111.38","avg_int_per_trn":"3.07969539","avg_sale":"45.33655589","int_pc":"5.722009624","int_rate":"0.067929628","mcc_name":"Other","n_card":"189627","n_trans":"352323","spend_pc":"84.23437264","trans_pc":"1.857979085"}],"Issuer 1":[{"amt_int":"18711.11192","amt_sale":"1021020.3","avg_int_per_trn":"0.191920651","avg_sale":"10.47264755","int_pc":"0.412966782","int_rate":"0.018325896","mcc_name":"Fast Food","n_card":"45309","n_trans":"97494","spend_pc":"22.5346024","trans_pc":"2.151757929"},{"amt_int":"9060.82824","amt_sale":"856715.78","avg_int_per_trn":"0.23123796","avg_sale":"21.86391844","int_pc":"0.434530416","int_rate":"0.010576236","mcc_name":"Drug Store","n_card":"20852","n_trans":"39184","spend_pc":"41.08554479","trans_pc":"1.879148283"},{"amt_int":"5547.13803","amt_sale":"1201370.5","avg_int_per_trn":"0.206751324","avg_sale":"44.77713381","int_pc":"0.441686283","int_rate":"0.004617342","mcc_name":"Grocery","n_card":"12559","n_trans":"26830","spend_pc":"95.65813361","trans_pc":"2.136316586"},{"amt_int":"37833.14675","amt_sale":"7299578.26","avg_int_per_trn":"0.262149452","avg_sale":"50.57946812","int_pc":"0.442912546","int_rate":"0.005182922","mcc_name":"Other","n_card":"85419","n_trans":"144319","spend_pc":"85.45614278","trans_pc":"1.689542139"},{"amt_int":"2618.12","amt_sale":"592618.87","avg_int_per_trn":"0.252203063","avg_sale":"57.08687699","int_pc":"0.346174798","int_rate":"0.004417882","mcc_name":"Department Stores","n_card":"7563","n_trans":"10381","spend_pc":"78.35764511","trans_pc":"1.372603464"},{"amt_int":"1103.89","amt_sale":"233332.13","avg_int_per_trn":"0.247453486","avg_sale":"52.30489352","int_pc":"0.343036047","int_rate":"0.004730982","mcc_name":"Family Clothing","n_card":"3218","n_trans":"4461","spend_pc":"72.5084307","trans_pc":"1.386264761"}],"Issuer 2":[{"amt_int":"1908.32485","amt_sale":"102121.13","avg_int_per_trn":"0.195685485","avg_sale":"10.47181399","int_pc":"0.373888098","int_rate":"0.018686876","mcc_name":"Fast Food","n_card":"5104","n_trans":"9752","spend_pc":"20.00805839","trans_pc":"1.910658307"},{"amt_int":"75.01","amt_sale":"19314.99","avg_int_per_trn":"0.255136054","avg_sale":"65.6972449","int_pc":"0.30004","int_rate":"0.003883512","mcc_name":"Family Clothing","n_card":"250","n_trans":"294","spend_pc":"77.25996","trans_pc":"1.176"},{"amt_int":"7578.32873","amt_sale":"2008881.81","avg_int_per_trn":"0.279004813","avg_sale":"73.95927435","int_pc":"0.341735603","int_rate":"0.003772411","mcc_name":"Other","n_card":"22176","n_trans":"27162","spend_pc":"90.58810471","trans_pc":"1.224837662"},{"amt_int":"618.12685","amt_sale":"68121.94","avg_int_per_trn":"0.24402955","avg_sale":"26.89377813","int_pc":"0.406128022","int_rate":"0.009073829","mcc_name":"Drug Store","n_card":"1522","n_trans":"2533","spend_pc":"44.75817346","trans_pc":"1.664257556"},{"amt_int":"380.42","amt_sale":"92282.23","avg_int_per_trn":"0.263814147","avg_sale":"63.99599861","int_pc":"0.318076923","int_rate":"0.004122354","mcc_name":"Department Stores","n_card":"1196","n_trans":"1442","spend_pc":"77.15905518","trans_pc":"1.205685619"},{"amt_int":"274.96444","amt_sale":"53358.51","avg_int_per_trn":"0.222823695","avg_sale":"43.24028363","int_pc":"0.426301457","int_rate":"0.005153151","mcc_name":"Grocery","n_card":"645","n_trans":"1234","spend_pc":"82.72637209","trans_pc":"1.913178295"}],"Other FI":[{"amt_int":"35418.63","amt_sale":"4393028.36","avg_int_per_trn":"0.471130251","avg_sale":"58.43502567","int_pc":"0.61043449","int_rate":"0.008062463","mcc_name":"Department Stores","n_card":"58022","n_trans":"75178","spend_pc":"75.7131495","trans_pc":"1.295680949"},{"amt_int":"108172.237","amt_sale":"5442803.77","avg_int_per_trn":"0.195888255","avg_sale":"9.856330644","int_pc":"0.424382925","int_rate":"0.019874359","mcc_name":"Fast Food","n_card":"254893","n_trans":"552214","spend_pc":"21.35328852","trans_pc":"2.166454159"},{"amt_int":"49369.36866","amt_sale":"13761319.73","avg_int_per_trn":"0.208058498","avg_sale":"57.9946551","int_pc":"0.400770937","int_rate":"0.003587546","mcc_name":"Grocery","n_card":"123186","n_trans":"237286","spend_pc":"111.7117183","trans_pc":"1.926241618"},{"amt_int":"5118069.764","amt_sale":"47633244.3","avg_int_per_trn":"5.308088724","avg_sale":"49.40172734","int_pc":"9.239727332","int_rate":"0.107447432","mcc_name":"Other","n_card":"553920","n_trans":"964202","spend_pc":"85.99300314","trans_pc":"1.740688186"},{"amt_int":"88668.02195","amt_sale":"8176909.53","avg_int_per_trn":"0.268710518","avg_sale":"24.78031593","int_pc":"0.473740006","int_rate":"0.010843708","mcc_name":"Drug Store","n_card":"187166","n_trans":"329976","spend_pc":"43.68800706","trans_pc":"1.763012513"},{"amt_int":"11070.85","amt_sale":"1534944.45","avg_int_per_trn":"0.3779092","avg_sale":"52.39612391","int_pc":"0.508186826","int_rate":"0.007212541","mcc_name":"Family Clothing","n_card":"21785","n_trans":"29295","spend_pc":"70.45877668","trans_pc":"1.344732614"}],"total":[{"amt_int":"56930.91","amt_sale":"6825077.93","avg_int_per_trn":"0.482551217","avg_sale":"57.8499388","int_pc":"0.632031951","int_rate":"0.00834143","mcc_name":"Department Stores","n_card":"90076","n_trans":"117979","spend_pc":"75.77021548","trans_pc":"1.309771748"},{"amt_int":"120936.7387","amt_sale":"11698286.26","avg_int_per_trn":"0.248621564","avg_sale":"24.04931914","int_pc":"0.444654693","int_rate":"0.010337988","mcc_name":"Drug Store","n_card":"271979","n_trans":"486429","spend_pc":"43.01172613","trans_pc":"1.788479993"},{"amt_int":"19528.84","amt_sale":"2450208.62","avg_int_per_trn":"0.411870505","avg_sale":"51.67581187","int_pc":"0.556551626","int_rate":"0.007970276","mcc_name":"Family Clothing","n_card":"35089","n_trans":"47415","spend_pc":"69.82839693","trans_pc":"1.351278178"},{"amt_int":"174214.5794","amt_sale":"8695192.93","avg_int_per_trn":"0.196844847","avg_sale":"9.82468821","int_pc":"0.431420695","int_rate":"0.020035735","mcc_name":"Fast Food","n_card":"403816","n_trans":"885035","spend_pc":"21.53256169","trans_pc":"2.191678883"},{"amt_int":"73957.32528","amt_sale":"20186371.16","avg_int_per_trn":"0.210824758","avg_sale":"57.54381745","int_pc":"0.409676863","int_rate":"0.003663726","mcc_name":"Grocery","n_card":"180526","n_trans":"350800","spend_pc":"111.8197443","trans_pc":"1.943210396"},{"amt_int":"6248528.758","amt_sale":"72914815.75","avg_int_per_trn":"4.199263147","avg_sale":"49.00169472","int_pc":"7.341346988","int_rate":"0.085696284","mcc_name":"Other","n_card":"851142","n_trans":"1488006","spend_pc":"85.66703999","trans_pc":"1.748246474"}]}}';
+      dataJSON = '{"sig_credit":{"CUs":[{"mcc_name":"Department Stores","n_trans":"40287","amt_sale":"2662276.35","amt_int":"39708.02","n_card":"30894","avg_sale":"66.08276491","trans_pc":"1.304039619","avg_int_per_trn":"0.985628615","int_rate":"0.014915063","spend_pc":"86.1745436","int_pc":"1.285298764"},{"mcc_name":"Drug Store","n_trans":"114402","amt_sale":"2798642.94","amt_int":"41550.91436","n_card":"64554","avg_sale":"24.46323438","trans_pc":"1.772190724","avg_int_per_trn":"0.363200944","int_rate":"0.014846808","spend_pc":"43.35351706","int_pc":"0.643661343"},{"mcc_name":"Family Clothing","n_trans":"17811","amt_sale":"1033428.18","amt_int":"15143.19","n_card":"13478","avg_sale":"58.02190669","trans_pc":"1.321486867","avg_int_per_trn":"0.850215597","int_rate":"0.014653355","spend_pc":"76.67518771","int_pc":"1.123548746"},{"mcc_name":"Fast Food","n_trans":"175519","amt_sale":"1688576.16","amt_int":"37004.13354","n_card":"82332","avg_sale":"9.620475048","trans_pc":"2.13184424","avg_int_per_trn":"0.210826939","int_rate":"0.0219144","spend_pc":"20.50935432","int_pc":"0.449450196"},{"mcc_name":"Grocery","n_trans":"109196","amt_sale":"6077665.98","amt_int":"70686.41685","n_card":"61110","avg_sale":"55.65832063","trans_pc":"1.786876125","avg_int_per_trn":"0.647335222","int_rate":"0.01163052","spend_pc":"99.4545243","int_pc":"1.156707852"},{"mcc_name":"Other","n_trans":"339134","amt_sale":"20220458.32","amt_int":"2336366.04","n_card":"191453","avg_sale":"59.62380157","trans_pc":"1.771369474","avg_int_per_trn":"6.889212053","int_rate":"0.115544663","spend_pc":"105.615782","int_pc":"12.20333993"}],"Issuer 2":[{"mcc_name":"Department Stores","n_trans":"19326","amt_sale":"1398794.79","amt_int":"27038.76","n_card":"14973","avg_sale":"72.37890872","trans_pc":"1.290723302","avg_int_per_trn":"1.39908724","int_rate":"0.019330041","spend_pc":"93.42114406","int_pc":"1.805834502"},{"mcc_name":"Drug Store","n_trans":"35881","amt_sale":"1082599.81","amt_int":"22385.71689","n_card":"19582","avg_sale":"30.17195201","trans_pc":"1.832346032","avg_int_per_trn":"0.623887765","int_rate":"0.02067774","spend_pc":"55.28545654","int_pc":"1.14317827"},{"mcc_name":"Family Clothing","n_trans":"6785","amt_sale":"453637.39","amt_int":"9010.68","n_card":"5030","avg_sale":"66.85886367","trans_pc":"1.348906561","avg_int_per_trn":"1.328029477","int_rate":"0.019863178","spend_pc":"90.18635984","int_pc":"1.791387674"},{"mcc_name":"Fast Food","n_trans":"24412","amt_sale":"337457.9","amt_int":"8889.52829","n_card":"13050","avg_sale":"13.82344339","trans_pc":"1.870651341","avg_int_per_trn":"0.364145842","int_rate":"0.026342629","spend_pc":"25.85884291","int_pc":"0.681189907"},{"mcc_name":"Grocery","n_trans":"48331","amt_sale":"2742687.07","amt_int":"45030.46065","n_card":"23770","avg_sale":"56.74798928","trans_pc":"2.03327724","avg_int_per_trn":"0.931709682","int_rate":"0.016418373","spend_pc":"115.384395","int_pc":"1.894424091"},{"mcc_name":"Other","n_trans":"121966","amt_sale":"12579017.32","amt_int":"2145909.914","n_card":"69544","avg_sale":"103.135442","trans_pc":"1.753796158","avg_int_per_trn":"17.59432886","int_rate":"0.1705944","spend_pc":"180.8785419","int_pc":"30.85686636"}],"CPM Credit Union":[{"mcc_name":"Department Stores","n_trans":"1132","amt_sale":"74001.24","amt_int":"1031.97","n_card":"838","avg_sale":"65.37212014","trans_pc":"1.350835322","avg_int_per_trn":"0.911634276","int_rate":"0.013945307","spend_pc":"88.30696897","int_pc":"1.23146778"},{"mcc_name":"Drug Store","n_trans":"3689","amt_sale":"93339.62","amt_int":"1289.82596","n_card":"2242","avg_sale":"25.30214692","trans_pc":"1.645405888","avg_int_per_trn":"0.349641084","int_rate":"0.013818633","spend_pc":"41.63230152","int_pc":"0.575301499"},{"mcc_name":"Family Clothing","n_trans":"514","amt_sale":"27877.95","amt_int":"396.14","n_card":"400","avg_sale":"54.23725681","trans_pc":"1.285","avg_int_per_trn":"0.770700389","int_rate":"0.014209797","spend_pc":"69.694875","int_pc":"0.99035"},{"mcc_name":"Fast Food","n_trans":"7892","amt_sale":"66479.58","amt_int":"1469.78481","n_card":"3380","avg_sale":"8.423667005","trans_pc":"2.334911243","avg_int_per_trn":"0.186237305","int_rate":"0.022108816","spend_pc":"19.66851479","int_pc":"0.434847577"},{"mcc_name":"Grocery","n_trans":"5492","amt_sale":"290324.74","amt_int":"3309.45506","n_card":"2861","avg_sale":"52.8632083","trans_pc":"1.919608528","avg_int_per_trn":"0.602595605","int_rate":"0.011399149","spend_pc":"101.4766655","int_pc":"1.156747662"},{"mcc_name":"Other","n_trans":"12049","amt_sale":"656411.17","amt_int":"10262.90162","n_card":"6390","avg_sale":"54.47847705","trans_pc":"1.885602504","avg_int_per_trn":"0.851763766","int_rate":"0.015634867","spend_pc":"102.7247527","int_pc":"1.60608789"}],"Issuer 1":[{"mcc_name":"Department Stores","n_trans":"79653","amt_sale":"5915942.18","amt_int":"109634.38","n_card":"56920","avg_sale":"74.27142958","trans_pc":"1.399385102","avg_int_per_trn":"1.376399884","int_rate":"0.018532024","spend_pc":"103.934332","int_pc":"1.926113493"},{"mcc_name":"Drug Store","n_trans":"217495","amt_sale":"6382146.38","amt_int":"126639.704","n_card":"113020","avg_sale":"29.34387632","trans_pc":"1.924393913","avg_int_per_trn":"0.582264898","int_rate":"0.019842808","spend_pc":"56.46917696","int_pc":"1.120507026"},{"mcc_name":"Family Clothing","n_trans":"37372","amt_sale":"2491692.06","amt_int":"46813.13","n_card":"26446","avg_sale":"66.67269774","trans_pc":"1.413143765","avg_int_per_trn":"1.252625763","int_rate":"0.018787687","spend_pc":"94.21810709","int_pc":"1.770140286"},{"mcc_name":"Fast Food","n_trans":"138049","amt_sale":"1765821.01","amt_int":"45043.29645","n_card":"73502","avg_sale":"12.7912626","trans_pc":"1.878166581","avg_int_per_trn":"0.326284844","int_rate":"0.025508416","spend_pc":"24.02412193","int_pc":"0.61281729"},{"mcc_name":"Grocery","n_trans":"244085","amt_sale":"13644128.73","amt_int":"224346.4927","n_card":"117996","avg_sale":"55.89908733","trans_pc":"2.068587071","avg_int_per_trn":"0.919132649","int_rate":"0.016442713","spend_pc":"115.6321293","int_pc":"1.901305915"},{"mcc_name":"Other","n_trans":"592930","amt_sale":"51760555.1","amt_int":"9228924.156","n_card":"294943","avg_sale":"87.29623244","trans_pc":"2.010320638","avg_int_per_trn":"15.56494722","int_rate":"0.178300332","spend_pc":"175.4934177","int_pc":"31.29053463"}],"Other FI":[{"mcc_name":"Department Stores","n_trans":"254446","amt_sale":"18141017.61","amt_int":"322256.84","n_card":"193010","avg_sale":"71.29613989","trans_pc":"1.318304751","avg_int_per_trn":"1.266503855","int_rate":"0.017763989","spend_pc":"93.99003995","int_pc":"1.66963805"},{"mcc_name":"Drug Store","n_trans":"726329","amt_sale":"21221182.41","amt_int":"393256.5024","n_card":"416905","avg_sale":"29.21703857","trans_pc":"1.742193066","avg_int_per_trn":"0.541430264","int_rate":"0.018531319","spend_pc":"50.901722","int_pc":"0.943276052"},{"mcc_name":"Family Clothing","n_trans":"110404","amt_sale":"7262483.95","amt_int":"126757.16","n_card":"81785","avg_sale":"65.78098574","trans_pc":"1.349929694","avg_int_per_trn":"1.148121083","int_rate":"0.017453692","spend_pc":"88.79970594","int_pc":"1.549882741"},{"mcc_name":"Fast Food","n_trans":"660232","amt_sale":"7352877.96","amt_int":"168547.8506","n_card":"338615","avg_sale":"11.13680942","trans_pc":"1.949801397","avg_int_per_trn":"0.255285794","int_rate":"0.022922705","spend_pc":"21.71456657","int_pc":"0.497756599"},{"mcc_name":"Grocery","n_trans":"821944","amt_sale":"47394923.76","amt_int":"559752.0828","n_card":"447059","avg_sale":"57.66198641","trans_pc":"1.838558222","avg_int_per_trn":"0.681009999","int_rate":"0.01181038","spend_pc":"106.0149192","int_pc":"1.252076533"},{"mcc_name":"Other","n_trans":"2125321","amt_sale":"167338108","amt_int":"24314859.37","n_card":"1175926","avg_sale":"78.73545127","trans_pc":"1.807359477","avg_int_per_trn":"11.44055857","int_rate":"0.145303778","spend_pc":"142.303264","int_pc":"20.67720194"}]},"sig_debit":{"Other FI":[{"mcc_name":"Department Stores","n_trans":"75178","amt_sale":"4393028.36","amt_int":"35418.63","n_card":"58022","avg_sale":"58.43502567","trans_pc":"1.295680949","avg_int_per_trn":"0.471130251","int_rate":"0.008062463","spend_pc":"75.7131495","int_pc":"0.61043449"},{"mcc_name":"Drug Store","n_trans":"329976","amt_sale":"8176909.53","amt_int":"88668.02195","n_card":"187166","avg_sale":"24.78031593","trans_pc":"1.763012513","avg_int_per_trn":"0.268710518","int_rate":"0.010843708","spend_pc":"43.68800706","int_pc":"0.473740006"},{"mcc_name":"Family Clothing","n_trans":"29295","amt_sale":"1534944.45","amt_int":"11070.85","n_card":"21785","avg_sale":"52.39612391","trans_pc":"1.344732614","avg_int_per_trn":"0.3779092","int_rate":"0.007212541","spend_pc":"70.45877668","int_pc":"0.508186826"},{"mcc_name":"Fast Food","n_trans":"552214","amt_sale":"5442803.77","amt_int":"108172.237","n_card":"254893","avg_sale":"9.856330644","trans_pc":"2.166454159","avg_int_per_trn":"0.195888255","int_rate":"0.019874359","spend_pc":"21.35328852","int_pc":"0.424382925"},{"mcc_name":"Grocery","n_trans":"237286","amt_sale":"13761319.73","amt_int":"49369.36866","n_card":"123186","avg_sale":"57.9946551","trans_pc":"1.926241618","avg_int_per_trn":"0.208058498","int_rate":"0.003587546","spend_pc":"111.7117183","int_pc":"0.400770937"},{"mcc_name":"Other","n_trans":"964202","amt_sale":"47633244.3","amt_int":"5118069.764","n_card":"553920","avg_sale":"49.40172734","trans_pc":"1.740688186","avg_int_per_trn":"5.308088724","int_rate":"0.107447432","spend_pc":"85.99300314","int_pc":"9.239727332"}],"CUs":[{"mcc_name":"Department Stores","n_trans":"30978","amt_sale":"1747148.47","amt_int":"18513.74","n_card":"23295","avg_sale":"56.39965363","trans_pc":"1.329813265","avg_int_per_trn":"0.597641552","int_rate":"0.010596546","spend_pc":"75.00100751","int_pc":"0.794751663"},{"mcc_name":"Drug Store","n_trans":"114736","amt_sale":"2596539.01","amt_int":"22589.76168","n_card":"62439","avg_sale":"22.63055196","trans_pc":"1.837569468","avg_int_per_trn":"0.196884689","int_rate":"0.008699951","spend_pc":"41.58521133","int_pc":"0.361789293"},{"mcc_name":"Family Clothing","n_trans":"13365","amt_sale":"662617.05","amt_int":"7279.09","n_card":"9836","avg_sale":"49.57852974","trans_pc":"1.358784059","avg_int_per_trn":"0.544638234","int_rate":"0.010985365","spend_pc":"67.36651586","int_pc":"0.74004575"},{"mcc_name":"Fast Food","n_trans":"225575","amt_sale":"2129247.73","amt_int":"45422.90564","n_card":"98510","avg_sale":"9.439200842","trans_pc":"2.289869049","avg_int_per_trn":"0.201364981","int_rate":"0.021332842","spend_pc":"21.61453385","int_pc":"0.461099438"},{"mcc_name":"Grocery","n_trans":"85450","amt_sale":"5170322.42","amt_int":"18765.85415","n_card":"44136","avg_sale":"60.50699146","trans_pc":"1.936061265","avg_int_per_trn":"0.219612102","int_rate":"0.003629533","spend_pc":"117.1452424","int_pc":"0.425182485"},{"mcc_name":"Other","n_trans":"352323","amt_sale":"15973111.38","amt_int":"1085047.519","n_card":"189627","avg_sale":"45.33655589","trans_pc":"1.857979085","avg_int_per_trn":"3.07969539","int_rate":"0.067929628","spend_pc":"84.23437264","int_pc":"5.722009624"}],"Issuer 1":[{"mcc_name":"Department Stores","n_trans":"10381","amt_sale":"592618.87","amt_int":"2618.12","n_card":"7563","avg_sale":"57.08687699","trans_pc":"1.372603464","avg_int_per_trn":"0.252203063","int_rate":"0.004417882","spend_pc":"78.35764511","int_pc":"0.346174798"},{"mcc_name":"Drug Store","n_trans":"39184","amt_sale":"856715.78","amt_int":"9060.82824","n_card":"20852","avg_sale":"21.86391844","trans_pc":"1.879148283","avg_int_per_trn":"0.23123796","int_rate":"0.010576236","spend_pc":"41.08554479","int_pc":"0.434530416"},{"mcc_name":"Family Clothing","n_trans":"4461","amt_sale":"233332.13","amt_int":"1103.89","n_card":"3218","avg_sale":"52.30489352","trans_pc":"1.386264761","avg_int_per_trn":"0.247453486","int_rate":"0.004730982","spend_pc":"72.5084307","int_pc":"0.343036047"},{"mcc_name":"Fast Food","n_trans":"97494","amt_sale":"1021020.3","amt_int":"18711.11192","n_card":"45309","avg_sale":"10.47264755","trans_pc":"2.151757929","avg_int_per_trn":"0.191920651","int_rate":"0.018325896","spend_pc":"22.5346024","int_pc":"0.412966782"},{"mcc_name":"Grocery","n_trans":"26830","amt_sale":"1201370.5","amt_int":"5547.13803","n_card":"12559","avg_sale":"44.77713381","trans_pc":"2.136316586","avg_int_per_trn":"0.206751324","int_rate":"0.004617342","spend_pc":"95.65813361","int_pc":"0.441686283"},{"mcc_name":"Other","n_trans":"144319","amt_sale":"7299578.26","amt_int":"37833.14675","n_card":"85419","avg_sale":"50.57946812","trans_pc":"1.689542139","avg_int_per_trn":"0.262149452","int_rate":"0.005182922","spend_pc":"85.45614278","int_pc":"0.442912546"}],"CPM Credit Union":[{"mcc_name":"Department Stores","n_trans":"772","amt_sale":"40531.5","amt_int":"443.99","n_card":"565","avg_sale":"52.50194301","trans_pc":"1.366371681","avg_int_per_trn":"0.57511658","int_rate":"0.010954196","spend_pc":"71.73716814","int_pc":"0.785823009"},{"mcc_name":"Drug Store","n_trans":"4477","amt_sale":"102253.23","amt_int":"887.035","n_card":"2522","avg_sale":"22.83967612","trans_pc":"1.77517843","avg_int_per_trn":"0.198131561","int_rate":"0.008674885","spend_pc":"40.5445004","int_pc":"0.351718874"},{"mcc_name":"Family Clothing","n_trans":"363","amt_sale":"18984.86","amt_int":"203.52","n_card":"273","avg_sale":"52.29988981","trans_pc":"1.32967033","avg_int_per_trn":"0.560661157","int_rate":"0.010720121","spend_pc":"69.54161172","int_pc":"0.745494505"},{"mcc_name":"Fast Food","n_trans":"12816","amt_sale":"103498.48","amt_int":"2252.25766","n_card":"4874","avg_sale":"8.075724095","trans_pc":"2.629462454","avg_int_per_trn":"0.175737957","int_rate":"0.021761263","spend_pc":"21.2348133","int_pc":"0.46209636"},{"mcc_name":"Grocery","n_trans":"4443","amt_sale":"235080.35","amt_int":"1007.86662","n_card":"2110","avg_sale":"52.91027459","trans_pc":"2.105687204","avg_int_per_trn":"0.226843714","int_rate":"0.004287328","spend_pc":"111.4124882","int_pc":"0.477661905"},{"mcc_name":"Other","n_trans":"13273","amt_sale":"571688.22","amt_int":"7584.37191","n_card":"7332","avg_sale":"43.07151511","trans_pc":"1.810283688","avg_int_per_trn":"0.57141354","int_rate":"0.013266623","spend_pc":"77.97166121","int_pc":"1.03442061"}],"Issuer 2":[{"mcc_name":"Department Stores","n_trans":"1442","amt_sale":"92282.23","amt_int":"380.42","n_card":"1196","avg_sale":"63.99599861","trans_pc":"1.205685619","avg_int_per_trn":"0.263814147","int_rate":"0.004122354","spend_pc":"77.15905518","int_pc":"0.318076923"},{"mcc_name":"Drug Store","n_trans":"2533","amt_sale":"68121.94","amt_int":"618.12685","n_card":"1522","avg_sale":"26.89377813","trans_pc":"1.664257556","avg_int_per_trn":"0.24402955","int_rate":"0.009073829","spend_pc":"44.75817346","int_pc":"0.406128022"},{"mcc_name":"Family Clothing","n_trans":"294","amt_sale":"19314.99","amt_int":"75.01","n_card":"250","avg_sale":"65.6972449","trans_pc":"1.176","avg_int_per_trn":"0.255136054","int_rate":"0.003883512","spend_pc":"77.25996","int_pc":"0.30004"},{"mcc_name":"Fast Food","n_trans":"9752","amt_sale":"102121.13","amt_int":"1908.32485","n_card":"5104","avg_sale":"10.47181399","trans_pc":"1.910658307","avg_int_per_trn":"0.195685485","int_rate":"0.018686876","spend_pc":"20.00805839","int_pc":"0.373888098"},{"mcc_name":"Grocery","n_trans":"1234","amt_sale":"53358.51","amt_int":"274.96444","n_card":"645","avg_sale":"43.24028363","trans_pc":"1.913178295","avg_int_per_trn":"0.222823695","int_rate":"0.005153151","spend_pc":"82.72637209","int_pc":"0.426301457"},{"mcc_name":"Other","n_trans":"27162","amt_sale":"2008881.81","amt_int":"7578.32873","n_card":"22176","avg_sale":"73.95927435","trans_pc":"1.224837662","avg_int_per_trn":"0.279004813","int_rate":"0.003772411","spend_pc":"90.58810471","int_pc":"0.341735603"}]},"pin_debit":{"CUs":[{"mcc_name":"Department Stores","n_trans":"78653","amt_sale":"4529210.75","amt_int":"43542.927","n_card":"63131","avg_sale":"57.58471705","trans_pc":"1.2458697","avg_int_per_trn":"0.553607962","int_rate":"0.0096138","spend_pc":"71.74305413","int_pc":"0.689723385"},{"mcc_name":"Drug Store","n_trans":"298279","amt_sale":"6459215.54","amt_int":"51700.317","n_card":"154117","avg_sale":"21.65494567","trans_pc":"1.935406217","avg_int_per_trn":"0.173328719","int_rate":"0.008004117","spend_pc":"41.91111649","int_pc":"0.335461481"},{"mcc_name":"Family Clothing","n_trans":"35618","amt_sale":"1634782.37","amt_int":"16930.893","n_card":"26885","avg_sale":"45.89764641","trans_pc":"1.324827971","avg_int_per_trn":"0.475346538","int_rate":"0.010356665","spend_pc":"60.80648577","int_pc":"0.62975239"},{"mcc_name":"Fast Food","n_trans":"5798","amt_sale":"57662.73","amt_int":"1178.867","n_card":"4242","avg_sale":"9.945279407","trans_pc":"1.366808109","avg_int_per_trn":"0.203323042","int_rate":"0.020444176","spend_pc":"13.59328854","int_pc":"0.277903583"},{"mcc_name":"Grocery","n_trans":"576604","amt_sale":"26592879.71","amt_int":"97307.128","n_card":"267718","avg_sale":"46.11983217","trans_pc":"2.153773747","avg_int_per_trn":"0.168759024","int_rate":"0.003659142","spend_pc":"99.33168375","int_pc":"0.363468754"},{"mcc_name":"Other","n_trans":"437377","amt_sale":"18412800.05","amt_int":"170123.343","n_card":"220953","avg_sale":"42.09823573","trans_pc":"1.979502428","avg_int_per_trn":"0.38896271","int_rate":"0.009239406","spend_pc":"83.33355985","int_pc":"0.769952628"}],"Other FI":[{"mcc_name":"Department Stores","n_trans":"270509","amt_sale":"16063628.48","amt_int":"109614.904","n_card":"216700","avg_sale":"59.3829724","trans_pc":"1.248311029","avg_int_per_trn":"0.405217216","int_rate":"0.006823795","spend_pc":"74.12841938","int_pc":"0.50583712"},{"mcc_name":"Drug Store","n_trans":"948886","amt_sale":"21888405.92","amt_int":"190367.439","n_card":"489235","avg_sale":"23.06747694","trans_pc":"1.939530083","avg_int_per_trn":"0.200622034","int_rate":"0.008697181","spend_pc":"44.74006545","int_pc":"0.389112469"},{"mcc_name":"Family Clothing","n_trans":"107087","amt_sale":"5242647.01","amt_int":"40711.559","n_card":"81055","avg_sale":"48.95689495","trans_pc":"1.321164641","avg_int_per_trn":"0.380172747","int_rate":"0.007765459","spend_pc":"64.68011856","int_pc":"0.502270791"},{"mcc_name":"Fast Food","n_trans":"14093","amt_sale":"142956.59","amt_int":"3108.182","n_card":"10240","avg_sale":"10.14380118","trans_pc":"1.376269531","avg_int_per_trn":"0.220547932","int_rate":"0.021742139","spend_pc":"13.96060449","int_pc":"0.303533398"},{"mcc_name":"Grocery","n_trans":"1862178","amt_sale":"96604472.8","amt_int":"349446.518","n_card":"873393","avg_sale":"51.87714214","trans_pc":"2.132119218","avg_int_per_trn":"0.187654734","int_rate":"0.003617291","spend_pc":"110.6082517","int_pc":"0.400102266"},{"mcc_name":"Other","n_trans":"1457417","amt_sale":"63681998.1","amt_int":"462191.627","n_card":"736681","avg_sale":"43.69511135","trans_pc":"1.978355625","avg_int_per_trn":"0.317130668","int_rate":"0.007257807","spend_pc":"86.44446932","int_pc":"0.627397241"}],"CPM Credit Union":[{"mcc_name":"Department Stores","n_trans":"2607","amt_sale":"139143.83","amt_int":"1507.377","n_card":"1992","avg_sale":"53.37316072","trans_pc":"1.30873494","avg_int_per_trn":"0.578203682","int_rate":"0.010833229","spend_pc":"69.85132028","int_pc":"0.756715361"},{"mcc_name":"Drug Store","n_trans":"14577","amt_sale":"332540.65","amt_int":"2731.41","n_card":"7788","avg_sale":"22.81269466","trans_pc":"1.871725732","avg_int_per_trn":"0.187378061","int_rate":"0.008213763","spend_pc":"42.6991076","int_pc":"0.350720339"},{"mcc_name":"Family Clothing","n_trans":"1421","amt_sale":"65843.78","amt_int":"742.885","n_card":"1127","avg_sale":"46.33622801","trans_pc":"1.260869565","avg_int_per_trn":"0.522790289","int_rate":"0.011282539","spend_pc":"58.42393966","int_pc":"0.659170364"},{"mcc_name":"Fast Food","n_trans":"293","amt_sale":"3737.96","amt_int":"76.546","n_card":"219","avg_sale":"12.75754266","trans_pc":"1.337899543","avg_int_per_trn":"0.261249147","int_rate":"0.020478015","spend_pc":"17.0683105","int_pc":"0.349525114"},{"mcc_name":"Grocery","n_trans":"34629","amt_sale":"1523838.5","amt_int":"5486.28","n_card":"14662","avg_sale":"44.0046926","trans_pc":"2.36181967","avg_int_per_trn":"0.158430217","int_rate":"0.003600303","spend_pc":"103.9311485","int_pc":"0.374183604"},{"mcc_name":"Other","n_trans":"26526","amt_sale":"1117685.86","amt_int":"10093.19","n_card":"12871","avg_sale":"42.13548443","trans_pc":"2.060912128","avg_int_per_trn":"0.380501772","int_rate":"0.009030435","spend_pc":"86.83753088","int_pc":"0.784180716"}],"Issuer 2":[{"mcc_name":"Department Stores","n_trans":"15694","amt_sale":"937406.43","amt_int":"3974.24","n_card":"13260","avg_sale":"59.73024277","trans_pc":"1.183559578","avg_int_per_trn":"0.253233083","int_rate":"0.004239612","spend_pc":"70.6943009","int_pc":"0.29971644"},{"mcc_name":"Drug Store","n_trans":"14399","amt_sale":"304208.86","amt_int":"3306.01","n_card":"7662","avg_sale":"21.12708244","trans_pc":"1.879274341","avg_int_per_trn":"0.229599972","int_rate":"0.010867566","spend_pc":"39.70358392","int_pc":"0.431481336"},{"mcc_name":"Family Clothing","n_trans":"3117","amt_sale":"167165.37","amt_int":"788.04","n_card":"2414","avg_sale":"53.63021174","trans_pc":"1.291217896","avg_int_per_trn":"0.252820019","int_rate":"0.004714134","spend_pc":"69.24828915","int_pc":"0.326445733"},{"mcc_name":"Fast Food","n_trans":"263","amt_sale":"2220.19","amt_int":"59.08","n_card":"193","avg_sale":"8.441787072","trans_pc":"1.362694301","avg_int_per_trn":"0.224638783","int_rate":"0.026610335","spend_pc":"11.50357513","int_pc":"0.30611399"},{"mcc_name":"Grocery","n_trans":"20075","amt_sale":"1125692.61","amt_int":"4939.639","n_card":"10337","avg_sale":"56.07435168","trans_pc":"1.94205282","avg_int_per_trn":"0.246059228","int_rate":"0.004388089","spend_pc":"108.8993528","int_pc":"0.477860017"},{"mcc_name":"Other","n_trans":"13362","amt_sale":"631863.48","amt_int":"3302.347","n_card":"7760","avg_sale":"47.2880916","trans_pc":"1.721907216","avg_int_per_trn":"0.247144664","int_rate":"0.005226362","spend_pc":"81.42570619","int_pc":"0.42556018"}],"Issuer 1":[{"mcc_name":"Department Stores","n_trans":"29725","amt_sale":"1747421.77","amt_int":"7469.472","n_card":"23607","avg_sale":"58.78626644","trans_pc":"1.259160419","avg_int_per_trn":"0.251285854","int_rate":"0.004274567","spend_pc":"74.02133986","int_pc":"0.316409201"},{"mcc_name":"Drug Store","n_trans":"159546","amt_sale":"3304065.26","amt_int":"36771.675","n_card":"77115","avg_sale":"20.70917015","trans_pc":"2.068936005","avg_int_per_trn":"0.230476947","int_rate":"0.011129222","spend_pc":"42.84594774","int_pc":"0.476842054"},{"mcc_name":"Family Clothing","n_trans":"19199","amt_sale":"919532.34","amt_int":"4704.5","n_card":"14045","avg_sale":"47.8948039","trans_pc":"1.366963332","avg_int_per_trn":"0.245038804","int_rate":"0.005116188","spend_pc":"65.47044073","int_pc":"0.33495906"},{"mcc_name":"Fast Food","n_trans":"2107","amt_sale":"21478.52","amt_int":"474.57","n_card":"1566","avg_sale":"10.19388704","trans_pc":"1.345466156","avg_int_per_trn":"0.225234931","int_rate":"0.022095098","spend_pc":"13.71553001","int_pc":"0.303045977"},{"mcc_name":"Grocery","n_trans":"227785","amt_sale":"11155672.78","amt_int":"55771.565","n_card":"98878","avg_sale":"48.97457155","trans_pc":"2.303697486","avg_int_per_trn":"0.24484301","int_rate":"0.004999391","spend_pc":"112.8225973","int_pc":"0.564044226"},{"mcc_name":"Other","n_trans":"161532","amt_sale":"7011204.28","amt_int":"39404.908","n_card":"82017","avg_sale":"43.40442934","trans_pc":"1.969494129","avg_int_per_trn":"0.243944903","int_rate":"0.005620277","spend_pc":"85.48476877","int_pc":"0.480448053"}]}}';
 
       _export('dataJSON', dataJSON);
     }
   };
 });
-$__System.register("9", ["67"], function (_export) {
+$__System.register("c", ["70"], function (_export) {
   /**
    *@module model
    *@description model depends on a json file of insights data existing
@@ -28083,6 +29923,7 @@ $__System.register("9", ["67"], function (_export) {
 
   /**
    * reviver callback passed as second argument to JSON.parse
+   * @private
    * @function typeConverter
    * @param {string} key - key from a json string
    * @param {string} value - value belonging to key in json string
@@ -28119,20 +29960,26 @@ $__System.register("9", ["67"], function (_export) {
   function typeConverter(key, value) {
     // reviver passes key as string
     switch (key) {
-      case "amt_fee":
+      case "amt_int":
         return parseFloat(value);
         break;
       case "amt_sale":
         return parseFloat(value);
         break;
-      case "avg_fee":
+      case "avg_int_per_trn":
         return parseFloat(value);
         break;
       case "avg_sale":
         return parseFloat(value);
         break;
-      case "fee_pc":
+      case "int_pc":
         return parseFloat(value);
+        break;
+      case "int_rate":
+        return parseFloat(value);
+        break;
+      case "mcc_name":
+        return value;
         break;
       case "n_card":
         return parseInt(value);
@@ -28140,7 +29987,7 @@ $__System.register("9", ["67"], function (_export) {
       case "n_trans":
         return parseInt(value);
         break;
-      case "sale_pc":
+      case "spend_pc":
         return parseFloat(value);
         break;
       case "trans_pc":
@@ -28160,73 +30007,59 @@ $__System.register("9", ["67"], function (_export) {
     }
   };
 });
-$__System.register('1', ['3', '5', '7', '8', '9', '11', '12', '13', '56', '66', 'f', '1a', 'd'], function (_export) {
+$__System.register('1', ['3', '5', '11', '13', '16', '17', '19', '60', 'a', 'b', '1b', 'f', '1c', 'c'], function (_export) {
   /***** jspm packages *****/
 
-  /**************************** Lazy Page Loader ************************************/
+  /***************************** Page Loading ************************************/
 
   /***** local packages *****/
   'use strict';
 
-  var jquery, bootstrap, d3, groupedExport, getInsightsData, getFiName, donutExport, donutConfig, stackConfig, tableExport, testing, stacksChart, groupedBarConfig, stackExport, toolTips, groupedWidth, groupedHeight, groupedMargin, classMap, classMapFunctionBar, groupRangeFunction, groupedConfig, groupedVals, groupedDefaults, sigDebitSelector, sigDebitGroupedIds, sigDebitGroupedCb, pinDebitSelector, pinDebitGroupedIds, pinDebitGroupedCb, sigCreditSelector, sigCreditGroupedIds, sigCreditGroupedCb, groupedStackMargin, groupedStackWidth, groupedStackHeight, groupedStackSvg, groupedStackClassMapFunction, groupedStackClassMap, groupedStackData, testStacks;
+  var jquery, bootstrap, groupedBarConfig, donutExport, donutConfig, stackConfig, stackExport, tableExport, testing, d3, groupedExport, groupStackExport, toolTips, stacksChart, getInsightsData, getFiName, groupedSvgSize, groupedMargin, classMap, classMapFunctionBar, groupRangeFunction, groupedConfig, groupedVals, groupedDefaults, sigDebitSelector, sigDebitGroupedIds, pinDebitSelector, pinDebitGroupedIds, sigCreditSelector, sigCreditGroupedIds, groupedStackMargin, groupedStackWidth, groupedStackHeight, groupedStackSelector;
 
   //change company name
   function updateCompanyName(getFiName) {
-
     var sel = d3.select("#navbar li");
     sel.style("opacity", "0");
 
-    sel._groups[0][0].innerHTML = "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>";
-    //d3.select("#navbar li")[0][0].textContent
+    var titleHtml = "<a>" + getFiName() + " |" + "<strong> 2017 </strong> </a>";
+    sel.html(titleHtml);
     sel.transition().duration(1000).style("opacity", "1");
   }
 
-  //groupedStackFilter(groupedStackData, ["sig_debit", "sig_credit"]);
-  //console.log(groupedStackData);
-
-  //testStacks(groupedStackSvg, groupedStackData);
-
-  function groupedStackFilter(data, checked) {
-    //loop through data array
-    for (var i = 0; i < data.length; i++) {
-      //update columns to contain only what was checked
-      data[i].groups.columns = data[i].groups.columns.filter(function (d) {
-        if (checked.indexOf(d) > -1) return d;
-      });
-    }
-  }
   return {
     setters: [function (_) {
       jquery = _['default'];
     }, function (_2) {
       bootstrap = _2['default'];
     }, function (_3) {
-      d3 = _3;
+      groupedBarConfig = _3['default'];
     }, function (_4) {
-      groupedExport = _4.groupedExport;
-    }, function (_10) {
-      getInsightsData = _10.getInsightsData;
-      getFiName = _10.getFiName;
+      donutExport = _4.donutExport;
     }, function (_5) {
-      donutExport = _5.donutExport;
+      donutConfig = _5['default'];
     }, function (_6) {
-      donutConfig = _6['default'];
+      stackConfig = _6['default'];
     }, function (_7) {
-      stackConfig = _7['default'];
+      stackExport = _7.stackExport;
     }, function (_8) {
       tableExport = _8.tableExport;
       testing = _8.testing;
-    }, function (_9) {
-      stacksChart = _9.stacksChart;
-    }, function (_f) {
-      groupedBarConfig = _f['default'];
     }, function (_a) {
-      stackExport = _a.stackExport;
-    }, function (_d) {
-      toolTips = _d.toolTips;
+      d3 = _a;
+    }, function (_b) {
+      groupedExport = _b.groupedExport;
+    }, function (_b2) {
+      groupStackExport = _b2.groupStackExport;
+    }, function (_f) {
+      toolTips = _f.toolTips;
+    }, function (_c) {
+      stacksChart = _c.stacksChart;
+    }, function (_c2) {
+      getInsightsData = _c2.getInsightsData;
+      getFiName = _c2.getFiName;
     }],
     execute: function () {
-      window.d3 = d3;
       d3.select(".loader").transition().duration(4000).style("opacity", "0").remove();updateCompanyName(getFiName);
 
       //Tooltips
@@ -28235,8 +30068,7 @@ $__System.register('1', ['3', '5', '7', '8', '9', '11', '12', '13', '56', '66', 
       /************************************************ ALL GROUPED BAR CHARTS ************************************************/
 
       //set up SVG and margins
-      groupedWidth = 400;
-      groupedHeight = 150;
+      groupedSvgSize = { width: 400, height: 150 };
       groupedMargin = { top: 20, right: 20, bottom: 20, left: 20 };
       classMap = { "Department Stores": "fill-blue", "Grocery": "fill-red",
         "Family Clothing": "fill-gray-light", "Fast Food": "fill-orange-yellow",
@@ -28264,114 +30096,43 @@ $__System.register('1', ['3', '5', '7', '8', '9', '11', '12', '13', '56', '66', 
       /*********************** SIG DEBIT GROUPED BAR *********************/
       sigDebitSelector = "#sigDebitGrouped";
 
-      groupedExport.setSvgSize(sigDebitSelector, groupedWidth, groupedHeight);
-
-      groupedExport.setMargins(sigDebitSelector, groupedMargin);
-      groupedExport.drawSvg(sigDebitSelector);
-
-      //Build data
-      groupedExport.buildData(sigDebitSelector, "sig_debit");
-
       //Setup checkboxes
       sigDebitGroupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
-      sigDebitGroupedCb = groupedExport.observerCallbackBuilder(sigDebitSelector);
 
-      groupedExport.initObservers(sigDebitSelector, sigDebitGroupedIds, groupedVals, groupedDefaults, sigDebitGroupedCb);
-
-      //Draw chart
-      groupedExport.createDrawingFunc(sigDebitSelector, groupedConfig);
-      groupedExport.draw(sigDebitSelector);
-
-      //Add dropdown event listeners
-      groupedExport.addDropdownListener(sigDebitSelector);
+      groupedExport.addGraph(sigDebitSelector, groupedSvgSize, groupedMargin, "sig_debit", groupedConfig);
 
       /*********************** SIG DEBIT TABLE *********************/
       // add table to page
-      tableExport.addTable(sigDebitSelector);
-
-      // get data for drawing the table
-      tableExport.setData(sigDebitSelector, "sig_debit");
-
-      // draw the table
-      tableExport.createDrawingFunc(sigDebitSelector);
-      tableExport.draw(sigDebitSelector);
-      tableExport.addDropdownListener(sigDebitSelector);
+      tableExport.addTable(sigDebitSelector, "sig_debit");
 
       /************************************************ PIN DEBIT ************************************************/
 
       /*********************** PIN DEBIT GROUPED BAR *********************/
       pinDebitSelector = "#pinDebitGrouped";
 
-      groupedExport.setSvgSize(pinDebitSelector, groupedWidth, groupedHeight);
-
-      groupedExport.setMargins(pinDebitSelector, groupedMargin);
-      groupedExport.drawSvg(pinDebitSelector);
-
-      //Build data
-      groupedExport.buildData(pinDebitSelector, "pin_debit");
-
       //Setup checkboxes
       pinDebitGroupedIds = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11', "groupedCbox12"];
-      pinDebitGroupedCb = groupedExport.observerCallbackBuilder(pinDebitSelector);
 
-      groupedExport.initObservers(pinDebitSelector, pinDebitGroupedIds, groupedVals, groupedDefaults, pinDebitGroupedCb);
-
-      //Draw chart
-      groupedExport.createDrawingFunc(pinDebitSelector, groupedConfig);
-      groupedExport.draw(pinDebitSelector);
-
-      //Add dropdown event listeners
-      groupedExport.addDropdownListener(pinDebitSelector);
+      groupedExport.addGraph(pinDebitSelector, groupedSvgSize, groupedMargin, "pin_debit", groupedConfig);
 
       /*********************** PIN DEBIT TABLE *********************/
       // add table to page
-      tableExport.addTable(pinDebitSelector);
-
-      // get data for drawing the table
-      tableExport.setData(pinDebitSelector, "pin_debit");
-
-      // draw the table
-      tableExport.createDrawingFunc(pinDebitSelector);
-      tableExport.draw(pinDebitSelector);
-      tableExport.addDropdownListener(pinDebitSelector);
+      tableExport.addTable(pinDebitSelector, "pin_debit");
 
       /************************************************ SIG CREDIT ************************************************/
 
       /*********************** SIG CREDIT GROUPED BAR *********************/
+
       sigCreditSelector = "#sigCreditGrouped";
-
-      groupedExport.setSvgSize(sigCreditSelector, groupedWidth, groupedHeight);
-
-      groupedExport.setMargins(sigCreditSelector, groupedMargin);
-      groupedExport.drawSvg(sigCreditSelector);
-
-      //Build data
-      groupedExport.buildData(sigCreditSelector, "sig_credit");
 
       //Setup checkboxes
       sigCreditGroupedIds = ['groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16', 'groupedCbox17', "groupedCbox18"];
-      sigCreditGroupedCb = groupedExport.observerCallbackBuilder(sigCreditSelector);
 
-      groupedExport.initObservers(sigCreditSelector, sigCreditGroupedIds, groupedVals, groupedDefaults, sigCreditGroupedCb);
-
-      //Draw chart
-      groupedExport.createDrawingFunc(sigCreditSelector, groupedConfig);
-      groupedExport.draw(sigCreditSelector);
-
-      //Add dropdown event listeners
-      groupedExport.addDropdownListener(sigCreditSelector);
+      groupedExport.addGraph(sigCreditSelector, groupedSvgSize, groupedMargin, "sig_credit", groupedConfig);
 
       /*********************** SIG CREDIT TABLE *********************/
       // add table to page
-      tableExport.addTable(sigCreditSelector);
-
-      // get data for drawing the table
-      tableExport.setData(sigCreditSelector, "sig_credit");
-
-      // draw the table
-      tableExport.createDrawingFunc(sigCreditSelector);
-      tableExport.draw(sigCreditSelector);
-      tableExport.addDropdownListener(sigCreditSelector);
+      tableExport.addTable(sigCreditSelector, "sig_credit");
 
       /************************************************ GROUPED STACK ************************************************/
 
@@ -28379,80 +30140,9 @@ $__System.register('1', ['3', '5', '7', '8', '9', '11', '12', '13', '56', '66', 
       groupedStackMargin = { top: 40, right: 40, bottom: 40, left: 40 };
       groupedStackWidth = 400;
       groupedStackHeight = 150;
+      groupedStackSelector = "#groupStack";
 
-      //draw svg
-      groupedStackSvg = d3.select("#groupedStack .groupedStack").append("div").classed("svg-container", true).append("svg").attr("class", "svg-content-responsive")
-      //  .attr("width", "100vw")
-      //  .attr("height", "100vh")
-      //.attr("preserveAspectRatio", "xMinYMin meet")    
-      .attr("viewBox", -groupedStackMargin.left + " " + -groupedStackMargin.right + " " + groupedStackWidth + " " + groupedStackHeight);
-
-      //setup config objects
-
-      groupedStackClassMapFunction = function groupedStackClassMapFunction(d) {
-        return classMap[d.key];
-      };
-
-      groupedStackClassMap = { "pin_debit": "fill-blue", "sig_credit": "fill-red",
-        "sig_debit": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-        "Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
-
-      //create test data
-      groupedStackData = [{ key: "fiName" }, { key: "fiName2" }, { key: "fiName3" }, { key: "fiName4" }, { key: "fiName5" }, { key: "fiName6" }];
-
-      groupedStackData[0].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.5,
-        total: 1
-      }];
-      groupedStackData[0].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      groupedStackData[1].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.50,
-        total: 1
-      }];
-      groupedStackData[1].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      groupedStackData[2].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.50,
-        total: 1
-      }];
-      groupedStackData[2].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      groupedStackData[3].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.50,
-        total: 1
-      }];
-      groupedStackData[3].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      groupedStackData[4].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.50,
-        total: 1
-      }];
-      groupedStackData[4].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      groupedStackData[5].groups = [{
-        "sig_debit": 0.25,
-        "sig_credit": 0.25,
-        "pin_debit": 0.50,
-        total: 1
-      }];
-      groupedStackData[5].groups.columns = ["sig_debit", "sig_credit", "pin_debit"];
-
-      //config chart
-      testStacks = stacksChart().margin(groupedStackMargin).width(groupedStackWidth).height(groupedStackHeight);
-
-      //draw chart
-      testStacks(groupedStackSvg, groupedStackData);
+      groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin);
     }
   };
 });
