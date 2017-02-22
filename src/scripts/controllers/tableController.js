@@ -194,7 +194,7 @@ function dropdownCallbackBuilder(chartname) {
       // only redraw if dropdown value changed
       if(current != old) { 
         // set dropdown value
-        setDropdown(chartname, val);
+        setDropdown(chartname, current);
     
         // draw table
         draw(chartname);
