@@ -124,14 +124,15 @@ export class Panel {
     return this._dropdownChanged;
   }
 
-  /**
-   * Set dropdownChanged to val
-   * @param {Boolean} val
-   */
+ /**
+  * origin/gStackedModelandController
+  * Set dropdownChanged to val
+  * @param {Boolean} val
+  */
   set dropdownChanged(val) {
     this._dropdownChanged = val;
   }
-  
+
   /**
    * @return {Object} contains width and height properties
    */

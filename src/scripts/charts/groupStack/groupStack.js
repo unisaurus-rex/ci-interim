@@ -11,8 +11,8 @@ import * as d3 from "d3";
 export function stacksChart(){
   //Default Parameters
   var margin = {top: 30, right: 40, bottom: 50, left: 40};
-  var width =0;// 900 - margin.left - margin.right;
-  var height =0;// 300 - margin.top - margin.bottom;
+  var width =400;// 900 - margin.left - margin.right;
+  var height =150;// 300 - margin.top - margin.bottom;
 
   var x = d3.scaleBand();
   var y = d3.scaleLinear();
@@ -26,7 +26,6 @@ export function stacksChart(){
 
   /***********************************************************************/
   function chart(svg, data){
-
 
     //set x scale
     x

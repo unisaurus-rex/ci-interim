@@ -10,10 +10,10 @@ import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
-import {groupStackedExport} from 'groupStackedController';
+import {groupStackExport} from 'groupStackController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
-import {stacksChart} from 'groupedStack';
+import {stacksChart} from 'groupStack';
 import {getInsightsData, getFiName} from 'model';
 
 /***************************** Page Loading ************************************/
@@ -25,9 +25,9 @@ function updateCompanyName(getFiName){
   var sel = d3.select("#navbar li");
   sel.style("opacity", "0");
 
-  sel._groups[0][0].innerHTML = 
-    "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
-  sel.transition().duration(1000).style("opacity", "1")
+  let titleHtml = "<a>" + getFiName() + " |" + "<strong> 2017 </strong> </a>"; 
+  sel.html(titleHtml);
+  sel.transition().duration(1000).style("opacity", "1");
 }
 
 updateCompanyName( getFiName );
@@ -96,6 +96,8 @@ tableExport.addTable(pinDebitSelector, "pin_debit");
 /************************************************ SIG CREDIT ************************************************/
 
 /*********************** SIG CREDIT GROUPED BAR *********************/
+
+
 var sigCreditSelector =  "#sigCreditGrouped";
 //Setup checkboxes
 var sigCreditGroupedIds = ['groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16', 'groupedCbox17', "groupedCbox18"];
@@ -112,114 +114,6 @@ tableExport.addTable(sigCreditSelector, "sig_credit");
 var groupedStackMargin = {top: 40, right: 40, bottom: 40, left: 40};
 var groupedStackWidth =400;
 var groupedStackHeight =150;
+var groupedStackSelector =  "#groupStack";
 
-var groupedStackSelector =  "#groupedStack";
-
-groupStackedExport.setSvgSize(groupedStackSelector, groupedStackWidth, groupedStackHeight);
-
-groupStackedExport.setMargins(groupedStackSelector, groupedStackMargin);
-groupStackedExport.drawSvg(groupedStackSelector);
-
-groupStackedExport.buildData(groupedStackSelector);
-
-//Setup checkboxes
-var groupStackedIds = ['groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
-
-var groupStackedVals = ['pin_debit', 'sig_credit', 'sig_debit' ];
-var groupStackedDefaults = [true, true, true];
-
-var groupStackedCb = groupStackedExport.observerCallbackBuilder(groupedStackSelector);
-groupStackedExport.initObservers(groupedStackSelector, groupStackedIds, groupStackedVals, groupStackedDefaults, groupStackedCb);
- 
-groupStackedExport.createDrawingFunc(groupedStackSelector);
-groupStackedExport.draw(groupedStackSelector);
-
-groupStackedExport.addDropdownListener(groupedStackSelector);
-//draw svg
-//var groupedStackSvg = d3.select("#groupedStack .groupedStack") 
-//  .append("div")
-//  .classed("svg-container", true)
-//  .append("svg")
-//  .attr("class", "svg-content-responsive")
-////  .attr("width", "100vw")
-////  .attr("height", "100vh")
-//  //.attr("preserveAspectRatio", "xMinYMin meet")     
-//  .attr("viewBox", -groupedStackMargin.left + " " + -groupedStackMargin.right + " "+ groupedStackWidth + " " + groupedStackHeight)
-//;
-
-//var groupedStackData = [ {key: "fiName"}, { key: "fiName2"}, { key: "fiName3"}, { key: "fiName4"}, { key: "fiName5"}, { key: "fiName6"}];
-//
-//groupedStackData[0].groups = [{
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.5,
-//  total: 1
-//}];
-//groupedStackData[0].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-//groupedStackData[1].groups = [ {
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.50,
-//  total: 1
-//}]
-//groupedStackData[1].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-//groupedStackData[2].groups = [ {
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.50,
-//  total: 1
-//}]
-//groupedStackData[2].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-//groupedStackData[3].groups = [ {
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.50,
-//  total: 1
-//}]
-//groupedStackData[3].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-//groupedStackData[4].groups = [ {
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.50,
-//  total: 1
-//}]
-//groupedStackData[4].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-//groupedStackData[5].groups = [ {
-//  "sig_debit" : 0.25,
-//  "sig_credit" : 0.25,
-//  "pin_debit" : 0.50,
-//  total: 1
-//}]
-//groupedStackData[5].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-//
-////config chart
-//var testStacks = stacksChart()
-//  .margin( groupedStackMargin)
-//  .width(groupedStackWidth )
-//  .height(groupedStackHeight )
-//;
-//
-////draw chart
-//testStacks(groupedStackSvg, groupedStackData);
-
-//groupedStackFilter(groupedStackData, ["sig_debit", "sig_credit"]);
-//console.log(groupedStackData);
-
-//testStacks(groupedStackSvg, groupedStackData);
-
-/*function groupedStackFilter(data, checked){
-//loop through data array
-for (var i=0; i< data.length; i++){
-//update columns to contain only what was checked
-data[i].groups.columns = data[i].groups.columns.filter( 
-function(d){ 
-if ( checked.indexOf(d) > -1 )
-return d;
-})
-}
-}*/
+groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin);
