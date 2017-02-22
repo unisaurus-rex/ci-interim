@@ -9,7 +9,7 @@ import {InvalidChartError, DuplicateChartError} from 'errorObjects';
 /***** export *****/
 
 export var exportObj = {
-  addGroupedBar, addGroupedBar,
+  addGroupedBar: addGroupedBar,
   addCheckboxes: addCheckboxes,
   getAllCheckboxes: getAllCheckboxes,
   getAllChecked: getAllChecked,

@@ -10,7 +10,7 @@ import {toolTips} from 'tooltips';
 var charts = {};
 
 export var groupedExport = {
-  addGraph: addGraph,
+  addGraph: addGraph
 }
 
 /***** Public Functions *****/
