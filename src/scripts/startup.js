@@ -223,5 +223,3 @@ return d;
 })
 }
 }*/
-
-window.grouped = groupedExport.charts;

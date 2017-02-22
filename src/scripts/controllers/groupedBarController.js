@@ -9,12 +9,8 @@ import {toolTips} from 'tooltips';
 
 var charts = {};
 
-//used to create a global 
-var get = {};
-
 export var groupedExport = {
   addGraph: addGraph,
-  charts: charts
 }
 
 /***** Public Functions *****/
@@ -80,6 +76,7 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
 /***** Private Functions *****/
 
 /**
+ * @private
  * @function addCheckboxListeners
  * @param {String} chartname
  */
@@ -97,7 +94,6 @@ function addCheckboxListeners(chartname) {
     ids.push(d3.select(this).attr('id'));
   });
 
-  // TODO: pull in observerCallbackBuilder
   let observerFunc = addBootstrapCheckboxObservers()
       .elementIds(ids)
       .callback(cb);
@@ -109,6 +105,7 @@ function addCheckboxListeners(chartname) {
 }
 
 /**
+ * @private
  * @function addDropdownListener
  * @param {String} chartname
  */
@@ -154,9 +151,14 @@ function buildContainer(chartname){
  * @returns {Array}
  */
 function buildData(chartname, mccNames) {
-  let data = groupedModel.getData(chartname);
-  let dropdown = groupedModel.getDropdown(chartname);
-  return filterByCheckbox( filterByDropdown(data, dropdown), mccNames);
+  try{
+    let data = groupedModel.getData(chartname);
+    let dropdown = groupedModel.getDropdown(chartname);
+    return filterByCheckbox( filterByDropdown(data, dropdown), mccNames);
+  }
+  catch(e){
+    handleError(e);
+  }
 }
 
 /**
@@ -167,25 +169,30 @@ function buildData(chartname, mccNames) {
 function draw(chartname) {
   if(charts.hasOwnProperty(chartname)) {
     
-    // selector for locating the drawing functions target
-    let chartSelector = `${chartname} svg`;
+    try{
+      // selector for locating the drawing functions target
+      let chartSelector = `${chartname} svg`;
 
-    // determine what mcc values to display data for 
-    let mccNames = groupedModel.getAllChecked(chartname);
-    mccNames.push( "Issuer" );
+      // determine what mcc values to display data for 
+      let mccNames = groupedModel.getAllChecked(chartname);
+      mccNames.push( "Issuer" );
 
-    // use mcc values to filter data for display
-    let data = buildData(chartname, mccNames);
+      // use mcc values to filter data for display
+      let data = buildData(chartname, mccNames);
 
-    // get chart drawing target as d3 selection
-    let loc = d3.select(chartSelector);
+      // get chart drawing target as d3 selection
+      let loc = d3.select(chartSelector);
 
-    // draw chart
-    charts[chartname].drawFunc.column(groupedModel.getDropdown(chartname));
-    charts[chartname].drawFunc(loc, data);
+      // draw chart
+      charts[chartname].drawFunc.column(groupedModel.getDropdown(chartname));
+      charts[chartname].drawFunc(loc, data);
 
-    // add tooltip
-    toolTips();
+      // add tooltip
+      toolTips();
+    }
+    catch(e) {
+      handleError(e);
+    }
   }  
 }
 
@@ -200,32 +207,36 @@ function draw(chartname) {
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
   return function(d) {
+    try {
+      // get dropdown values
+      let current = d3.select(this).attr('data-value');
 
-    // get dropdown values
-    let current = d3.select(this).attr('data-value');
+      let old = groupedModel.getDropdown(chartname);
 
-    let old = groupedModel.getDropdown(chartname);
+      if( current != old) {
+        // set dropdown param
+        groupedModel.setDropdown(chartname, current);
 
-    if( current != old) {
-      // set dropdown param
-      groupedModel.setDropdown(chartname, current);
+        // set dropdownChanged
+        groupedModel.setDropdownChanged(chartname);
 
-      // set dropdownChanged
-      groupedModel.setDropdownChanged(chartname);
-
-      if(groupedModel.getResetCount(chartname) == 0) {
-        // if resetCount is 0, checkbox observers won't trigger a draw
-        draw(chartname);
-      } else {
-        // check all checkboxes and let the observers handle the drawing
-        let selector = `${chartname} .checkboxes label`;
-        d3.selectAll(selector).classed('active', true);
-      }
+        if(groupedModel.getResetCount(chartname) == 0) {
+          // if resetCount is 0, checkbox observers won't trigger a draw
+          draw(chartname);
+        } else {
+          // check all checkboxes and let the observers handle the drawing
+          let selector = `${chartname} .checkboxes label`;
+          d3.selectAll(selector).classed('active', true);
+        }
       
-      //update dropdown text
-      updateDropdownText( chartname, d3.select(this).text());
-      //update Panel Title
-      updatePanelTitle( chartname, d3.select(this).text());
+        //update dropdown text
+        updateDropdownText( chartname, d3.select(this).text());
+        //update Panel Title
+        updatePanelTitle( chartname, d3.select(this).text());
+      }
+    }
+    catch(e) {
+      handleError(e);
     }
   };
 }
@@ -313,33 +324,39 @@ function handleError(err) {
 
 /**
  * Return function to be called when a checkbox input changes
+ * @private
  * @function observerCallbackBuilder
  * @param {String} chartname
  * @return {function} 
  */
 function observerCallbackBuilder(chartname) {
   return function(value) {
-    if(groupedModel.getDropdownChanged(chartname)){
-      // only want to redraw the graph once.  if the dropdown changed
-      // wait until there is only one checkbox left to toggle before drawing 
-      if(groupedModel.getResetCount(chartname) > 1){
-        // count greater than 1, toggle checkbox and do nothing else
-        groupedModel.toggle(chartname, value);
+    try {
+      if(groupedModel.getDropdownChanged(chartname)){
+        // only want to redraw the graph once.  if the dropdown changed
+        // wait until there is only one checkbox left to toggle before drawing 
+        if(groupedModel.getResetCount(chartname) > 1){
+          // count greater than 1, toggle checkbox and do nothing else
+          groupedModel.toggle(chartname, value);
+        } else {
+          // count == 1, time to do work
+          // toggle checkbox
+          groupedModel.toggle(chartname, value);
+
+          // draw
+          draw(chartname);
+
+          // reset the dropdownChanged so drawing isn't messed up later
+          groupedModel.unsetDropdownChanged(chartname);
+        } 
       } else {
-        // count == 1, time to do work
-        // toggle checkbox
+        // dropdown didn't change, toggle and draw
         groupedModel.toggle(chartname, value);
-
-        // draw
         draw(chartname);
-
-        // reset the dropdownChanged so drawing isn't messed up later
-        groupedModel.unsetDropdownChanged(chartname);
-      } 
-    } else {
-      // dropdown didn't change, toggle and draw
-      groupedModel.toggle(chartname, value);
-      draw(chartname);
+      }
+    }
+    catch(e) {
+      handleError(e);
     }
   };
 }
