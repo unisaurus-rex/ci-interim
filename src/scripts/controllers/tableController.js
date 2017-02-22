@@ -186,14 +186,23 @@ function draw(chartname) {
  */
 function dropdownCallbackBuilder(chartname) {
   return function(d) {
-    // get selected dropdown value
-    let val = d3.select(this).attr('data-value');
+    try {
+      // get selected dropdown value
+      let current = d3.select(this).attr('data-value');
+      let old = tableModel.getDropdown(chartname);
 
-    // set dropdown value
-    setDropdown(chartname, val);
+      // only redraw if dropdown value changed
+      if(current != old) { 
+        // set dropdown value
+        setDropdown(chartname, val);
     
-    // draw table
-    draw(chartname);
+        // draw table
+        draw(chartname);
+      }
+    }
+    catch(e) {
+      handleError(e);
+    }
   }
 }
 
