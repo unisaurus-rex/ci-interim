@@ -162,7 +162,7 @@ var groupedStackMargin = {top: 40, right: 40, bottom: 40, left: 40};
 var groupedStackWidth =400;
 var groupedStackHeight =150;
 
-var groupedStackSelector =  "#groupedStack";
+var groupedStackSelector =  "#groupStack";
 var groupStackedIds = ['groupedCbox19', 'groupedCbox20', 'groupedCbox21'];
 groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin, groupStackedIds);
 
