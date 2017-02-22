@@ -10,26 +10,24 @@ import {donutExport} from 'donutController';
 import donutConfig from "donutConfig";
 import stackConfig from "stackConfig";
 import {stackExport} from 'stackedController';
+import {groupStackExport} from 'groupStackController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
-import {stacksChart} from 'groupedStack';
+import {stacksChart} from 'groupStack';
 import {getInsightsData, getFiName} from 'model';
 
-/**************************** Lazy Page Loader ************************************/
-window.d3=d3;
+/***************************** Page Loading ************************************/
 d3.select(".loader").transition().duration(4000)
-.style("opacity", "0").remove();
+  .style("opacity", "0").remove();
 
 //change company name
 function updateCompanyName(getFiName){
-
   var sel = d3.select("#navbar li");
   sel.style("opacity", "0");
 
-  sel._groups[0][0].innerHTML = 
-  "<a>" + getFiName() + " |" + "<strong> 2017 </string> </a>"; 
-  //d3.select("#navbar li")[0][0].textContent
-  sel.transition().duration(1000).style("opacity", "1")
+  let titleHtml = "<a>" + getFiName() + " |" + "<strong> 2017 </strong> </a>"; 
+  sel.html(titleHtml);
+  sel.transition().duration(1000).style("opacity", "1");
 }
 
 updateCompanyName( getFiName );
@@ -40,8 +38,7 @@ toolTips();
 /************************************************ ALL GROUPED BAR CHARTS ************************************************/
 
 //set up SVG and margins
-var groupedWidth = 400;
-var groupedHeight = 150;
+var groupedSvgSize = {width: 400, height: 150};
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
 var classMap =  {"Department Stores": "fill-blue", "Grocery": "fill-red",
@@ -71,114 +68,45 @@ var groupedDefaults = [true, true, true, true, true, true];
 
 /*********************** SIG DEBIT GROUPED BAR *********************/
 var sigDebitSelector =  "#sigDebitGrouped";
-groupedExport.setSvgSize(sigDebitSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(sigDebitSelector, groupedMargin);
-groupedExport.drawSvg(sigDebitSelector);
-
-//Build data
-groupedExport.buildData(sigDebitSelector, "sig_debit");
 
 //Setup checkboxes
 var sigDebitGroupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
 
-var sigDebitGroupedCb = groupedExport.observerCallbackBuilder(sigDebitSelector);
-groupedExport.initObservers(sigDebitSelector, sigDebitGroupedIds, groupedVals, groupedDefaults, sigDebitGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(sigDebitSelector, groupedConfig);
-groupedExport.draw(sigDebitSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(sigDebitSelector);
+groupedExport.addGraph(sigDebitSelector, groupedSvgSize, groupedMargin, "sig_debit", groupedConfig);
 
 /*********************** SIG DEBIT TABLE *********************/
 // add table to page
-tableExport.addTable(sigDebitSelector);
-
-// get data for drawing the table
-tableExport.setData(sigDebitSelector, "sig_debit");
-
-// draw the table
-tableExport.createDrawingFunc(sigDebitSelector);
-tableExport.draw(sigDebitSelector);
-tableExport.addDropdownListener(sigDebitSelector);
+tableExport.addTable(sigDebitSelector, "sig_debit");
 
 
 /************************************************ PIN DEBIT ************************************************/
 
 /*********************** PIN DEBIT GROUPED BAR *********************/
 var pinDebitSelector =  "#pinDebitGrouped";
-groupedExport.setSvgSize(pinDebitSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(pinDebitSelector, groupedMargin);
-groupedExport.drawSvg(pinDebitSelector);
-
-//Build data
-groupedExport.buildData(pinDebitSelector, "pin_debit");
 
 //Setup checkboxes
 var pinDebitGroupedIds = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11', "groupedCbox12"];
 
-var pinDebitGroupedCb = groupedExport.observerCallbackBuilder(pinDebitSelector);
-groupedExport.initObservers(pinDebitSelector, pinDebitGroupedIds, groupedVals, groupedDefaults, pinDebitGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(pinDebitSelector, groupedConfig);
-groupedExport.draw(pinDebitSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(pinDebitSelector);
+groupedExport.addGraph(pinDebitSelector, groupedSvgSize, groupedMargin, "pin_debit", groupedConfig);
 
 /*********************** PIN DEBIT TABLE *********************/
 // add table to page
-tableExport.addTable(pinDebitSelector);
-
-// get data for drawing the table
-tableExport.setData(pinDebitSelector, "pin_debit");
-
-// draw the table
-tableExport.createDrawingFunc(pinDebitSelector);
-tableExport.draw(pinDebitSelector);
-tableExport.addDropdownListener(pinDebitSelector);
-
+tableExport.addTable(pinDebitSelector, "pin_debit");
 
 /************************************************ SIG CREDIT ************************************************/
 
 /*********************** SIG CREDIT GROUPED BAR *********************/
+
+
 var sigCreditSelector =  "#sigCreditGrouped";
-groupedExport.setSvgSize(sigCreditSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(sigCreditSelector, groupedMargin);
-groupedExport.drawSvg(sigCreditSelector);
-
-//Build data
-groupedExport.buildData(sigCreditSelector, "sig_credit");
-
 //Setup checkboxes
 var sigCreditGroupedIds = ['groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16', 'groupedCbox17', "groupedCbox18"];
 
-var sigCreditGroupedCb = groupedExport.observerCallbackBuilder(sigCreditSelector);
-groupedExport.initObservers(sigCreditSelector, sigCreditGroupedIds, groupedVals, groupedDefaults, sigCreditGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(sigCreditSelector, groupedConfig);
-groupedExport.draw(sigCreditSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(sigCreditSelector);
+groupedExport.addGraph(sigCreditSelector, groupedSvgSize, groupedMargin, "sig_credit", groupedConfig);
 
 /*********************** SIG CREDIT TABLE *********************/
 // add table to page
-tableExport.addTable(sigCreditSelector);
-
-// get data for drawing the table
-tableExport.setData(sigCreditSelector, "sig_credit");
-
-// draw the table
-tableExport.createDrawingFunc(sigCreditSelector);
-tableExport.draw(sigCreditSelector);
-tableExport.addDropdownListener(sigCreditSelector);
+tableExport.addTable(sigCreditSelector, "sig_credit");
 
 /************************************************ GROUPED STACK ************************************************/
 
@@ -186,102 +114,6 @@ tableExport.addDropdownListener(sigCreditSelector);
 var groupedStackMargin = {top: 40, right: 40, bottom: 40, left: 40};
 var groupedStackWidth =400;
 var groupedStackHeight =150;
- 
-//draw svg
-var groupedStackSvg = d3.select("#groupedStack .groupedStack") 
-  .append("div")
-  .classed("svg-container", true)
-  .append("svg")
-  .attr("class", "svg-content-responsive")
-//  .attr("width", "100vw")
-//  .attr("height", "100vh")
-  //.attr("preserveAspectRatio", "xMinYMin meet")     
-  .attr("viewBox", -groupedStackMargin.left + " " + -groupedStackMargin.right + " "+ groupedStackWidth + " " + groupedStackHeight)
-;
+var groupedStackSelector =  "#groupStack";
 
-//setup config objects
-var groupedStackClassMapFunction = function (d){
-  return classMap[ d.key ];
-}
-
-var groupedStackClassMap =  {"pin_debit": "fill-blue", "sig_credit": "fill-red",
-"sig_debit": "fill-gray-light", "Fast Food": "fill-orange-yellow",
-"Pharmacies": "fill-teal", "All Others": "fill-gray-dark" };
-
-//create test data
-var groupedStackData = [ {key: "fiName"}, { key: "fiName2"}, { key: "fiName3"}, { key: "fiName4"}, { key: "fiName5"}, { key: "fiName6"}];
-
-groupedStackData[0].groups = [{
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.5,
-  total: 1
-}];
-groupedStackData[0].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-groupedStackData[1].groups = [ {
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.50,
-  total: 1
-}]
-groupedStackData[1].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-groupedStackData[2].groups = [ {
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.50,
-  total: 1
-}]
-groupedStackData[2].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-groupedStackData[3].groups = [ {
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.50,
-  total: 1
-}]
-groupedStackData[3].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-groupedStackData[4].groups = [ {
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.50,
-  total: 1
-}]
-groupedStackData[4].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-groupedStackData[5].groups = [ {
-  "sig_debit" : 0.25,
-  "sig_credit" : 0.25,
-  "pin_debit" : 0.50,
-  total: 1
-}]
-groupedStackData[5].groups.columns = [ "sig_debit", "sig_credit", "pin_debit"]
-
-//config chart
-var testStacks = stacksChart()
-  .margin( groupedStackMargin)
-  .width(groupedStackWidth )
-  .height(groupedStackHeight )
-;
-
-//draw chart
-testStacks(groupedStackSvg, groupedStackData);
-
-//groupedStackFilter(groupedStackData, ["sig_debit", "sig_credit"]);
-//console.log(groupedStackData);
-
-//testStacks(groupedStackSvg, groupedStackData);
-
-function groupedStackFilter(data, checked){
-  //loop through data array
-  for (var i=0; i< data.length; i++){
-    //update columns to contain only what was checked
-    data[i].groups.columns = data[i].groups.columns.filter( 
-      function(d){ 
-        if ( checked.indexOf(d) > -1 )
-          return d;
-      })
-  }
-}
+groupStackExport.addGroupStack(groupedStackSelector, groupedStackWidth, groupedStackHeight, groupedStackMargin);

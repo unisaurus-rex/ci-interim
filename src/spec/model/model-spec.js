@@ -12,13 +12,13 @@ describe("filtering data", function() {
     var keys = Object.keys(result);
 
     it("result is object with five keys, one per fi", function() {
-      expect(keys.length).toBe(5);
+      expect(keys.length).toBe(6);
     });
     
   });
 
   describe("filters by transaction type and fi", function() {
-    var result = getInsightsData("sig_debit", "All Issuers");
+    var result = getInsightsData("sig_debit", "Issuer 1");
 
     it("result is array", function() {
       expect(Array.isArray(result)).toBe(true);

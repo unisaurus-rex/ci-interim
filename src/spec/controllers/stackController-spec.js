@@ -1,6 +1,6 @@
 import {getSegmentData} from 'stackedController';
 
-describe("The stacked contoller should", function() {
+xdescribe("The stacked contoller should", function() {
 
 
   describe("return spend data", function() {
@@ -32,7 +32,7 @@ describe("The stacked contoller should", function() {
     });
 
     it("that is an array contaiing an object", function() {
-       var test = function (){ return typeof data[0] === "object" }
+      var test = function (){ return typeof data[0] === "object" }
     });
 
     it("with an object containing the correct properties", function(){

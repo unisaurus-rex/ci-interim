@@ -31,6 +31,27 @@ export default function tableChart() {
       .delay(1500)
       .style("opacity", 1);
 
+
+    //set precision of floats and add commas
+    var formatFloat = d3.format(',.3f');
+    //add commas to ints
+    var formatInt = d3.format(',')
+    //return true if type of int
+    function isInt(n){
+      return Number(n) === n && n % 1 === 0;
+    }
+    //format table values
+    function format(x){
+      if (typeof x != "string"){
+        if (isInt (x)){
+          var formattedValue = formatInt(x);            
+        }else{
+          var formattedValue = formatFloat ( x);
+        } 
+      }else { var formattedValue =x}
+      return formattedValue;
+    }
+
     /***** create a row for each object in the data *****/
     // mapping function from data ro td based on columns
     // row is an object with keys = data.columns
@@ -54,7 +75,7 @@ export default function tableChart() {
     bodyCells.enter()
       .append("td")
       .merge(bodyCells)
-      .text( (d) => {return d.value;} )
+      .text( (d) => {  return format(d.value) ;} )
       .style("opacity", 0)
       .transition()
       .delay(1500)
