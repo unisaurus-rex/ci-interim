@@ -18,13 +18,13 @@ System.config({
   },
 
   map: {
-    "ctrlState": "utils/ctrlState.js",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "bootstrap-sass": "github:twbs/bootstrap-sass@3.3.7",
     "checkboxObserver": "scripts/util/checkboxObserver.js",
     "checkboxes": "scripts/utils/checkboxes.js",
     "core-js": "npm:core-js@1.2.7",
+    "ctrlState": "utils/ctrlState.js",
     "d3": "npm:d3@4.4.0",
     "data": "scripts/data.js",
     "donut": "scripts/charts/donut/donut.js",

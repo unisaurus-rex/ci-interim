@@ -38,8 +38,7 @@ toolTips();
 /************************************************ ALL GROUPED BAR CHARTS ************************************************/
 
 //set up SVG and margins
-var groupedWidth = 400;
-var groupedHeight = 150;
+var groupedSvgSize = {width: 400, height: 150};
 var groupedMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
 var classMap =  {"Department Stores": "fill-blue", "Grocery": "fill-red",
@@ -69,26 +68,11 @@ var groupedDefaults = [true, true, true, true, true, true];
 
 /*********************** SIG DEBIT GROUPED BAR *********************/
 var sigDebitSelector =  "#sigDebitGrouped";
-groupedExport.setSvgSize(sigDebitSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(sigDebitSelector, groupedMargin);
-groupedExport.drawSvg(sigDebitSelector);
-
-//Build data
-groupedExport.buildData(sigDebitSelector, "sig_debit");
 
 //Setup checkboxes
 var sigDebitGroupedIds = ['groupedCbox1', 'groupedCbox2', 'groupedCbox3', 'groupedCbox4', 'groupedCbox5', "groupedCbox6"];
 
-var sigDebitGroupedCb = groupedExport.observerCallbackBuilder(sigDebitSelector);
-groupedExport.initObservers(sigDebitSelector, sigDebitGroupedIds, groupedVals, groupedDefaults, sigDebitGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(sigDebitSelector, groupedConfig);
-groupedExport.draw(sigDebitSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(sigDebitSelector);
+groupedExport.addGraph(sigDebitSelector, groupedSvgSize, groupedMargin, "sig_debit", groupedConfig);
 
 /*********************** SIG DEBIT TABLE *********************/
 // add table to page
@@ -99,26 +83,11 @@ tableExport.addTable(sigDebitSelector, "sig_debit");
 
 /*********************** PIN DEBIT GROUPED BAR *********************/
 var pinDebitSelector =  "#pinDebitGrouped";
-groupedExport.setSvgSize(pinDebitSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(pinDebitSelector, groupedMargin);
-groupedExport.drawSvg(pinDebitSelector);
-
-//Build data
-groupedExport.buildData(pinDebitSelector, "pin_debit");
 
 //Setup checkboxes
 var pinDebitGroupedIds = ['groupedCbox7', 'groupedCbox8', 'groupedCbox9', 'groupedCbox10', 'groupedCbox11', "groupedCbox12"];
 
-var pinDebitGroupedCb = groupedExport.observerCallbackBuilder(pinDebitSelector);
-groupedExport.initObservers(pinDebitSelector, pinDebitGroupedIds, groupedVals, groupedDefaults, pinDebitGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(pinDebitSelector, groupedConfig);
-groupedExport.draw(pinDebitSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(pinDebitSelector);
+groupedExport.addGraph(pinDebitSelector, groupedSvgSize, groupedMargin, "pin_debit", groupedConfig);
 
 /*********************** PIN DEBIT TABLE *********************/
 // add table to page
@@ -128,26 +97,10 @@ tableExport.addTable(pinDebitSelector, "pin_debit");
 
 /*********************** SIG CREDIT GROUPED BAR *********************/
 var sigCreditSelector =  "#sigCreditGrouped";
-groupedExport.setSvgSize(sigCreditSelector, groupedWidth, groupedHeight);
-
-groupedExport.setMargins(sigCreditSelector, groupedMargin);
-groupedExport.drawSvg(sigCreditSelector);
-
-//Build data
-groupedExport.buildData(sigCreditSelector, "sig_credit");
-
 //Setup checkboxes
 var sigCreditGroupedIds = ['groupedCbox13', 'groupedCbox14', 'groupedCbox15', 'groupedCbox16', 'groupedCbox17', "groupedCbox18"];
 
-var sigCreditGroupedCb = groupedExport.observerCallbackBuilder(sigCreditSelector);
-groupedExport.initObservers(sigCreditSelector, sigCreditGroupedIds, groupedVals, groupedDefaults, sigCreditGroupedCb);
-
-//Draw chart
-groupedExport.createDrawingFunc(sigCreditSelector, groupedConfig);
-groupedExport.draw(sigCreditSelector);
-
-//Add dropdown event listeners
-groupedExport.addDropdownListener(sigCreditSelector);
+groupedExport.addGraph(sigCreditSelector, groupedSvgSize, groupedMargin, "sig_credit", groupedConfig);
 
 /*********************** SIG CREDIT TABLE *********************/
 // add table to page
@@ -270,5 +223,3 @@ return d;
 })
 }
 }*/
-
-window.tables = tableExport.tables;

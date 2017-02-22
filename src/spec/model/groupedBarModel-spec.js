@@ -246,6 +246,54 @@ describe('Grouped Bar Model', function() {
 
     });
 
+    describe('getDropdownChanged', function() {
+      
+      let f = function() {
+        groupedModel.getDropdownChanged(invalidName);
+      };
+      
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
+      });
+
+      it('the error message contains the chartname', function() {
+        expect(f).toThrowError(re);
+      });
+
+    });
+
+    describe('setDropdownChanged', function() {
+      
+      let f = function() {
+        groupedModel.setDropdownChanged(invalidName);
+      };
+      
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
+      });
+
+      it('the error message contains the chartname', function() {
+        expect(f).toThrowError(re);
+      });
+
+    });
+
+    describe('unsetDropdownChanged', function() {
+      
+      let f = function() {
+        groupedModel.unsetDropdownChanged(invalidName);
+      };
+      
+      it('throws InvalidChartError', function() {
+        expect(f).toThrowError(InvalidChartError);
+      });
+
+      it('the error message contains the chartname', function() {
+        expect(f).toThrowError(re);
+      });
+
+    });
+
   });
 
   describe('addGroupedBar', function() {

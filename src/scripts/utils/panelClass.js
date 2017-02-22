@@ -14,6 +14,7 @@ export class Panel {
     this._cboxes = null;
     this._data = null;
     this._dropdown = null;
+    this._dropdownChanged = false;
     this._resetCount = 0;
     this._svgSize = {
       width: 0,
@@ -116,6 +117,21 @@ export class Panel {
     return this;
   }
 
+  /**
+   * @return {Boolean} current value of dropdownChanged
+   */
+  get dropdownChanged() {
+    return this._dropdownChanged;
+  }
+
+  /**
+   * Set dropdownChanged to val
+   * @param {Boolean} val
+   */
+  set dropdownChanged(val) {
+    this._dropdownChanged = val;
+  }
+  
   /**
    * @return {Object} contains width and height properties
    */
