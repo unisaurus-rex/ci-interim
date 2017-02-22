@@ -65,6 +65,10 @@ function addGraph(chartname, svgSize, svgMargins, txnType, config) {
     // add dropdown listener
     addDropdownListener(chartname);
 
+    // initialize panel title and dropdown title
+    updateDropdownText(chartname);
+    updatePanelTitle(chartname);
+
     // draw the chart
     draw(chartname);
   }
@@ -465,12 +469,19 @@ function setDropdown(chartname, val) {
 }
 
 /**
- * Change the dropdown button text for a chart
+ * Change the dropdown button text for a chart. If no text provided,
+ * uses the text from the first dropdown option
+ * @private
  * @function updateDropdownText
  * @param {String} chartname
- * @param {String} text - text of selected button from dropdown
+ * @param {String} [text] - text of selected button from dropdown
  */
 function updateDropdownText( chartname, text ){
+  // check if text was specified, if not, get default value
+  if(text === undefined) {
+    text = getDropdownDefaultName(chartname);
+  }
+
   let selection = `${chartname} button`;
   let button = d3.select( selection );
   let buttonText = `${text} <span class='caret'> </span>`;
@@ -478,14 +489,34 @@ function updateDropdownText( chartname, text ){
 }
 
 /**
+ * @private
  * @function updatePanelTitle
  * @param {String} chartname
- * @param {String} text - 
+ * @param {String} text - text of selected button from dropdown
  */
 function updatePanelTitle( chartname, text){
+  // check if text was specified, if not, get default value
+  if(text === undefined) {
+    text = getDropdownDefaultName(chartname);
+  }
+
   let selection = `${chartname} h2`;
   let title = d3.select(selection);
   let titleText = `${title.attr("data-value")}: ${text}`; 
 
   title.html(titleText);
+}
+
+/**
+ * Get the text of the first dropdown option for a chart
+ * @private
+ * @function getDropdownDefaultName
+ * @param {String} chartname
+ * @return {String} 
+ */
+function getDropdownDefaultName(chartname){
+  //return first dropdown option 
+  let selector = chartname + ' .dropdown-menu li a';
+  let val = d3.select(selector);
+  return val.text();;
 }
