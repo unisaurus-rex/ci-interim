@@ -1,12 +1,8 @@
 import {getInsightsData} from 'model';
 import {exportObj as groupStackModel} from 'groupStackModel';
 import CtrlState from  'ctrlState';
-import {InvalidTableError} from 'errorObjects';
 import * as d3 from "d3";
 import {stacksChart} from 'groupStack';
-
-import Panel from "panel";
-import Checkboxes from 'checkboxes';
 import addBootstrapCheckboxObservers from 'newCheckboxObserver';
 import {toolTips} from 'tooltips';
 
@@ -14,63 +10,82 @@ var groupStacks = {};
 
 export var groupStackExport = {
   addGroupStack: addGroupStack
-
 }
 
-function addGroupStack(chartname, width, height, margins, elementIds ) {
+/***** Public Functions *****/
+
+/**
+ * @function addGroupStack
+ * @param {String} chartname
+ * @param {Int} width - Size of svg container. Object with width and height properties
+ * @param {Int} height - Margin widths of svg container. Object with top, left, bottom and right properties
+ * @param {Object} margins - Margin containing values for top, left, right, and bottom 
+ */
+function addGroupStack(chartname, width, height, margins) {
 
   if (!groupStacks.hasOwnProperty(chartname)) {
 
-    //create object to store controller state
-    let c = new CtrlState();
-    groupStacks[chartname] = c;
+    try{
+      //create object to store controller state
+      let c = new CtrlState();
+      groupStacks[chartname] = c;
 
-    //Add chart to model
-    groupStackModel.addGroupStack(chartname);
 
-    //Set size, draw svg
-    groupStackModel.setSvgSize(chartname, {width: width, height: height})
-    groupStackModel.setMargins(chartname, margins)
-    buildContainer(chartname);
+      //Add chart to model
+      groupStackModel.addGroupStack(chartname);
 
-    //Initialize dropdown in model
-    setDropdown(chartname);
+      //Set size, draw svg
+      groupStackModel.setSvgSize(chartname, {width: width, height: height})
+      groupStackModel.setMargins(chartname, margins)
+      buildContainer(chartname);
 
-    //Update the panel title and text
-    initDropdownText(chartname);
-    initPanelTitle(chartname);
-    
-    //init dropdownChanged in model
-    groupStackModel.setDropdownChanged(chartname, false);
-    
-    //set data in model
-    setData(chartname);
+      //Initialize dropdown in model
+      setDropdown(chartname);
 
-    //set checkboxes in model
-    setCheckboxes(chartname);
-    //set observers in ctrlState
-    setObservers(chartname, elementIds);
+      //Update the panel title and text
+      initDropdownText(chartname);
+      initPanelTitle(chartname);
+      
+      //init dropdownChanged in model
+      groupStackModel.setDropdownChanged(chartname, false);
+      
+      //set data in model
+      setData(chartname);
 
-    //set dropdown event listener
-    addDropdownListener(chartname);
+      //set checkboxes in model
+      setCheckboxes(chartname);
+      //set observers in ctrlState
+      setObservers(chartname);
 
-    //init drawFunc
-    setDrawFunc(chartname);
-    
-    //draw chart
-    draw(chartname);
+      //set dropdown event listener
+      addDropdownListener(chartname);
+
+      //init drawFunc
+      setDrawFunc(chartname);
+      
+      //draw chart
+      draw(chartname);
+    }
+    catch(e){
+      handleError(e.message);
+    }
   }
 
   return;
 };
 
+/***** Private Functions *****/
 
-
+/**
+* Set the data needed for the chart 
+* @function setData
+* @private
+* @param {String} chartname - css selector for chart
+*/
 function setData(chartname){
-  //set data in model
-  let data = getData(chartname, groupStackModel.getDropdown(chartname));
-
   try{
+    //set data in model
+    let data = getData(chartname, groupStackModel.getDropdown(chartname));
     groupStackModel.setData(chartname, data);
   }
   catch(e){
@@ -78,15 +93,34 @@ function setData(chartname){
   }
 }
 
+/**
+* Return the filtered data based on checkmarks
+* @function buildData
+* @private
+* @param {String} chartname - css selector for chart
+*/
 function buildData(chartname){
-  //get and filter data
-  let data = groupStackModel.getData(chartname, groupStackModel.getDropdown(chartname));
-  let arr = groupStackModel.getAllChecked(chartname);
-  groupedStackFilter(data, arr);
+  try{  
+    let dropdown = groupStackModel.getDropdown(chartname);
+    //get and filter data
+    let data = groupStackModel.getData(chartname, dropdown);
+    let arr = groupStackModel.getAllChecked(chartname);
+    groupedStackFilter(data, arr);
 
-  return data;
+    return data;
+  }
+  catch(e){
+    handleError(e.message);
+  }
 }
 
+/**
+* Return the filtered data based on checkmarks
+* @function groupedStackFilter
+* @private
+* @param {String} chartname - css selector for chart
+* @returns {Object []}
+*/
 function groupedStackFilter(data, checked){
   //update groups.columns on every array element
   for (var i=0; i< data.length; i++){
@@ -94,10 +128,13 @@ function groupedStackFilter(data, checked){
     }
 }
 
+/**
+ * Draw the chart associated with chartname
+ * @function draw
+ * @param {String} chartname
+ */
 function draw(chartname) {
   if(groupStacks.hasOwnProperty(chartname)) {
-
-    console.log("draw called");
     //update data    
     let d = buildData( chartname )
     //get selection string
@@ -109,19 +146,37 @@ function draw(chartname) {
   }  
 }
 
-function setObservers(chartname, elementIds){
+/**
+ * Set the observers and observersFunc
+ * @function setObservers
+ * @param {String} chartname
+ */
+function setObservers(chartname){
+  let ids = []; // holds id of each element that needs an observer
+  let selector = `${chartname} .checkboxes label`; 
+  let labels = d3.selectAll(selector);
+
+  // use labels selection to get id of each label element
+  labels.each( function(d) {
+    ids.push(d3.select(this).attr('id'));
+  });
+
   //set observersfunc and observers
   let cb=  observerCallbackBuilder (chartname);
   let observerFunc = addBootstrapCheckboxObservers()
-    .elementIds(elementIds)
+    .elementIds(ids)
     .callback(cb);
 
   let observers = observerFunc();
   groupStacks[chartname].observers = observers;
   groupStacks[chartname].observerFunc = observerFunc;
-  
 }
 
+/**
+ * Set the checkboxes in the model
+ * @function setCheckboxes
+ * @param {String} chartname
+ */
 function setCheckboxes(chartname) {
   // select all chart checkboxes
   let vals = [];
@@ -148,6 +203,11 @@ function setCheckboxes(chartname) {
   }
 }
 
+/**
+ * Get the current dropdown name
+ * @function getDropdownDefaultName
+ * @param {String} chartname
+ */
 function getDropdownDefaultName(chartname){
   //return current dropdown selection
   let selector = chartname + ' .dropdown-menu li a';
@@ -155,18 +215,35 @@ function getDropdownDefaultName(chartname){
   return val._groups[0][0].outerText;
 }
 
+/**
+ * Initialize panel title
+ * @function initPanelTitle
+ * @param {String} chartname
+ */
 function initPanelTitle(chartname){
   //update panel title
   let val = getDropdownDefaultName(chartname);
   updatePanelTitle(chartname, val);
 }
 
+/**
+ * Initialize dropdown text
+ * @function initDropdownText
+ * @param {String} chartname
+ */
 function initDropdownText(chartname){
   //update dropdown text
   let val = getDropdownDefaultName(chartname);
   updateDropdownText(chartname, val);
 }
 
+/**
+* Set the dropdown param of the associated chart
+* @function setDropdown
+* @private
+* @param {String} chartname - css selector for chart
+* @param {String} [val] - optional dropdown value
+*/
 function setDropdown(chartname, val) {
   // if user did not pass in val, default to first dropdown list element
   if(val === undefined) {
@@ -181,6 +258,13 @@ function setDropdown(chartname, val) {
   }
 }
 
+/**
+* Get the first item in chartname's dropdown list
+* @private
+* @function getDropdownDefaultValue
+* @param {String} chartname
+* @return {String} value of the first dropdown item
+*/
 function getDropdownDefaultValue(chartname) {
   //return column name
   let selector = chartname + ' .dropdown-menu li a';
@@ -188,28 +272,50 @@ function getDropdownDefaultValue(chartname) {
   return val;
 } 
 
+/**
+* @function handleError
+* @private
+* @param {Object} err - Error object with message property
+*/
 function handleError(err) {
   console.log(err.message);
 }
 
+/**
+ * add the svg container for the chart to dom
+ * @private
+ * @function buildContainer
+ * @param {String} chartname - css selector for chart
+ */
 function buildContainer(chartname) {
-  //get svg attributes from model
-  let size = groupStackModel.getSvgSize(chartname);
-  let margins = groupStackModel.getMargins(chartname);
-
-  //get selection string
-  let svgSelect = chartname + " .groupStack";
-  
-  //draw svg
-  let groupedStackSvg = d3.select(svgSelect) 
-    .append("div")
-    .classed("svg-container", true)
-    .append("svg")
-    .attr("class", "svg-content-responsive")
-    .attr("viewBox", -margins.left + " " + -margins.right + " "+ size.width + " " + size.height)
-  ;
+  try {
+    //get svg attributes from model
+    let size = groupStackModel.getSvgSize(chartname);
+    let margins = groupStackModel.getMargins(chartname);
+    //get selection string
+    let svgSelect = chartname + " .groupStack";
+    
+    //draw svg
+    let groupedStackSvg = d3.select(svgSelect) 
+      .append("div")
+      .classed("svg-container", true)
+      .append("svg")
+      .attr("class", "svg-content-responsive")
+      .attr("viewBox", -margins.left + " " + -margins.right + " "+ size.width + " " + size.height)
+    ;
+  }
+  catch (e) {
+    handleError(e);
+  }
 }
 
+/**
+* Create a drawing function and store it in the charts
+* @private
+* @function setDrawFunc
+* @param {String} chartname - css selector for chart
+* @param {Object} config - groupedBarConfig object
+*/
 function setDrawFunc(chartname) {
   //init draw function
   if(groupStacks.hasOwnProperty(chartname)) {
@@ -219,93 +325,133 @@ function setDrawFunc(chartname) {
   }
 }
 
+/**
+* Return function to be called when a checkbox input changes
+* @function observerCallbackBuilder
+* @param {String} chartname
+* @return {function} 
+*/
 function observerCallbackBuilder(chartname) {
   return function(value) {
+    try {
+      if(groupStacks.hasOwnProperty(chartname)){
+        let resetCount =  groupStackModel.getResetCount(chartname);
+        let dropdownChanged = groupStackModel.getDropdownChanged(chartname); 
 
-
-    if(groupStacks.hasOwnProperty(chartname)){
-      let resetCount =  groupStackModel.getResetCount(chartname);
-      let dropdownChanged = groupStackModel.getDropdownChanged(chartname); 
-
-      if (dropdownChanged === true){
-        if(resetCount == 1){
+        if (dropdownChanged === true){
+          if(resetCount == 1){
+            groupStackModel.toggle(chartname, value);
+            groupStackModel.setDropdownChanged(chartname, false);
+            draw(chartname);  
+          }
+          else{
+            groupStackModel.toggle(chartname, value);  
+          }
+        } else{
           groupStackModel.toggle(chartname, value);
-          groupStackModel.setDropdownChanged(chartname, false);
-          draw(chartname);  
+          draw(chartname);
         }
-        else{
-          groupStackModel.toggle(chartname, value);  
-        }
-      } else{
-        groupStackModel.toggle(chartname, value);
-        draw(chartname);
+      } else {
+        throw new Error("Attempt to reference non-existent panel object");
       }
-    } else {
-      throw new Error("Attempt to reference non-existent panel object");
+    }
+    catch (e) {
+      handleError(e);
     }
   };
 }
 
+/**
+ * Return a function to call after the the dropdown is selected
+ * Returned function will update the dropdown selection and trigger the
+ * redraw process
+ * @function dropdownCallbackBuilder
+ * @param {String} chartname
+ * @returns {Function} 
+ */
 function dropdownCallbackBuilder(chartname) {
   // return d3 event callback
   return function(d) {
+    try {
+      // get dropdown values
+      let current = d3.select(this).attr('data-value');
 
-    // get dropdown values
-    let current = d3.select(this).attr('data-value');
+      //if dropdown has changed
+      if ( current != groupStackModel.getDropdown(chartname)){
+        setDropdown(chartname, current);
 
-    //if dropdown has changed
-    if ( current != groupStackModel.getDropdown(chartname)){
-      setDropdown(chartname, current);
+        groupStackModel.setDropdownChanged(chartname, true);
+      
+        // check all checkboxes
+        let selector = chartname + " .checkboxes label";
+        d3.selectAll(selector).classed('active', true);
 
-      groupStackModel.setDropdownChanged(chartname, true);
-    
-      // check all checkboxes
-      let selector = chartname + " .checkboxes label";
-      d3.selectAll(selector).classed('active', true);
+        //update dropdown text
+        updateDropdownText( chartname, d3.select(this).html());
+        //update Panel Title
+        updatePanelTitle( chartname, d3.select(this).html());
 
-      //update dropdown text
-      updateDropdownText( chartname, d3.select(this).html());
-      //update Panel Title
-      updatePanelTitle( chartname, d3.select(this).html());
+        setData(chartname); 
 
-      setData(chartname); 
-
-      if( groupStackModel.getResetCount(chartname) ==0 ){
-        draw(chartname);
-        groupStackModel.setDropdownChanged(chartname, false);
-      }      
+        if( groupStackModel.getResetCount(chartname) ==0 ){
+          draw(chartname);
+          groupStackModel.setDropdownChanged(chartname, false);
+        }      
+      }
+    }
+    catch (e) {
+      handleError(e);
     }
   };
 }
 
+/**
+ * Update dropdown text
+ * @function updateDropdownText
+ * @param {String} chartname
+ * @param {String} text
+ */
 function updateDropdownText( chartname, text ){
   let selection = chartname + " button";
   let button = d3.select( selection );
   button._groups[0][0].innerHTML = text +  "<span class='caret'> </span>";
 }
 
+/**
+ * Update panel title
+ * @function updatePanelTitle
+ * @param {String} chartname
+ * @param {String} text
+ */
 function updatePanelTitle( chartname, text){
   let selection = chartname + " h2";
   let title = d3.select(selection);
 
   title._groups[0][0].innerText = d3.select (title._groups[0][0]).attr("data-value") + ": "+ text;
-
 }
 
-
+/**
+ * @function addDropdownListener
+ * @param {String} chartname
+ */
 function addDropdownListener(chartname) {
   let selector = chartname + " .dropdown-menu li a";
   let cb = dropdownCallbackBuilder(chartname);
   d3.selectAll(selector).on('click', cb);
 }
 
+
+/**
+ * Return data given a column name
+ * @function getData
+ * @param {String} chartname
+ * @param {String} col
+ */
 export function getData( chartname, col ){
   function add(a, b) {
     return a + b;
   }
-  //let data = groupStackModel.getData(chartname);
-
-  let data = {};
+  
   //get data for all txn types
   let pinDebitInsightsData = getInsightsData("pin_debit");
   let sigDebitInsightsData = getInsightsData("sig_debit");

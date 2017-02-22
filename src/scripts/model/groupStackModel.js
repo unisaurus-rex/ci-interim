@@ -250,7 +250,9 @@ function toggle(chartname, name) {
     throw new InvalidChartError(chartname); 
   }
 }
-
+/**
+ * @return {Boolean} current value of dropdownChanged
+ */
 function setDropdownChanged(chartname, val){
   if(charts.hasOwnProperty(chartname)) {
     charts[chartname].dropdownChanged = val;
@@ -258,7 +260,10 @@ function setDropdownChanged(chartname, val){
     throw new InvalidChartError(chartname); 
   }
 }
-
+ /**
+   * Set dropdownChanged to val
+   * @param {Boolean} val
+   */
 function getDropdownChanged(chartname){
   if(charts.hasOwnProperty(chartname)) {
     return charts[chartname].dropdownChanged;
