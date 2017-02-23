@@ -382,21 +382,26 @@ function dropdownCallbackBuilder(chartname) {
         setDropdown(chartname, current);
 
         groupStackModel.setDropdownChanged(chartname, true);
-      
-        // check all checkboxes
-        let selector = chartname + " .checkboxes label";
-        d3.selectAll(selector).classed('active', true);
+        setData(chartname);
 
+        if(groupStackModel.getResetCount(chartname) == 0) {
+          // if resetCount is 0, checkbox observers won't trigger a draw
+          draw(chartname);
+          groupStackModel.setDropdownChanged(chartname, false);
+        } else {
+          // check all checkboxes and let the observers handle the drawing
+          let selector = `${chartname} .checkboxes label`;
+          d3.selectAll(selector).classed('active', true);
+        }
+      
         //update dropdown text
         updateDropdownText( chartname, d3.select(this).html());
         //update Panel Title
         updatePanelTitle( chartname, d3.select(this).html());
 
-        setData(chartname); 
-
         if( groupStackModel.getResetCount(chartname) ==0 ){
           draw(chartname);
-          groupStackModel.setDropdownChanged(chartname, false);
+
         }      
       }
     }
