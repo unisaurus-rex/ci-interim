@@ -12,7 +12,7 @@ describe("filtering data", function() {
     var keys = Object.keys(result);
 
     it("result is object with five keys, one per fi", function() {
-      expect(keys.length).toBe(6);
+      expect(keys.length).toBe(5);
     });
     
   });

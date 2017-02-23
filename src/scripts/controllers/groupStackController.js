@@ -3,7 +3,7 @@ import {exportObj as groupStackModel} from 'groupStackModel';
 import CtrlState from  'ctrlState';
 import * as d3 from "d3";
 import {stacksChart} from 'groupStack';
-import addBootstrapCheckboxObservers from 'newCheckboxObserver';
+import addBootstrapCheckboxObservers from 'checkboxObserver';
 import {toolTips} from 'tooltips';
 
 var groupStacks = {};

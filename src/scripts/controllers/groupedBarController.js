@@ -2,7 +2,7 @@ import {getInsightsData} from 'model';
 import {exportObj as groupedModel} from 'groupedBarModel' ;
 import CtrlState from 'ctrlState';
 import * as d3 from "d3";
-import addBootstrapCheckboxObservers from 'newCheckboxObserver';
+import addBootstrapCheckboxObservers from "checkboxObserver";
 import groupedBarChart from 'groupedBar';
 import {toolTips} from 'tooltips';
 

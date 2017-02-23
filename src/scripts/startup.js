@@ -6,10 +6,6 @@ import * as d3 from "d3";
 /***** local packages *****/
 import {groupedExport} from 'groupedBarController';
 import groupedBarConfig from "groupedBarConfig";
-import {donutExport} from 'donutController';
-import donutConfig from "donutConfig";
-import stackConfig from "stackConfig";
-import {stackExport} from 'stackedController';
 import {groupStackExport} from 'groupStackController';
 import {tableExport, testing} from 'tableController';
 import {toolTips} from 'tooltips';
