@@ -33,7 +33,7 @@ export default function tableChart() {
 
 
     //set precision of floats and add commas
-    var formatFloat = d3.format(',.3f');
+    var formatFloat = d3.format(',');
     //add commas to ints
     var formatInt = d3.format(',')
     //return true if type of int
